@@ -6,6 +6,10 @@ t.innerHTML="<script id=\"mz-debug\">(function(){window.__mzErr=[];window.addEve
   for(var i=0;i<n.attributes.length;i++){s.setAttribute(n.attributes[i].name,n.attributes[i].value);}
   s.text=n.textContent;p.insertBefore(s,cs);}
  else{p.insertBefore(n,cs);}});
+/* Live voor iedereen: menubalk onderin op telefoon en tablet (vaste versie) */
+try{(function(){var B='https://cdn.jsdelivr.net/gh/kajasariwating/moza-site@63767c7a1d7953f1d1da80201243be42e1e73b86/nieuw/';
+ var l=document.createElement('link');l.rel='stylesheet';l.href=B+'balk.css';document.head.appendChild(l);
+ var j=document.createElement('script');j.src=B+'balk.js';j.async=true;document.head.appendChild(j);})()}catch(e){}
 try{var q=location.search,ls=window.localStorage;
  if(/[?&]nieuw=1(&|$)/.test(q))ls.setItem('mzNieuw','1');
  if(/[?&]nieuw=0(&|$)/.test(q))ls.removeItem('mzNieuw');
