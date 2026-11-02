@@ -13,15 +13,15 @@ t.innerHTML=%(html)s;
  else{p.insertBefore(n,cs);}});%(extra)s})();
 """
 
-# Testschakelaar: ?nieuw=1 zet de nieuwe vormgeving aan (onthouden in deze browser), ?nieuw=0 zet hem uit.
-SCHAKELAAR = """
+# Testschakelaar (haalt altijd de nieuwste testversie van main, max. 5 minuten oud in de browser): ?nieuw=1 zet de nieuwe vormgeving aan (onthouden in deze browser), ?nieuw=0 zet hem uit.
+SCHAKELAAR = r"""
 try{var q=location.search,ls=window.localStorage;
  if(/[?&]nieuw=1(&|$)/.test(q))ls.setItem('mzNieuw','1');
  if(/[?&]nieuw=0(&|$)/.test(q))ls.removeItem('mzNieuw');
- if(ls.getItem('mzNieuw')==='1'){var B=(cs.src||'').replace(/dist\/header\.js.*$/,'nieuw/');
+ if(ls.getItem('mzNieuw')==='1'){var B='https://cdn.jsdelivr.net/gh/kajasariwating/moza-site@main/nieuw/',V='?v='+Math.floor(Date.now()/300000);
   document.documentElement.classList.add('mz-nieuw');
-  var l=document.createElement('link');l.rel='stylesheet';l.href=B+'nieuw.css';document.head.appendChild(l);
-  var j=document.createElement('script');j.src=B+'nieuw.js';j.async=true;document.head.appendChild(j);}}catch(e){}
+  var l=document.createElement('link');l.rel='stylesheet';l.href=B+'nieuw.css'+V;document.head.appendChild(l);
+  var j=document.createElement('script');j.src=B+'nieuw.js'+V;j.async=true;document.head.appendChild(j);}}catch(e){}
 """
 
 # Deze stukken blijven als echte HTML in de injectie staan (zoekmachines en lettertypes).
