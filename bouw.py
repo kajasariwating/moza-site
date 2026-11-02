@@ -10,7 +10,18 @@ t.innerHTML=%(html)s;
  if(n.nodeName==='SCRIPT'){var s=document.createElement('script');
   for(var i=0;i<n.attributes.length;i++){s.setAttribute(n.attributes[i].name,n.attributes[i].value);}
   s.text=n.textContent;p.insertBefore(s,cs);}
- else{p.insertBefore(n,cs);}});})();
+ else{p.insertBefore(n,cs);}});%(extra)s})();
+"""
+
+# Testschakelaar: ?nieuw=1 zet de nieuwe vormgeving aan (onthouden in deze browser), ?nieuw=0 zet hem uit.
+SCHAKELAAR = """
+try{var q=location.search,ls=window.localStorage;
+ if(/[?&]nieuw=1(&|$)/.test(q))ls.setItem('mzNieuw','1');
+ if(/[?&]nieuw=0(&|$)/.test(q))ls.removeItem('mzNieuw');
+ if(ls.getItem('mzNieuw')==='1'){var B=(cs.src||'').replace(/dist\/header\.js.*$/,'nieuw/');
+  document.documentElement.classList.add('mz-nieuw');
+  var l=document.createElement('link');l.rel='stylesheet';l.href=B+'nieuw.css';document.head.appendChild(l);
+  var j=document.createElement('script');j.src=B+'nieuw.js';j.async=true;document.head.appendChild(j);}}catch(e){}
 """
 
 # Deze stukken blijven als echte HTML in de injectie staan (zoekmachines en lettertypes).
@@ -28,6 +39,6 @@ for naam in ('header', 'footer'):
             for m in re.finditer(pat, html, re.S):
                 if m.group(0) not in blijft: blijft.append(m.group(0))
             html = re.sub(pat, '', html, flags=re.S)
-    pathlib.Path(f'dist/{naam}.js').write_text(LOADER % {'naam': naam, 'html': js_string(html)})
+    pathlib.Path(f'dist/{naam}.js').write_text(LOADER % {'naam': naam, 'html': js_string(html), 'extra': SCHAKELAAR if naam == 'header' else ''})
 pathlib.Path('dist/blijft-in-header.html').write_text('\n'.join(blijft) + '\n')
 print('klaar', [ (p.name, p.stat().st_size) for p in pathlib.Path('dist').iterdir()])

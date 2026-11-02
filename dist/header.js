@@ -5,4 +5,12 @@ t.innerHTML="<script id=\"mz-debug\">(function(){window.__mzErr=[];window.addEve
  if(n.nodeName==='SCRIPT'){var s=document.createElement('script');
   for(var i=0;i<n.attributes.length;i++){s.setAttribute(n.attributes[i].name,n.attributes[i].value);}
   s.text=n.textContent;p.insertBefore(s,cs);}
- else{p.insertBefore(n,cs);}});})();
+ else{p.insertBefore(n,cs);}});
+try{var q=location.search,ls=window.localStorage;
+ if(/[?&]nieuw=1(&|$)/.test(q))ls.setItem('mzNieuw','1');
+ if(/[?&]nieuw=0(&|$)/.test(q))ls.removeItem('mzNieuw');
+ if(ls.getItem('mzNieuw')==='1'){var B=(cs.src||'').replace(/dist\/header\.js.*$/,'nieuw/');
+  document.documentElement.classList.add('mz-nieuw');
+  var l=document.createElement('link');l.rel='stylesheet';l.href=B+'nieuw.css';document.head.appendChild(l);
+  var j=document.createElement('script');j.src=B+'nieuw.js';j.async=true;document.head.appendChild(j);}}catch(e){}
+})();
