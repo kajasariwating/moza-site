@@ -252,3 +252,6 @@ html.mz-nieuw body #mzmob .cols section.mzpop,html.mz-nieuw body #mzmob .col.r s
 /* Voorpagina: Nieuws en Maluku blauw, Van de redactie lichtblauw (zoals de rubrieken) */
 html.mz-nieuw body .mzs-tag.blauw{background:#1F3BD1!important;color:#fff!important}
 html.mz-nieuw.moza-dark body .mzs-tag.blauw{background:#3D57E8!important;color:#fff!important}
+/* Footer: regel boven de slogan */
+html.mz-nieuw body .mzf .mzf-brand{flex-direction:column!important;align-items:flex-start!important}
+html.mz-nieuw body .mzf .mz-fslog{display:block;font:900 24px/1.15 'Hanken Grotesk',system-ui,sans-serif;letter-spacing:-.02em;color:#fff;margin:0 0 4px}

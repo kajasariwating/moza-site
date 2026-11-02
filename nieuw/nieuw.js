@@ -186,6 +186,8 @@
   /* ---------- Footer: oude opbouw, zonder logo, met kop Mis niets ---------- */
   function footer(){
     var c=document.querySelector('.mzf .mzf-nb');if(!c)return false;
+    var ser=document.querySelector('.mzf .mzf-brand .mzf-ser');
+    if(ser&&!document.querySelector('.mzf .mz-fslog')){var g=document.createElement('span');g.className='mz-fslog';g.textContent='Molukse Zaken lees je op MOZA.nu';ser.parentNode.insertBefore(g,ser)}
     if(c.querySelector('.mz-misniets'))return true;
     var h=document.createElement('h2');h.className='mz-misniets';h.textContent='Mis niets';
     var l=c.querySelector('.mzf-h');c.insertBefore(h,l?l.nextSibling:c.firstChild);
