@@ -392,3 +392,14 @@ html.mz-nieuw.moza-dark #mz-arechts .mzar-bt{background:#ECECF1;color:#111}
 @media (max-width:1024px){
   html.mz-nieuw body .moza-right.mz-ar-aan{padding:0 16px;margin:24px 0}
 }
+/* Header computer: gele weerbalk bovenaan (zoals de mockup) */
+@media (min-width:1025px){
+  html.mz-nieuw body #header{display:flex!important;flex-direction:column!important}
+  html.mz-nieuw body #header>.moza-toko{order:-1}
+}
+/* Knoppen onder de artikelkop: telefoon datum boven, knoppen in één rij */
+@media (max-width:1024px){
+  html.mz-nieuw body #mz-akop .moza-dateline{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:10px!important}
+  html.mz-nieuw body #mz-akop .moza-dateline .md-pop{display:none!important}
+  html.mz-nieuw body #mz-akop .moza-dateline .md-btns{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:6px!important;width:100%!important}
+}
