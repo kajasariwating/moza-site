@@ -210,9 +210,10 @@
     var hero=document.querySelector('.moza-hero');if(!hero)return false;
     if(hero.getAttribute('data-mzrk'))return true;hero.setAttribute('data-mzrk','1');
     /* label met de rubrieknaam (lichtblauw, Dit weekend roze) vooraan in de rij met chips */
-    var lab=document.querySelector('.mzr-hero .mzr-label'),naam=lab?lab.textContent.trim():'';
+    var NM={dwt:'Deze week toen',dw:'Dit weekend',kvdw:'Kaart van de week',adf:'Achter de foto',lw:'Leeswijzer',wvdw:'Woord van de week',jz:'Jullie zeiden',mdm:'MOZA deze maand'},naam='';
+    for(var k in NM)if(H.classList.contains('mzr-'+k))naam=NM[k];
     var rij=hero.querySelector('.moza-chiprow .blog-item-meta-wrapper')||hero.querySelector('.moza-chiprow');
-    if(naam&&rij){var c=document.createElement('span');c.className='mzs-tag mzrk-tag'+(/^dit weekend/i.test(naam)?' roze':'');c.textContent=naam.charAt(0)+naam.slice(1).toLowerCase();rij.insertBefore(c,rij.firstChild)}
+    if(naam&&rij){var c=document.createElement('span');c.className='mzs-tag mzrk-tag'+(/^dit weekend/i.test(naam)?' roze':'');c.textContent=naam;rij.insertBefore(c,rij.firstChild)}
     /* vaste rubriekafbeelding (met tekst) niet als foto: neem de eerste foto uit de tekst, anders een effen vlak */
     var img=hero.querySelector('img');
     if(img&&VASTE.test(img.getAttribute('src')||img.src||'')){
