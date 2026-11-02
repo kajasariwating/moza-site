@@ -314,3 +314,18 @@ html.mz-nieuw body #mz-start .mzs-h{text-shadow:0 1px 12px rgba(0,0,0,.35)}
   html.mz-nieuw body #mz-start .mzs-lead img{aspect-ratio:3/2}
   html.mz-nieuw body #mz-start .mzs-lead{padding-bottom:26px}
 }
+/* Rubriekstukken: zelfde kop als gewone artikelen (gekleurde rubriek-hero weg) */
+html.mz-nieuw.mzr body .mzr-hero{display:none!important}
+html.mz-nieuw.mzr body .moza-hero{display:block!important}
+html.mz-nieuw.mzr body .moza-left{display:block!important}
+html.mz-nieuw.mzr body .moza-right{display:flex!important}
+html.mz-nieuw.mzr body .blog-item-content-wrapper{display:flex!important}
+html.mz-nieuw.mzr body .blog-item-content{max-width:none!important;margin:0!important;padding:0!important}
+html.mz-nieuw.mzr body .blog-item-content .sqs-html-content>p{font-size:19px;line-height:1.65}
+html.mz-nieuw.mzr body .blog-item-content .sqs-html-content>p:first-child{font-size:inherit}
+html.mz-nieuw body .moza-hero .mzrk-tag{display:inline-block;background:#C9D3FF;color:#111;font:800 11px/1 "Hanken Grotesk",system-ui,sans-serif;letter-spacing:.1em;text-transform:uppercase;padding:5px 7px;margin:0 8px 0 0;align-self:center}
+html.mz-nieuw body .moza-hero .mzrk-tag.roze{background:#FF7AB6}
+/* Geen eigen foto: effen donker vlak met de kop */
+html.mz-nieuw body .moza-hero.mzrk-vlak img{display:none!important}
+html.mz-nieuw body .moza-hero.mzrk-vlak{background:#111;min-height:0}
+html.mz-nieuw body .moza-hero.mzrk-vlak .moza-hero-t{position:static!important;background:none!important;padding-top:36px}
