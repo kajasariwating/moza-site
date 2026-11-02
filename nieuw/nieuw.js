@@ -84,6 +84,17 @@
     if(c==='van de redactie')return '<span class="mzs-tag">'+esc(i.cat)+'</span>';
     return i.cat?'<span class="mzs-cat">'+esc(i.cat)+'</span>':'';
   }
+  /* GoatCounter: meest bekeken /lezen- en /kennisbank-pagina's vanaf een datum (zelfde bron als de site, 10 min onthouden) */
+  function ymdNL(d){try{return new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Amsterdam',year:'numeric',month:'2-digit',day:'2-digit'}).format(d)}catch(e){return d.toISOString().slice(0,10)}}
+  function gcTop(start,ck){
+    var GC='https://moza.goatcounter.com',KEY=window.MOZA_GC_KEY||'',cv=null;try{cv=JSON.parse(localStorage.getItem(ck))}catch(e){}
+    if(cv&&Date.now()-cv.t<600e3)return Promise.resolve(cv.v);
+    if(!KEY)return Promise.reject();
+    return fetch(GC+'/api/v0/stats/hits?start='+start+'&limit=40',{headers:{'Authorization':'Bearer '+KEY,'Content-Type':'application/json'}}).then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(j){
+      var l=(j.hits||[]).filter(function(x){return !x.event&&/^\/(lezen|kennisbank)\/./.test(x.path||'')}).map(function(x){return {t:String(x.title||'').replace(/\s+[—|-]\s+MOZA.*$/,''),u:String(x.path).replace(/\/+$/,''),n:+(x.count!=null?x.count:x.count_unique)||0}}).filter(function(x){return x.n>=2}).sort(function(a,b){return b.n-a.n}).slice(0,10);
+      try{localStorage.setItem(ck,JSON.stringify({t:Date.now(),v:l}))}catch(e){}return l});
+  }
+  var heroP=null;
   function voorpagina(){
     if(P!=='/')return true;
     var col=document.querySelector('#mzmob .cols .col.l');
@@ -91,27 +102,45 @@
     if(document.getElementById('mz-start'))return true;
     var box=document.createElement('section');box.id='mz-start';box.setAttribute('aria-label','Net binnen');
     col.insertBefore(box,col.firstChild);
-    fetch('/lezen?format=json&v='+Math.floor(Date.now()/300000)).then(function(r){return r.json()}).then(function(j){
-      var L=(j.items||[]).map(info);if(!L.length)return;
-      var a=L[0],h='';
-      h+='<a class="mzs-lead" href="'+esc(a.url)+'">'+(a.img?'<img src="'+esc(a.img)+'?format=750w" alt="" loading="eager">':'')+
+    var gist=ymdNL(new Date(Date.now()-864e5));
+    var feed=fetch('/lezen?format=json&v='+Math.floor(Date.now()/300000)).then(function(r){return r.json()});
+    /* Hero: het meest gelezen artikel van de laatste 2 dagen (gisteren en vandaag); anders het nieuwste */
+    heroP=Promise.all([feed,gcTop(gist,'mgc:hero2:'+gist).catch(function(){return []})]).then(function(r){
+      var items=r[0].items||[],top=(r[1]||[]).filter(function(x){return /^\/lezen\/./.test(x.u)})[0];
+      if(!top)return items[0]||null;
+      var inFeed=items.filter(function(i){return i.fullUrl===top.u})[0];
+      if(inFeed)return inFeed;
+      return fetch(top.u+'?format=json').then(function(x){return x.json()}).then(function(x){return x.item||items[0]}).catch(function(){return items[0]});
+    });
+    Promise.all([feed,heroP]).then(function(r){
+      var H=r[1];if(!H)throw 0;
+      var L=(r[0].items||[]).filter(function(i){return i.fullUrl!==H.fullUrl}).map(info),a=info(H),h='';
+      h+='<a class="mzs-lead" href="'+esc(a.url)+'">'+(a.img?'<img src="'+esc(a.img)+'?format=1000w" alt="" loading="eager">':'')+
          '<span class="mzs-lt">'+label(a)+'<span class="mzs-h">'+esc(a.titel)+'</span></span></a>';
-      h+='<div class="mzs-kop"><h2>Net binnen</h2><a href="/lezen">Alles →</a></div><div class="mzs-streep" aria-hidden="true"><i></i><i></i><i></i></div><ul class="mzs-list">';
-      L.slice(1,5).forEach(function(i){
-        /* Geen fotootjes onder de hero, net als op desktop: label en datum, dan de kop */
-        h+='<li><a href="'+esc(i.url)+'"><span class="mzs-tx"><span class="mzs-r">'+label(i)+'<span class="mzs-d">'+i.dag+'</span></span><span class="mzs-t">'+esc(i.titel)+'</span></span></a></li>';
-      });
-      box.innerHTML=h+'</ul>';
-      /* Desktop: rechts een lijst zonder foto's */
-      var r=document.querySelector('#mzmob .cols .col.r'),o5=r&&r.querySelector('.sec.o5');
-      if(r&&!document.getElementById('mz-nb')){var nb=document.createElement('section');nb.id='mz-nb';nb.setAttribute('aria-label','Net binnen');
-        var k='<div class="mzs-kop"><h2>Net binnen</h2><a href="/lezen">Alles →</a></div><div class="mzs-streep" aria-hidden="true"><i></i><i></i><i></i></div><ul>';
-        L.slice(1,6).forEach(function(i){k+='<li><a href="'+esc(i.url)+'"><span class="mzs-r">'+label(i)+'<span class="mzs-d">'+i.dag+'</span></span><span class="mzs-t">'+esc(i.titel)+'</span></a></li>'});
-        nb.innerHTML=k+'</ul>';r.insertBefore(nb,o5||r.firstChild);}
+      var nbl=function(i){return '<li><a href="'+esc(i.url)+'"><span class="mzs-tx"><span class="mzs-r">'+label(i)+'<span class="mzs-d">'+i.dag+'</span></span><span class="mzs-t">'+esc(i.titel)+'</span></span></a></li>'};
+      var nbkop='<div class="mzs-kop"><h2>Net binnen</h2><a href="/lezen">Alles →</a></div><div class="mzs-streep" aria-hidden="true"><i></i><i></i><i></i></div>';
+      /* Net binnen: de 3 nieuwste (zonder de hero) */
+      box.innerHTML=h+nbkop+'<ul class="mzs-list">'+L.slice(0,3).map(nbl).join('')+'</ul>';
+      var r2=document.querySelector('#mzmob .cols .col.r'),o5=r2&&r2.querySelector('.sec.o5');
+      if(r2&&!document.getElementById('mz-nb')){var nb=document.createElement('section');nb.id='mz-nb';nb.setAttribute('aria-label','Net binnen');
+        nb.innerHTML=nbkop+'<ul>'+L.slice(0,3).map(function(i){return '<li><a href="'+esc(i.url)+'"><span class="mzs-r">'+label(i)+'<span class="mzs-d">'+i.dag+'</span></span><span class="mzs-t">'+esc(i.titel)+'</span></a></li>'}).join('')+'</ul>';
+        r2.insertBefore(nb,o5||r2.firstChild);
+        /* Peiling direct onder Net binnen (computer) */
+        var pd=peilBlok('mz-peil-d');if(pd)nb.parentNode.insertBefore(pd,nb.nextSibling);}
+      /* Peiling direct onder Net binnen (telefoon), daarna de overige 10 stukken heel compact */
+      var pm=peilBlok('mz-peil-m');if(pm)col.insertBefore(pm,box.nextSibling);
+      var K=L.slice(3,13);
+      if(K.length){var kort=document.createElement('section');kort.id='mz-kort';kort.setAttribute('aria-label','Meer berichten');
+        kort.innerHTML='<ul>'+K.map(function(i){return '<li><a href="'+esc(i.url)+'">'+esc(i.titel)+'</a></li>'}).join('')+'</ul><a class="mzk-all" href="/lezen">Alle berichten →</a>';
+        col.insertBefore(kort,(pm||box).nextSibling);}
     }).catch(function(){box.remove()});
     return true;
   }
-
+  function peilBlok(id){
+    var pl=window.MOZA_POLL;if(!pl||!pl.q||!pl.url||document.getElementById(id))return null;
+    var e=document.createElement('section');e.id=id;e.className='mzh-peil mz-peil';
+    e.innerHTML='<a href="'+esc(pl.url)+'"><span class="mzh-lab">Peiling van de maand</span><h3>'+esc(pl.q)+'</h3><span class="mzh-go">Doe mee →</span></a>';return e;
+  }
 
   /* ---------- Voorpagina: de rest zoals in de mockup (alle schermen) ---------- */
   var DAG=['zo','ma','di','wo','do','vr','za'];
@@ -124,24 +153,14 @@
     var box=document.createElement('div');box.id='mz-meer';cols.parentNode.insertBefore(box,cols.nextSibling);
     var vak={};['opk','week','pop','peil','kb','boek'].forEach(function(k){var e=document.createElement('section');e.className='mzh-'+k;box.appendChild(e);vak[k]=e});
     /* Meest gelezen vandaag: de lijst die de site al bijhoudt */
-    /* Meest gelezen vandaag: zelfde bron als de site (GoatCounter, cache 10 min), de hero zelf niet */
-    (function(){
-      var GC='https://moza.goatcounter.com',KEY=window.MOZA_GC_KEY||'',d=new Date(),ymd;
-      try{ymd=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Amsterdam',year:'numeric',month:'2-digit',day:'2-digit'}).format(d)}catch(e){ymd=d.toISOString().slice(0,10)}
-      var ck='mgc:top:'+ymd,cv=null;try{cv=JSON.parse(localStorage.getItem(ck))}catch(e){}
-      var lijst=cv&&Date.now()-cv.t<600e3?Promise.resolve(cv.v):(KEY?fetch(GC+'/api/v0/stats/hits?start='+ymd+'&limit=40',{headers:{'Authorization':'Bearer '+KEY,'Content-Type':'application/json'}}).then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(j){
-        var l=(j.hits||[]).filter(function(x){return !x.event&&/^\/(lezen|kennisbank)\/./.test(x.path||'')}).map(function(x){return {t:String(x.title||'').replace(/\s+[—|-]\s+MOZA.*$/,''),u:String(x.path).replace(/\/+$/,''),n:+(x.count!=null?x.count:x.count_unique)||0}}).filter(function(x){return x.n>=2}).sort(function(a,b){return b.n-a.n}).slice(0,6);
-        try{localStorage.setItem(ck,JSON.stringify({t:Date.now(),v:l}))}catch(e){}return l}):Promise.reject());
-      Promise.all([lijst,fetch('/lezen?format=json&v='+Math.floor(Date.now()/300000)).then(function(r){return r.json()}).catch(function(){return {}})]).then(function(r){
-        var items=(r[1].items||[]),hero=items[0]&&items[0].fullUrl,T={};items.forEach(function(i){T[i.fullUrl]=dec(i.title)});
-        var L=(r[0]||[]).filter(function(x){return x.u!==hero}).slice(0,4);
-        if(L.length<3)throw 0;
-        vak.pop.innerHTML=kop('Meest gelezen vandaag')+'<ol>'+L.map(function(x,i){return '<li><a href="'+esc(x.u)+'"><b>'+(i+1)+'</b><span>'+esc(T[x.u]||x.t)+'</span></a></li>'}).join('')+'</ol>';
-      }).catch(function(){vak.pop.remove()});
-    })();
-    /* Peiling */
-    var pl=window.MOZA_POLL;
-    if(pl&&pl.q&&pl.url)vak.peil.innerHTML='<a href="'+esc(pl.url)+'"><span class="mzh-lab">Peiling van de maand</span><h3>'+esc(pl.q)+'</h3><span class="mzh-go">Doe mee →</span></a>';else vak.peil.remove();
+    /* Meest gelezen vandaag: zelfde bron als de site, zonder de hero */
+    vak.peil.remove();
+    Promise.all([gcTop(ymdNL(new Date()),'mgc:top:'+ymdNL(new Date())),heroP||Promise.resolve(null),fetch('/lezen?format=json&v='+Math.floor(Date.now()/300000)).then(function(r){return r.json()}).catch(function(){return {}})]).then(function(r){
+      var hero=r[1]&&r[1].fullUrl,T={};(r[2].items||[]).forEach(function(i){T[i.fullUrl]=dec(i.title)});
+      var L=(r[0]||[]).filter(function(x){return x.u!==hero}).slice(0,4);
+      if(L.length<3)throw 0;
+      vak.pop.innerHTML=kop('Meest gelezen vandaag')+'<ol>'+L.map(function(x,i){return '<li><a href="'+esc(x.u)+'"><b>'+(i+1)+'</b><span>'+esc(T[x.u]||x.t)+'</span></a></li>'}).join('')+'</ol>';
+    }).catch(function(){vak.pop.remove()});
     /* Op de kaart: het cijfer uit de laatste Kaart van de week */
     fetch('/lezen?format=json&v='+Math.floor(Date.now()/300000)).then(function(r){return r.json()}).then(function(j){
       var k=(j.items||[]).filter(function(i){return (i.tags||[]).some(function(t){return /^kaart van de week$/i.test(t)})})[0];
