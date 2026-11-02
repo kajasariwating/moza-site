@@ -10,3 +10,6 @@ html.mzr:not(.mz-nieuw) body .moza-hero .mzrk-tag.roze{background:#FF7AB6}
 html.mzr:not(.mz-nieuw) body .moza-hero.mzrk-vlak img{display:none!important}
 html.mzr:not(.mz-nieuw) body .moza-hero.mzrk-vlak{background:#111;min-height:0!important;height:auto!important;aspect-ratio:auto!important}
 html.mzr:not(.mz-nieuw) body .moza-hero.mzrk-vlak .moza-hero-t{position:static!important;background:none!important;padding-top:40px!important;padding-bottom:28px!important}
+
+/* Blok "Deze week op MOZA.nu" (weekschema) weg, op alle schermen */
+section.mzv-week{display:none!important}
