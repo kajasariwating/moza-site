@@ -71,7 +71,7 @@
     var tags=it.tags||[],rub=null;
     if(tags.some(function(t){return /^rubriek$/i.test(t)}))RUB.forEach(function(r){if(!rub&&tags.some(function(t){return t.toLowerCase()===r.toLowerCase()}))rub=r});
     var t=dec(it.title);
-    if(rub&&t.toLowerCase().indexOf(rub.toLowerCase()+':')===0){t=t.slice(rub.length+1).trim();t=t.charAt(0).toUpperCase()+t.slice(1)}
+    if(rub&&t.toLowerCase().indexOf(rub.toLowerCase())===0&&t.indexOf(':')>-1&&t.indexOf(':')<rub.length+15){t=t.slice(t.indexOf(':')+1).trim();t=t.charAt(0).toUpperCase()+t.slice(1)}
     var c=(it.categories||[])[0]||'';
     var d=new Date(it.publishOn||it.addedOn);
     return {rub:rub,titel:t,cat:c,url:it.fullUrl,img:it.assetUrl,dag:d.getDate()+' '+MND[d.getMonth()]};
