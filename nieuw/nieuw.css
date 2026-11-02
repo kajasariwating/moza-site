@@ -98,3 +98,30 @@ html.mz-nieuw section.mzv-week{display:none!important}
   html.mz-nieuw.moza-dark .mzs-tag.roze{background:#E06FA3}
   html.mz-nieuw.moza-dark .mzs-streep i:nth-child(2){background:#7E8FD9}html.mz-nieuw.moza-dark .mzs-streep i:nth-child(3){background:#E06FA3}
 }
+
+/* ---------- Artikelen ---------- */
+/* Icoontjes bij kaders */
+html.mz-nieuw .moza-tips .mt-head::before,html.mz-nieuw .moza-bronnen .mb-head::before,html.mz-nieuw aside.mzpc>.k::before{content:"";display:inline-block;width:18px;height:18px;margin-right:6px;vertical-align:-3px;background-size:contain;background-repeat:no-repeat}
+html.mz-nieuw .moza-tips .mt-head::before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23111' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.8.8 1 1.5 1 2.5h6c0-1 .2-1.7 1-2.5A6 6 0 0 0 12 3z'/%3E%3C/svg%3E")}
+html.mz-nieuw .moza-bronnen .mb-head::before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23111' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 19V5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2 2 2 0 0 0 2 2h13'/%3E%3C/svg%3E")}
+html.mz-nieuw aside.mzpc>.k::before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23111' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 20h16M7 20v-6M12 20V8M17 20v-9'/%3E%3C/svg%3E")}
+html.mz-nieuw.moza-dark .moza-tips .mt-head::before,html.mz-nieuw.moza-dark .moza-bronnen .mb-head::before,html.mz-nieuw.moza-dark aside.mzpc>.k::before{filter:invert(1)}
+/* Bronnen ingeklapt: alleen de kop, tikken klapt open */
+html.mz-nieuw .moza-bronnen.mzb-dicht>*:not(.mb-head){display:none!important}
+html.mz-nieuw .moza-bronnen .mb-head{cursor:pointer}
+html.mz-nieuw .moza-bronnen .mb-head::after{content:"+";float:right;font:900 20px/1 "Hanken Grotesk",sans-serif}
+html.mz-nieuw .moza-bronnen:not(.mzb-dicht) .mb-head::after{content:"\2212"}
+
+@media (max-width:767px){
+  /* Kop van het artikel compacter */
+  html.mz-nieuw body .moza-byline{display:none!important}
+  html.mz-nieuw body .moza-dateline .md-btns{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+  html.mz-nieuw body .moza-dateline .md-btns>*{width:auto!important;min-width:0!important;margin:0!important}
+  html.mz-nieuw body .moza-dateline .md-btns .md-btn,html.mz-nieuw body .moza-dateline .md-btns .mzh-btn{width:100%!important;font-size:13px!important;padding-left:4px!important;padding-right:4px!important;justify-content:center}
+  /* Delen zit bovenin: losse deelknoppen in de tekst weg */
+  html.mz-nieuw body .moza-dateline .md-sh,html.mz-nieuw body .moza-dateline .md-share,
+  html.mz-nieuw body .mzd-top .mzd-wa,html.mz-nieuw body .mzd-top .mzd-sh,
+  html.mz-nieuw body section.mzd-inv{display:none!important}
+  /* Rubriek-hero: zelfde opbouw, minder hoog */
+  html.mz-nieuw body .mzr-hero{padding-top:18px!important;padding-bottom:18px!important}
+}

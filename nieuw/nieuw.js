@@ -102,6 +102,15 @@
     return true;
   }
 
-  function start(){balk();var m=0;(function v(){if(voorpagina()||++m>40)return;setTimeout(v,250)})();var n=0;(function g(){if(deelknop()||++n>40)return;setTimeout(g,250)})()}
+  /* ---------- Bronnen ingeklapt ---------- */
+  function bronnen(){
+    var L=document.querySelectorAll('aside.moza-bronnen:not([data-mzb])');
+    [].forEach.call(L,function(a){var h=a.querySelector('.mb-head');if(!h)return;a.setAttribute('data-mzb','1');a.classList.add('mzb-dicht');
+      h.setAttribute('role','button');h.setAttribute('tabindex','0');h.setAttribute('aria-expanded','false');
+      var t=function(){var o=a.classList.toggle('mzb-dicht');h.setAttribute('aria-expanded',o?'false':'true')};
+      h.addEventListener('click',t);h.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();t()}})});
+  }
+
+  function start(){balk();var b=0;(function q(){bronnen();if(++b<20)setTimeout(q,500)})();var m=0;(function v(){if(voorpagina()||++m>40)return;setTimeout(v,250)})();var n=0;(function g(){if(deelknop()||++n>40)return;setTimeout(g,250)})()}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
 })();
