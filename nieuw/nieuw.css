@@ -422,6 +422,6 @@ html.mz-nieuw body #siteWrapper .mz-ph :is(h1,h2,h3,p,em,i,strong,span,div,small
 html.mz-nieuw #mzmal a.card:not(.big) .ph{display:none!important}
 html.mz-nieuw #mzt-v a.c:not(.top) img{display:none!important}
 @media (max-width:1024px){
-  html.mz-nieuw body #mz-akop .moza-dateline .md-btns .md-btn,html.mz-nieuw body #mz-akop .moza-dateline .md-btns .mzh-btn,html.mz-nieuw body #mz-akop .moza-dateline .md-btns button{font-size:13px!important;padding:8px 4px!important;min-height:40px;gap:4px!important;white-space:nowrap;overflow:hidden;justify-content:center!important}
+  html.mz-nieuw body #mz-akop .moza-dateline .md-btns .md-btn,html.mz-nieuw body #mz-akop .moza-dateline .md-btns .mzh-btn,html.mz-nieuw body #mz-akop .moza-dateline .md-btns button{font-size:12px!important;padding:8px 3px!important;min-height:40px;letter-spacing:-.01em;gap:4px!important;white-space:nowrap;overflow:hidden;justify-content:center!important}
   html.mz-nieuw body #mz-akop .moza-dateline .md-btns svg{width:14px!important;height:14px!important;flex:none}
 }
