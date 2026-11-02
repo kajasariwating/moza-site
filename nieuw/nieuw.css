@@ -418,3 +418,5 @@ html.mz-nieuw.moza-dark body #siteWrapper .mz-ph-zw{--ph-bg:#000;--ph-fg:#fff}
 html.mz-nieuw.moza-dark body #siteWrapper .mz-ph{border-bottom-color:#ECECF1!important}
 @media (max-width:1024px){html.mz-nieuw body #siteWrapper .mz-ph{padding-top:18px!important;padding-bottom:18px!important}html.mz-nieuw body #siteWrapper .mz-ph h1{font-size:32px!important}}
 html.mz-nieuw body #siteWrapper .mz-ph :is(h1,h2,h3,p,em,i,strong,span,div,small,label):not(a *):not(button *){color:var(--ph-fg)!important}
+/* ---------- Geen foto's in overzichten (alleen de hero/het grote stuk houdt zijn foto) ---------- */
+html.mz-nieuw #mzmal a.card:not(.big) .ph{display:none!important}
