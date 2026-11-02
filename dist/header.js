@@ -9,8 +9,16 @@ t.innerHTML="<script id=\"mz-debug\">(function(){window.__mzErr=[];window.addEve
 try{var q=location.search,ls=window.localStorage;
  if(/[?&]nieuw=1(&|$)/.test(q))ls.setItem('mzNieuw','1');
  if(/[?&]nieuw=0(&|$)/.test(q))ls.removeItem('mzNieuw');
- if(ls.getItem('mzNieuw')==='1'){var B='https://cdn.jsdelivr.net/gh/kajasariwating/moza-site@main/nieuw/',V='?v='+Math.floor(Date.now()/300000);
+ if(ls.getItem('mzNieuw')==='1'){
   document.documentElement.classList.add('mz-nieuw');
-  var l=document.createElement('link');l.rel='stylesheet';l.href=B+'nieuw.css'+V;document.head.appendChild(l);
-  var j=document.createElement('script');j.src=B+'nieuw.js'+V;j.async=true;document.head.appendChild(j);}}catch(e){}
+  /* Laad de nieuwste commit (niet @main: dat houdt jsDelivr uren vast). Commit 5 minuten onthouden. */
+  var laad=function(sha){var B='https://cdn.jsdelivr.net/gh/kajasariwating/moza-site@'+sha+'/nieuw/';
+   var l=document.createElement('link');l.rel='stylesheet';l.href=B+'nieuw.css';document.head.appendChild(l);
+   var j=document.createElement('script');j.src=B+'nieuw.js';j.async=true;document.head.appendChild(j);};
+  var c=(ls.getItem('mzNieuwSha')||'').split('|');
+  if(c[0]&&Date.now()-(+c[1]||0)<300000)laad(c[0]);
+  else fetch('https://api.github.com/repos/kajasariwating/moza-site/commits/main',{headers:{Accept:'application/vnd.github.sha'}})
+   .then(function(r){if(!r.ok)throw 0;return r.text()})
+   .then(function(t){t=t.trim();if(!/^[0-9a-f]{40}$/.test(t))throw 0;ls.setItem('mzNieuwSha',t+'|'+Date.now());laad(t)})
+   .catch(function(){laad(c[0]||'main')});}}catch(e){}
 })();
