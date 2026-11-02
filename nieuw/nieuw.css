@@ -249,3 +249,6 @@ html.mz-nieuw.moza-dark #mz-meer .mzh-kop a,html.mz-nieuw.moza-dark .mzh-pop li 
   html.mz-nieuw .mzh-bks{grid-auto-flow:row;grid-template-columns:repeat(5,minmax(0,1fr));overflow:visible}
 }
 html.mz-nieuw body #mzmob .cols section.mzpop,html.mz-nieuw body #mzmob .col.r section.mzpop.mz-pop-r{display:none!important}
+/* Voorpagina: Nieuws en Maluku blauw, Van de redactie lichtblauw (zoals de rubrieken) */
+html.mz-nieuw body .mzs-tag.blauw{background:#1F3BD1!important;color:#fff!important}
+html.mz-nieuw.moza-dark body .mzs-tag.blauw{background:#3D57E8!important;color:#fff!important}

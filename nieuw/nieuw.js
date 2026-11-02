@@ -79,6 +79,9 @@
   }
   function label(i){
     if(i.rub)return '<span class="mzs-tag'+(i.rub==='Dit weekend'?' roze':'')+'">'+esc(i.rub)+'</span>';
+    var c=(i.cat||'').toLowerCase();
+    if(c==='nieuws'||c==='maluku')return '<span class="mzs-tag blauw">'+esc(i.cat)+'</span>';
+    if(c==='van de redactie')return '<span class="mzs-tag">'+esc(i.cat)+'</span>';
     return i.cat?'<span class="mzs-cat">'+esc(i.cat)+'</span>':'';
   }
   function voorpagina(){
