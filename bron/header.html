@@ -3295,9 +3295,8 @@ html.mzr-adf{--mzr-hero-bg:#EDDCB8;--mzr-hero-fg:#111;--mzr-hero-title:#111;--mz
 html.mzr-lw{--mzr-hero-bg:#FF7AB6;--mzr-hero-fg:#111;--mzr-hero-title:#111;--mzr-label-bg:#111;--mzr-label-fg:#FF7AB6}
 html.mzr-wvdw{--mzr-hero-bg:#E9F25A;--mzr-hero-fg:#111;--mzr-hero-title:#1F3BD1;--mzr-label-bg:#111;--mzr-label-fg:#E9F25A}
 html.mzr-jz,html.mzr-mdm{--mzr-hero-bg:#F4F2EC;--mzr-hero-fg:#111;--mzr-hero-title:#111;--mzr-label-bg:#111;--mzr-label-fg:#E9F25A}
-/* weg met de gewone artikelonderdelen */
-html.mzr .moza-hero,html.mzr .moza-byline,html.mzr .moza-left,html.mzr .moza-side,html.mzr .moza-right{display:none!important}
-html.mzr .blog-item-title{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip:rect(0 0 0 0)!important;white-space:nowrap!important}
+/* kop zoals een nieuwsartikel: de rubriek-hero wordt niet getoond (zie nieuw/live.css) */
+.mzr-hero{display:none!important}
 /* hero */
 .mzr-hero{font-family:'Hanken Grotesk',system-ui,sans-serif;background:var(--mzr-hero-bg);color:var(--mzr-hero-fg);width:100vw;margin-left:calc(50% - 50vw);border-bottom:3px solid #111;box-sizing:border-box;padding:48px 24px 56px;margin-bottom:8px}
 .mzr-hero-in{max-width:860px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
@@ -3310,11 +3309,7 @@ html.mzr-kvdw .mzr-sub,html.mzr-adf .mzr-sub,html.mzr-lw .mzr-sub,html.mzr-wvdw 
 .mzr-title{margin:8px 0 0;font-size:clamp(30px,4.2vw,44px);line-height:1.05;font-weight:900;letter-spacing:-.03em;color:var(--mzr-hero-title)}
 html.mzr-dw .mzr-title{font-size:clamp(36px,5.5vw,58px);line-height:.98;letter-spacing:-.04em;margin:0}
 /* tekstkolom */
-html.mzr .blog-item-content-wrapper{display:block!important;grid-template-columns:none!important}
-html.mzr .blog-item-content{max-width:860px!important;margin:0 auto!important;padding:24px 0 0!important;float:none!important;width:auto!important}
 html.mzr .blog-item-content .sqs-html-content{font-family:'Hanken Grotesk',system-ui,sans-serif}
-html.mzr .blog-item-content .sqs-html-content>p{font-size:18px;line-height:1.6}
-html.mzr .blog-item-content .sqs-html-content>p:first-child{font-size:20px}
 .mzr-hide{display:none!important}
 html.mzr .sqs-html-content h3.mzr-kicker{font-family:'Hanken Grotesk',system-ui,sans-serif;margin:40px 0 12px!important}
 /* knop en pijllinks */

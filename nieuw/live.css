@@ -1,0 +1,12 @@
+/* MOZA live onderdelen (voor iedereen). Niet in de testversie (html.mz-nieuw), die heeft eigen opmaak. */
+
+/* Tab "Rubrieken" in de kop van Lezen, Agenda en Maluku weg */
+.kr a.kt[href="/lezen/tag/rubriek"]{display:none!important}
+
+/* Rubriekstukken: kop zoals een nieuwsartikel (foto met kop erover, chips, datum). De rubriekopmaak in de tekst blijft. */
+html.mzr:not(.mz-nieuw) body .moza-hero .mzrk-tag{display:inline-block;background:#C9D3FF;color:#111;font:800 11px/1 "Hanken Grotesk",system-ui,sans-serif;letter-spacing:.1em;text-transform:uppercase;padding:5px 7px;margin:0 8px 0 0;align-self:center}
+html.mzr:not(.mz-nieuw) body .moza-hero .mzrk-tag.roze{background:#FF7AB6}
+/* Geen eigen foto: effen donker vlak met de kop */
+html.mzr:not(.mz-nieuw) body .moza-hero.mzrk-vlak img{display:none!important}
+html.mzr:not(.mz-nieuw) body .moza-hero.mzrk-vlak{background:#111;min-height:0!important;height:auto!important;aspect-ratio:auto!important}
+html.mzr:not(.mz-nieuw) body .moza-hero.mzrk-vlak .moza-hero-t{position:static!important;background:none!important;padding-top:40px!important;padding-bottom:28px!important}
