@@ -330,3 +330,11 @@ html.mz-nieuw body .moza-hero .mzrk-tag.roze{background:#FF7AB6}
 html.mz-nieuw body .moza-hero.mzrk-vlak img{display:none!important}
 html.mz-nieuw body .moza-hero.mzrk-vlak{background:#111;min-height:0!important;height:auto!important;aspect-ratio:auto!important}
 html.mz-nieuw body .moza-hero.mzrk-vlak .moza-hero-t{position:static!important;background:none!important;padding-top:40px!important;padding-bottom:28px!important}
+/* Peiling: gekleurd blok (dag blauw, nacht roze) */
+html.mz-nieuw body .mzh-peil>a{background:#1F3BD1!important;border:2px solid #111!important;color:#fff!important;box-shadow:6px 6px 0 #111}
+html.mz-nieuw body .mzh-peil h3{color:#fff!important}
+html.mz-nieuw body .mzh-peil .mzh-go{color:#E9F25A!important}
+html.mz-nieuw.moza-dark body .mzh-peil>a{background:#FF7AB6!important;border-color:#ECECF1!important;color:#111!important;box-shadow:6px 6px 0 #ECECF1}
+html.mz-nieuw.moza-dark body .mzh-peil h3{color:#111!important}
+html.mz-nieuw.moza-dark body .mzh-peil .mzh-go{color:#111!important}
+html.mz-nieuw.moza-dark body .mzh-peil .mzh-lab{background:#111!important;color:#E9F25A!important}
