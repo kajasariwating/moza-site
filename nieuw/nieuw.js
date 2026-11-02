@@ -54,7 +54,7 @@
   }
   function deelknop(){
     if(!DEEL||document.getElementById('mz-deel'))return true;
-    var plek=document.querySelector('#header .header-display-mobile .moza-theme')||document.querySelector('#header .moza-theme');
+    var plek=[].filter.call(document.querySelectorAll('#header .moza-theme'),function(e){return e.getClientRects().length&&e.getBoundingClientRect().width>0})[0];
     if(!plek)return false;
     var b=document.createElement('button');b.type='button';b.id='mz-deel';b.setAttribute('aria-label','Deel dit bericht');
     b.innerHTML=ic('deel')+'Delen';b.addEventListener('click',deel);
@@ -99,6 +99,12 @@
            '<span class="mzs-tx">'+label(i)+'<span class="mzs-t">'+esc(i.titel)+'</span><span class="mzs-d">'+i.dag+'</span></span></a></li>';
       });
       box.innerHTML=h+'</ul>';
+      /* Desktop: rechts een lijst zonder foto's */
+      var r=document.querySelector('#mzmob .cols .col.r'),o5=r&&r.querySelector('.sec.o5');
+      if(r&&!document.getElementById('mz-nb')){var nb=document.createElement('section');nb.id='mz-nb';nb.setAttribute('aria-label','Net binnen');
+        var k='<div class="mzs-kop"><h2>Net binnen</h2><a href="/lezen">Alles →</a></div><div class="mzs-streep" aria-hidden="true"><i></i><i></i><i></i></div><ul>';
+        L.slice(0,7).forEach(function(i){k+='<li><a href="'+esc(i.url)+'"><span class="mzs-r">'+label(i)+'<span class="mzs-d">'+i.dag+'</span></span><span class="mzs-t">'+esc(i.titel)+'</span></a></li>'});
+        nb.innerHTML=k+'</ul>';r.insertBefore(nb,o5||r.firstChild);}
     }).catch(function(){box.remove()});
     return true;
   }

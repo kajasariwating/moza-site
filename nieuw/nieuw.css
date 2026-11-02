@@ -18,10 +18,13 @@ html.mz-nieuw #mz-deel svg{width:18px;height:18px}
 html.mz-nieuw.mzr body .mzr-label{background:#C9D3FF!important;color:#111!important}
 html.mz-nieuw.mzr-dw body .mzr-label{background:#FF7AB6!important;color:#111!important}
 
-/* Menubalk onderin: standaard verborgen, alleen op mobiel in de nieuwe vormgeving */
+/* Menubalk onderin: standaard verborgen, alleen op telefoon en tablet in de nieuwe vormgeving */
 #mz-onder{display:none}
 
-@media (max-width:767px){
+/* Gele weerbalk zonder zwarte lijnen (alle schermen) */
+html.mz-nieuw body #header .moza-toko,html.mz-nieuw body #mzmob .mzv-ybar{border-top:0!important;border-bottom:0!important;box-shadow:none!important}
+
+@media (max-width:1024px){
   /* Kop compact: Toko Buku-strook en tabbladen/tegels weg */
   html.mz-nieuw body #header .moza-toko a.mt-link{display:none!important}
   html.mz-nieuw body #header #mztabs{display:none!important}
@@ -32,8 +35,6 @@ html.mz-nieuw.mzr-dw body .mzr-label{background:#FF7AB6!important;color:#111!imp
   html.mz-nieuw body #mzmob header.hd .hdi button.mbtn,
   html.mz-nieuw body #mzmob header.hd .mzv-ybar a.brk{display:none!important}
 
-  /* Gele weerbalk zonder zwarte lijnen */
-  html.mz-nieuw body #header .moza-toko{border-top:0!important;border-bottom:0!important;box-shadow:none!important}
 
   /* Menubalk onderin */
   html.mz-nieuw #mz-onder{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:9990;background:#fff;border-top:3px solid #111;padding:0 0 env(safe-area-inset-bottom,0px)}
@@ -58,7 +59,8 @@ html.mz-nieuw.mzr-dw body .mzr-label{background:#FF7AB6!important;color:#111!imp
 /* ---------- Voorpagina: groot stuk + Net binnen ---------- */
 html.mz-nieuw section.mzv-week{display:none!important}
 #mz-start{display:none}
-@media (max-width:767px){
+html.mz-nieuw #mzmob .cols .sec.o5{display:none!important}
+@media (max-width:1024px){
   html.mz-nieuw #mzmob .cols a.hero.o1,
   html.mz-nieuw #mzmob .cols ul.mzx-list,
   html.mz-nieuw #mzmob .cols a.mzx-all,
@@ -112,19 +114,49 @@ html.mz-nieuw .moza-bronnen .mb-head{cursor:pointer}
 html.mz-nieuw .moza-bronnen .mb-head::after{content:"+";float:right;font:900 20px/1 "Hanken Grotesk",sans-serif}
 html.mz-nieuw .moza-bronnen:not(.mzb-dicht) .mb-head::after{content:"\2212"}
 
-@media (max-width:767px){
+/* Delen zit bovenin: losse deelknoppen in de tekst weg (alle schermen) */
+html.mz-nieuw body #siteWrapper .moza-dateline .md-sh,html.mz-nieuw body #siteWrapper .moza-dateline .md-share,
+html.mz-nieuw body #siteWrapper .mzd-top .mzd-wa,html.mz-nieuw body #siteWrapper .mzd-top .mzd-sh,
+html.mz-nieuw body #siteWrapper section.mzd-inv{display:none!important}
+html.mz-nieuw body #siteWrapper #page .blog-item-content > div:has(> .mzh-wrap) :is(.mzd-wa,.mzd-sh){display:none!important}
+html.mz-nieuw body #siteWrapper #page .blog-item-content > div:has(> .mzh-wrap){grid-template-columns:repeat(2,minmax(0,1fr))!important}
+html.mz-nieuw body #siteWrapper #page .blog-item-content > div:has(> .mzh-wrap) .mz-save{border-right:0!important}
+
+@media (max-width:1024px){
   /* Kop van het artikel compacter */
   html.mz-nieuw body .moza-byline{display:none!important}
   html.mz-nieuw body .moza-dateline .md-btns{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
   html.mz-nieuw body .moza-dateline .md-btns>*{width:auto!important;min-width:0!important;margin:0!important}
   html.mz-nieuw body .moza-dateline .md-btns .md-btn,html.mz-nieuw body .moza-dateline .md-btns .mzh-btn{width:100%!important;font-size:13px!important;padding-left:4px!important;padding-right:4px!important;justify-content:center}
-  /* Delen zit bovenin: losse deelknoppen in de tekst weg */
-  html.mz-nieuw body #siteWrapper .moza-dateline .md-sh,html.mz-nieuw body #siteWrapper .moza-dateline .md-share,
-  html.mz-nieuw body #siteWrapper .mzd-top .mzd-wa,html.mz-nieuw body #siteWrapper .mzd-top .mzd-sh,
-  html.mz-nieuw body #siteWrapper section.mzd-inv{display:none!important}
-  html.mz-nieuw body #siteWrapper #page .blog-item-content > div:has(> .mzh-wrap) :is(.mzd-wa,.mzd-sh){display:none!important}
-  html.mz-nieuw body #siteWrapper #page .blog-item-content > div:has(> .mzh-wrap){grid-template-columns:repeat(2,minmax(0,1fr))!important}
-  html.mz-nieuw body #siteWrapper #page .blog-item-content > div:has(> .mzh-wrap) .mz-save{border-right:0!important}
   /* Rubriek-hero: zelfde opbouw, minder hoog */
   html.mz-nieuw body .mzr-hero{padding-top:18px!important;padding-bottom:18px!important}
+}
+
+/* ---------- Desktop: Net binnen rechts, mét rubrieken ---------- */
+#mz-nb{display:none}
+@media (min-width:1025px){
+  html.mz-nieuw #mz-nb{display:block;font-family:"Hanken Grotesk",system-ui,sans-serif;color:#111;margin:0 0 28px}
+  html.mz-nieuw #mz-nb a{text-decoration:none!important;color:inherit}
+  html.mz-nieuw #mz-nb .mzs-kop{display:flex;align-items:baseline;justify-content:space-between}
+  html.mz-nieuw #mz-nb .mzs-kop h2{margin:0;font-size:26px;font-weight:900;letter-spacing:-.02em}
+  html.mz-nieuw #mz-nb .mzs-kop a{font-size:15px;font-weight:800}
+  html.mz-nieuw #mz-nb .mzs-streep{display:flex;height:6px;margin:10px 0 4px}
+  html.mz-nieuw #mz-nb .mzs-streep i{flex:1}
+  html.mz-nieuw #mz-nb .mzs-streep i:nth-child(1){background:#1F3BD1}html.mz-nieuw #mz-nb .mzs-streep i:nth-child(2){background:#C9D3FF}html.mz-nieuw #mz-nb .mzs-streep i:nth-child(3){background:#FF7AB6}
+  html.mz-nieuw #mz-nb ul{list-style:none;margin:0;padding:0}
+  html.mz-nieuw #mz-nb li{border-bottom:1px solid #E2E0DA;margin:0;padding:0}
+  html.mz-nieuw #mz-nb li:last-child{border-bottom:0}
+  html.mz-nieuw #mz-nb li a{display:flex;flex-direction:column;gap:5px;padding:13px 0}
+  html.mz-nieuw #mz-nb .mzs-r{display:flex;gap:8px;align-items:center}
+  html.mz-nieuw #mz-nb .mzs-tag{background:#C9D3FF;color:#111;font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:2px 5px}
+  html.mz-nieuw #mz-nb .mzs-tag.roze{background:#FF7AB6}
+  html.mz-nieuw #mz-nb .mzs-cat{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#1F3BD1}
+  html.mz-nieuw #mz-nb .mzs-d{font-size:13px;color:#555}
+  html.mz-nieuw #mz-nb .mzs-t{font-size:17px;font-weight:800;line-height:1.3}
+  html.mz-nieuw.moza-dark #mz-nb{color:#ECECF1}
+  html.mz-nieuw.moza-dark #mz-nb li{border-color:#2E3140}
+  html.mz-nieuw.moza-dark #mz-nb .mzs-d{color:#A9ABB6}
+  html.mz-nieuw.moza-dark #mz-nb .mzs-cat{color:#AEB9F2}
+  html.mz-nieuw.moza-dark #mz-nb .mzs-tag{background:#7E8FD9}
+  html.mz-nieuw.moza-dark #mz-nb .mzs-tag.roze{background:#E06FA3}
 }
