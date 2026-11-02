@@ -3393,7 +3393,7 @@ html.mzr body .sqs-html-content ul.mzr-tl>li{padding-left:28px!important;text-in
     var art=document.querySelector('article.entry.tag-rubriek');if(!art)return;
     var content=document.querySelector('.blog-item-content .sqs-html-content');var h1=document.querySelector('.blog-item-title h1, h1.entry-title, .blog-item-title');
     if(!content||!h1)return;
-    var title=txt(h1);var pre=(title.split(':')[0]||'').trim();var key=MAP[pre.toLowerCase()];if(!key)return;
+    var title=txt(h1);var pre=(title.split(':')[0]||'').trim();var key=MAP[pre.toLowerCase()];var viaTag=false;if(!key){var cl=' '+art.className+' ';for(var k in MAP){if(cl.indexOf(' tag-'+k.replace(/ /g,'-')+' ')>-1){key=MAP[k];pre=k;viaTag=true;break}}}if(!key)return;
     var root=document.documentElement;root.classList.add('mzr','mzr-'+key);
     if(!content.querySelector('.moza-lead')){var lp=[].filter.call(content.querySelectorAll('.sqs-html-content > p'),function(p){var t=p.textContent.trim();return t.length>60&&!/^\[/.test(t)&&!p.querySelector('em')&&!p.classList.contains('moza-dup');})[0];var fh=content.querySelector('.sqs-html-content h3');if(lp&&!(fh&&(fh.compareDocumentPosition(lp)&4)))lp.classList.add('moza-lead');}var mi=content.querySelector('.moza-intro'),mh=content.querySelector('.mzr-hero');if(mi&&mh&&(mi.compareDocumentPosition(mh)&4)){mh.parentNode.insertBefore(mi,mh.nextSibling);}
     if(content.getAttribute('data-mzr'))return;content.setAttribute('data-mzr','1');
@@ -3403,7 +3403,7 @@ html.mzr body .sqs-html-content ul.mzr-tl>li{padding-left:28px!important;text-in
     var pd=pubDate();var lees=txt(document.querySelector('.moza-leestijd'));var when=pd?(DAG[pd.getDay()]+' '+pd.getDate()+' '+MAAND[pd.getMonth()]+' '+pd.getFullYear()):'';
     if(lees)when+=(when?' · ':'')+lees.replace(/leestijd/i,'lezen');
     hin.appendChild(el('div','mzr-meta','<span class="mzr-label">'+esc(pre.toUpperCase())+'</span><span class="mzr-when">'+esc(when)+'</span>'));
-    var rest=title.slice(pre.length+1).trim();
+    var rest=viaTag?title:title.slice(pre.length+1).trim();
     if(key==='dwt'){
       var first=kids[0];
       if(first&&first.tagName==='P'&&isOnly(first,'strong')){var bd=parseNL(txt(first));hin.appendChild(el('div','mzr-big',esc(txt(first))));first.classList.add('mzr-hide');
