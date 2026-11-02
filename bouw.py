@@ -17,6 +17,7 @@ t.innerHTML=%(html)s;
 SCHAKELAAR = r"""
 /* Live voor iedereen: menubalk onderin, rubriekkop en voorpagina (vaste versie). De css staat er direct in, zodat niets eerst in de oude vorm verschijnt. */
 try{(function(){var B='https://cdn.jsdelivr.net/gh/kajasariwating/moza-site@__SHA__/nieuw/',d=document,H=d.documentElement,P=location.pathname.replace(/\/+$/,'')||'/';
+ H.classList.add('mz-balk');
  if(P==='/'){H.classList.add('mz-home');if(!/[?&]nieuw=1/.test(location.search)&&localStorage.getItem('mzNieuw')!=='1')H.classList.add('mz-lw')}
  var st=d.createElement('style');st.id='mz-live-css';st.textContent=__CSS__;d.head.appendChild(st);
  var j=d.createElement('script');j.src=B+'balk.js';j.async=true;d.head.appendChild(j);
