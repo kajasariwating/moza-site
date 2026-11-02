@@ -46,7 +46,7 @@
   html.mz-balk #mz-kop .cart svg{width:18px;height:18px}
   html.mz-balk #mz-kop .cart b{font-weight:900}
   html.mz-balk #mz-kop .don{display:inline-flex;align-items:center;height:44px;padding:0 14px;margin:0 0 0 4px;flex:none;border-radius:999px;background:#1F3BD1;color:#fff!important;font:900 15px/1 "Hanken Grotesk",system-ui,sans-serif;text-decoration:none!important}
-  html.mz-balk #mz-kop .r2{display:flex;align-items:stretch;height:45px;padding:0 0 0 16px;margin:0;background:#E9F25A;color:#111;border-bottom:1px solid #111}
+  html.mz-balk #mz-kop .r2{display:flex;align-items:stretch;height:45px;padding:0 0 0 16px;margin:0;background:#E9F25A;color:#111;border-bottom:1px solid #111;box-shadow:inset 0 1px 0 #111}
   html.mz-balk #mz-kop .wx{flex:1;min-width:0;display:flex;align-items:center;overflow:hidden;white-space:nowrap;font:300 14px/1.3 "Hanken Grotesk",system-ui,sans-serif;color:#111}
   html.mz-balk #mz-kop .wx .wxc{display:inline-flex!important;align-items:center;gap:5px;white-space:nowrap}
   html.mz-balk #mz-kop .wx .wxf{display:none!important}
