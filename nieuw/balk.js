@@ -61,5 +61,16 @@
     return true;
   }
   var kk=0;(function k(){if(kop()||++kk>40)return;setTimeout(k,250)})();
+  /* Leeshulp opent altijd onder de kop (niet over het logo en Doneer heen) en boven de menubalk */
+  function lpPlek(p){
+    if(!matchMedia('(max-width:1024px)').matches)return;
+    var k=document.querySelector('#mzmob header.hd');if(!k||!k.getClientRects().length)k=document.getElementById('header');if(!k)return;
+    var t=Math.max(0,Math.round(k.getBoundingClientRect().bottom)),o=document.getElementById('mz-onder'),b=o?Math.round(o.getBoundingClientRect().height):0;
+    if(p.style.getPropertyValue('top')!==t+'px'){p.style.setProperty('top',t+'px','important');p.style.setProperty('bottom',b+'px','important');p.style.setProperty('max-height','calc(100vh - '+(t+b)+'px)','important');p.style.setProperty('overflow-y','auto','important')}
+  }
+  function lpWacht(){var p=document.getElementById('mz-lp');if(!p)return false;
+    new MutationObserver(function(){lpPlek(p)}).observe(p,{attributes:true,attributeFilter:['class','style']});lpPlek(p);
+    window.addEventListener('scroll',function(){if(p.classList.contains('on'))lpPlek(p)},{passive:true});return true}
+  if(!lpWacht()){var lpo=new MutationObserver(function(){if(lpWacht())lpo.disconnect()});lpo.observe(document.documentElement,{childList:true,subtree:true});setTimeout(function(){lpo.disconnect()},30000)}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',balk);else balk();
 })();
