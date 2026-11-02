@@ -40,5 +40,13 @@
   html.mz-balk body #header .header-display-mobile .mzk-don{display:inline-flex;align-items:center;height:44px;padding:0 14px;margin-left:4px;border-radius:999px;background:#1F3BD1;color:#fff!important;font:900 15px/1 "Hanken Grotesk",system-ui,sans-serif;text-decoration:none!important}
   html.mz-balk.moza-dark body #mzmob .hdi .mzk-cart{border-color:#ECECF1;color:#ECECF1}
   html.mz-balk.moza-dark body #header .header-display-mobile .mzk-aa{color:#ECECF1}
+  /* volgorde zoals op de voorpagina: logo links, dan Aa, nachtstand, mandje, Doneer */
+  html.mz-balk.mzk-kop body #header .header-display-mobile{justify-content:flex-start!important;align-items:center!important;gap:2px}
+  html.mz-balk.mzk-kop body #header .header-display-mobile>.header-title-nav-wrapper{order:0;margin-right:auto!important}
+  html.mz-balk.mzk-kop body #header .header-display-mobile>.mzk-aa{order:1}
+  html.mz-balk.mzk-kop body #header .header-display-mobile>.moza-theme{order:2;background:none!important;color:#111!important;border:0!important;width:44px!important;height:44px!important}
+  html.mz-balk.mzk-kop body #header .header-display-mobile>.header-actions{order:3;margin:0 2px!important}
+  html.mz-balk.mzk-kop body #header .header-display-mobile>.mzk-don{order:4}
+  html.mz-balk.mzk-kop.moza-dark body #header .header-display-mobile>.moza-theme{color:#ECECF1!important}
 }
 
