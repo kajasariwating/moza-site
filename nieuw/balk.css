@@ -1,0 +1,32 @@
+/* MOZA menubalk onderin (live voor iedereen, telefoon en tablet). Tegels en hamburger bovenaan wijken. */
+#mz-onder{display:none}
+@media (max-width:1024px){
+  /* Kop compact: Toko Buku-strook en tabbladen/tegels weg */
+  html.mz-balk body #header #mztabs{display:none!important}
+  html.mz-balk body #mzmob nav.tabs,
+  html.mz-balk body #mzmob .tiles.mob{display:none!important}
+  /* Kompas rechtsboven is overbodig: Meer zit in de balk onderin */
+  html.mz-balk body #header .header-display-mobile .header-burger,
+  html.mz-balk body #mzmob header.hd .hdi button.mbtn,
+  html.mz-balk body #mzmob header.hd .mzv-ybar a.brk{display:none!important}
+
+
+  /* Menubalk onderin */
+  html.mz-balk #mz-onder{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:9990;background:#fff;border-top:3px solid #111;padding:0 0 env(safe-area-inset-bottom,0px)}
+  html.mz-balk #mz-onder a,html.mz-balk #mz-onder button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 0 6px;min-height:56px;box-sizing:border-box;color:#111;text-decoration:none!important;font:800 11px/1.1 "Hanken Grotesk",system-ui,sans-serif;background:none;border:0;cursor:pointer;position:relative;-webkit-tap-highlight-color:transparent}
+  html.mz-balk #mz-onder svg{width:24px;height:24px;flex:none}
+  html.mz-balk #mz-onder .ag{display:flex;background:#FF7AB6;color:#111;padding:0 6px}
+  html.mz-balk #mz-onder .live{position:absolute;top:7px;left:calc(50% + 8px);width:8px;height:8px;border-radius:50%;background:#FF4D2E}
+  html.mz-balk #mz-onder [aria-current="page"]{color:#1F3BD1;font-weight:900;box-shadow:inset 0 3px 0 #1F3BD1}
+  html.mz-balk body{padding-bottom:calc(62px + env(safe-area-inset-bottom,0px))!important}
+
+  /* Cookiemelding en vaste knoppen boven de balk houden */
+  html.mz-balk .sqs-cookie-banner-v2,html.mz-balk .gdpr-cookie-banner,html.mz-balk .sqs-cookie-banner{bottom:calc(62px + env(safe-area-inset-bottom,0px))!important}
+
+  /* Nachtmodus */
+  html.mz-balk.moza-dark #mz-onder{background:#17181D;border-top-color:#ECECF1}
+  html.mz-balk.moza-dark #mz-onder a,html.mz-balk.moza-dark #mz-onder button{color:#ECECF1}
+  html.mz-balk.moza-dark #mz-onder .ag{background:#E06FA3;color:#111}
+  html.mz-balk.moza-dark #mz-onder [aria-current="page"]{color:#AEB9F2;box-shadow:inset 0 3px 0 #AEB9F2}
+}
+
