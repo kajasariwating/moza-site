@@ -3,6 +3,9 @@
 @media (max-width:1024px){
   /* Kop compact: Toko Buku-strook en tabbladen/tegels weg */
   html.mz-balk body #header .moza-toko a.mt-link{display:none!important}
+  /* weerregel kort, net als op de voorpagina: plaats, tijd en temperatuur */
+  html.mz-balk body .mzv-wx .wxf{display:none!important}
+  html.mz-balk body .mzv-wx .wxc{display:inline-flex!important}
   html.mz-balk body #header #mztabs{display:none!important}
   html.mz-balk body #mzmob nav.tabs,
   html.mz-balk body #mzmob .tiles.mob{display:none!important}
