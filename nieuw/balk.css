@@ -2,6 +2,7 @@
 #mz-onder{display:none}
 @media (max-width:1024px){
   /* Kop compact: Toko Buku-strook en tabbladen/tegels weg */
+  html.mz-balk body #header .moza-toko a.mt-link{display:none!important}
   html.mz-balk body #header #mztabs{display:none!important}
   html.mz-balk body #mzmob nav.tabs,
   html.mz-balk body #mzmob .tiles.mob{display:none!important}
