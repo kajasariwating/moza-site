@@ -34,7 +34,7 @@
   html.mz-balk.moza-dark #mz-onder .ag{background:#E06FA3;color:#111}
   html.mz-balk.moza-dark #mz-onder [aria-current="page"]{color:#AEB9F2;box-shadow:inset 0 3px 0 #AEB9F2}
   /* Vaste kop: overal gelijk aan de voorpagina (logo, Aa, nachtstand, mandje, Doneer, gele weerregel met zoeken). Verspringt nooit. */
-  html.mz-balk #mz-kop{position:fixed;top:0;left:0;right:0;z-index:1001;height:109px;background:#fff;color:#111;font-family:"Hanken Grotesk",system-ui,sans-serif;box-sizing:border-box;-webkit-text-size-adjust:100%}
+  html.mz-balk #mz-kop{display:block;position:fixed;top:0;left:0;right:0;z-index:1001;height:109px;background:#fff;color:#111;font-family:"Hanken Grotesk",system-ui,sans-serif;box-sizing:border-box;-webkit-text-size-adjust:100%}
   html.mz-balk #mz-kop *{box-sizing:border-box}
   html.mz-balk #mz-kop .r1{display:flex;align-items:center;gap:2px;height:64px;padding:0 12px 0 16px;margin:0}
   html.mz-balk #mz-kop .logo{display:flex;width:44px;height:44px;flex:none;border-radius:50%;text-decoration:none!important}
