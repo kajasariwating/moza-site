@@ -152,6 +152,15 @@
     if(document.getElementById('mz-meer'))return true;
     var box=document.createElement('div');box.id='mz-meer';cols.parentNode.insertBefore(box,cols.nextSibling);
     var vak={};['opk','week','pop','peil','kb','boek'].forEach(function(k){var e=document.createElement('section');e.className='mzh-'+k;box.appendChild(e);vak[k]=e});
+    /* Computer: Op de kaart en Nieuw in de Kennisbank rechts, onder de peiling */
+    var mq=window.matchMedia('(min-width:1025px)');
+    function plaats(){var r=document.querySelector('#mzmob .cols .col.r');if(!r)return;
+      var re=document.getElementById('mz-rechts');
+      if(mq.matches){if(!re){re=document.createElement('div');re.id='mz-rechts';var na=document.getElementById('mz-peil-d')||document.getElementById('mz-nb');if(na)na.parentNode.insertBefore(re,na.nextSibling);else r.insertBefore(re,r.firstChild)}
+        if(vak.opk.parentNode)re.appendChild(vak.opk);if(vak.kb.parentNode)re.appendChild(vak.kb)}
+      else if(re){if(vak.opk.parentNode)box.insertBefore(vak.opk,box.firstChild);if(vak.kb.parentNode)box.insertBefore(vak.kb,vak.boek.parentNode===box?vak.boek:null)}}
+    var pt2=0;(function w(){if(document.getElementById('mz-peil-d')||document.getElementById('mz-nb')||++pt2>40){plaats();return}setTimeout(w,250)})();
+    if(mq.addEventListener)mq.addEventListener('change',function(){var re=document.getElementById('mz-rechts');if(re&&!mq.matches){plaats();re.remove()}else plaats()});
     /* Meest gelezen vandaag: de lijst die de site al bijhoudt */
     /* Meest gelezen vandaag: zelfde bron als de site, zonder de hero */
     vak.peil.remove();

@@ -242,10 +242,9 @@ html.mz-nieuw.moza-dark #mz-meer .mzh-kop a,html.mz-nieuw.moza-dark .mzh-pop li 
   html.mz-nieuw #mz-start .mzs-tag{align-self:flex-start;background:#C9D3FF;color:#111;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:3px 7px}
   html.mz-nieuw #mz-start .mzs-tag.roze{background:#FF7AB6}
   html.mz-nieuw #mz-start .mzs-cat{font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#C9D3FF}
-  html.mz-nieuw #mz-meer{max-width:1232px;margin:0 auto;padding:0 0 40px;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:32px}
+  html.mz-nieuw #mz-meer{max-width:1232px;margin:0 auto;padding:0 0 40px;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:32px}
   html.mz-nieuw .mzh-peil{grid-column:1}
-  html.mz-nieuw #mz-meer .mzh-kb{grid-column:1 / -1}
-  html.mz-nieuw #mz-meer .mzh-kb ul{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:32px}
+
   html.mz-nieuw .mzh-boek{grid-column:1 / -1}
   html.mz-nieuw .mzh-bks{grid-auto-flow:row;grid-template-columns:repeat(5,minmax(0,1fr));overflow:visible}
 }
@@ -279,3 +278,26 @@ html.mz-nieuw.moza-dark #mz-kort .mzk-all,html.mz-nieuw.moza-dark .mz-peil .mzh-
   html.mz-nieuw #mz-peil-d{display:block;margin:0 0 28px}
   html.mz-nieuw #mz-kort{margin:-8px 0 28px}
 }
+/* Rechterkolom computer: Op de kaart en Kennisbank onder de peiling */
+html.mz-nieuw #mz-rechts{font-family:"Hanken Grotesk",system-ui,sans-serif;color:#111;display:flex;flex-direction:column;gap:28px;margin:0 0 28px}
+html.mz-nieuw #mz-rechts a{text-decoration:none!important;color:inherit}
+html.mz-nieuw #mz-rechts .mzh-kop{display:flex;align-items:baseline;justify-content:space-between;margin:0 0 10px}
+html.mz-nieuw #mz-rechts .mzh-kop h2{margin:0;font-size:22px;font-weight:900;letter-spacing:-.02em;color:inherit}
+html.mz-nieuw #mz-rechts .mzh-kop a{font-size:15px;font-weight:800;color:#1F3BD1}
+html.mz-nieuw #mz-rechts ul{list-style:none;margin:0;padding:0}
+html.mz-nieuw #mz-rechts .mzh-go{display:inline-block;margin-top:10px;font-weight:800}
+html.mz-nieuw.moza-dark #mz-rechts{color:#ECECF1}
+html.mz-nieuw.moza-dark #mz-rechts .mzh-kop a{color:#AEB9F2}
+/* Overige berichten onder de hero: tijdlijn met bolletjes en een verbindende lijn */
+html.mz-nieuw #mz-kort li{position:relative;border-top:0!important;padding-left:26px}
+html.mz-nieuw #mz-kort li::before{content:"";position:absolute;left:5px;top:0;bottom:0;width:2px;background:#C9D3FF}
+html.mz-nieuw #mz-kort li:first-child::before{top:50%}
+html.mz-nieuw #mz-kort li:last-child::before{bottom:50%}
+html.mz-nieuw #mz-kort li::after{content:"";position:absolute;left:0;top:50%;width:12px;height:12px;margin-top:-6px;border-radius:50%;background:#fff;border:2px solid #1F3BD1;box-sizing:border-box}
+html.mz-nieuw #mz-kort li:first-child::after{background:#1F3BD1}
+html.mz-nieuw #mz-kort li a{padding:8px 0}
+html.mz-nieuw #mz-kort li a:hover{color:#1F3BD1}
+html.mz-nieuw #mz-kort .mzk-all{margin-left:26px}
+html.mz-nieuw.moza-dark #mz-kort li::before{background:#3A3F5C}
+html.mz-nieuw.moza-dark #mz-kort li::after{background:#17181D;border-color:#AEB9F2}
+html.mz-nieuw.moza-dark #mz-kort li:first-child::after{background:#AEB9F2}
