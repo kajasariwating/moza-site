@@ -301,3 +301,16 @@ html.mz-nieuw #mz-kort .mzk-all{margin-left:26px}
 html.mz-nieuw.moza-dark #mz-kort li::before{background:#3A3F5C}
 html.mz-nieuw.moza-dark #mz-kort li::after{background:#17181D;border-color:#AEB9F2}
 html.mz-nieuw.moza-dark #mz-kort li:first-child::after{background:#AEB9F2}
+/* Hero: tekst grotendeels over de foto, met een zachte overgang; een smalle zwarte strook eronder */
+html.mz-nieuw body #mz-start .mzs-lead{position:relative;display:block;background:#111;padding-bottom:22px;overflow:hidden}
+html.mz-nieuw body #mz-start .mzs-lead img{display:block;width:100%;object-fit:cover}
+html.mz-nieuw body #mz-start .mzs-lt{position:absolute;left:0;right:0;bottom:0;padding-top:120px;background:linear-gradient(to bottom,rgba(17,17,17,0) 0,rgba(17,17,17,.55) 38%,rgba(17,17,17,.9) 72%,#111 100%)}
+html.mz-nieuw body #mz-start .mzs-h{text-shadow:0 1px 12px rgba(0,0,0,.35)}
+@media (max-width:1024px){
+  html.mz-nieuw body #mz-start .mzs-lead img{aspect-ratio:4/3;max-height:none}
+  html.mz-nieuw body #mz-start .mzs-lt{padding-top:90px}
+}
+@media (min-width:1025px){
+  html.mz-nieuw body #mz-start .mzs-lead img{aspect-ratio:3/2}
+  html.mz-nieuw body #mz-start .mzs-lead{padding-bottom:26px}
+}
