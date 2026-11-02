@@ -22,7 +22,7 @@
     return '';
   }
   function meer(){
-    var d=document.querySelector('#mzmob nav.dnav button, #mzmob nav.dnav a');
+    var d=document.querySelector('#mzmob header.hd button.mbtn');
     if(d){d.click();return}
     var b=document.querySelector('#header .header-display-mobile .header-burger-btn')||document.querySelector('#header .header-burger-btn');
     if(b){b.click();return}

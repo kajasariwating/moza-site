@@ -29,7 +29,8 @@ html.mz-nieuw.mzr-dw body .mzr-label{background:#FF7AB6!important;color:#111!imp
   html.mz-nieuw body #mzmob .tiles.mob{display:none!important}
   /* Kompas rechtsboven is overbodig: Meer zit in de balk onderin */
   html.mz-nieuw body #header .header-display-mobile .header-burger,
-  html.mz-nieuw body #mzmob nav.dnav{display:none!important}
+  html.mz-nieuw body #mzmob header.hd .hdi button.mbtn,
+  html.mz-nieuw body #mzmob header.hd .mzv-ybar a.brk{display:none!important}
 
   /* Gele weerbalk zonder zwarte lijnen */
   html.mz-nieuw body #header .moza-toko{border-top:0!important;border-bottom:0!important;box-shadow:none!important}
