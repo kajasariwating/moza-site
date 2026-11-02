@@ -254,7 +254,8 @@ html.mz-nieuw body .mzs-tag.blauw{background:#1F3BD1!important;color:#fff!import
 html.mz-nieuw.moza-dark body .mzs-tag.blauw{background:#3D57E8!important;color:#fff!important}
 /* Footer: regel boven de slogan */
 html.mz-nieuw body .mzf .mzf-brand{flex-direction:column!important;align-items:flex-start!important}
-html.mz-nieuw body .mzf .mz-fslog{display:block;font:900 24px/1.15 'Hanken Grotesk',system-ui,sans-serif;letter-spacing:-.02em;color:#fff;margin:0 0 4px}
+html.mz-nieuw body .mzf .mz-fslog{display:block;font:700 24px/1.15 'Hanken Grotesk',system-ui,sans-serif;letter-spacing:-.01em;color:#fff;margin:0 0 2px}
+html.mz-nieuw body .mzf .mzf-ser.mz-fmoza{font-family:Fraunces,Georgia,serif!important;font-style:italic!important;font-weight:800!important;font-size:30px!important;line-height:1.1!important;color:#FF7AB6!important}
 /* Peiling direct onder Net binnen; overige berichten compact onder de hero */
 #mz-peil-m,#mz-peil-d,#mz-kort{display:none}
 html.mz-nieuw .mz-peil,html.mz-nieuw #mz-kort{font-family:"Hanken Grotesk",system-ui,sans-serif;color:#111}
