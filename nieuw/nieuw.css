@@ -394,7 +394,7 @@ html.mz-nieuw.moza-dark #mz-arechts .mzar-bt{background:#ECECF1;color:#111}
 }
 /* Header computer: gele weerbalk bovenaan (zoals de mockup) */
 @media (min-width:1025px){
-  html.mz-nieuw body #siteWrapper #header,html.mz-nieuw body #header#header{display:flex!important;flex-direction:column!important}
+  html.mz-nieuw body #siteWrapper #header#header{display:flex!important;flex-direction:column!important}
   html.mz-nieuw body #siteWrapper #header>.moza-toko{order:-1}
 }
 /* Knoppen onder de artikelkop: telefoon datum boven, knoppen in één rij */
