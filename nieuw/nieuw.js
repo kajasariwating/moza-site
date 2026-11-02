@@ -156,7 +156,7 @@
       I.forEach(function(i){var v=(i.variants||[])[0]||{};if(B.length<5&&B.indexOf(i)<0&&(v.unlimited||v.qtyInStock>0))B.push(i)});
       B=B.slice(0,5);if(!B.length){vak.boek.remove();return}
       vak.boek.innerHTML=kop('De boekenplank','/store','Toko Buku')+'<p class="mzh-sub">Elke aankoop steunt MOZA.nu.</p><div class="mzh-bks">'+B.map(function(i){var v=(i.variants||[])[0]||{},p=v.onSale&&v.salePriceMoney?v.salePriceMoney.value:(v.priceMoney||{}).value,lab=((i.tags||[]).filter(function(t){return /^label:/i.test(t)})[0]||'').replace(/^label:\s*/i,'');
-        return '<a href="'+esc(i.fullUrl)+'">'+(i.assetUrl?'<img src="'+esc(i.assetUrl)+'?format=300w" alt="" loading="lazy">':'')+(lab?'<span class="mzh-lab">'+esc(lab)+'</span>':'')+'<b>'+esc(dec(i.title))+'</b>'+(p?'<span class="mzh-pr">€ '+String(Number(p).toFixed(2)).replace('.',',')+'</span>':'')+'</a>'}).join('')+'</div>';
+        var im=((i.items||[])[0]||{}).assetUrl||i.assetUrl;return '<a href="'+esc(i.fullUrl)+'">'+(im?'<img src="'+esc(im)+'?format=300w" alt="" loading="lazy">':'')+(lab?'<span class="mzh-lab">'+esc(lab)+'</span>':'')+'<b>'+esc(dec(i.title))+'</b>'+(p?'<span class="mzh-pr">€ '+String(Number(p).toFixed(2)).replace('.',',')+'</span>':'')+'</a>'}).join('')+'</div>';
     }).catch(function(){vak.boek.remove()});
     return true;
   }
