@@ -1,5 +1,6 @@
 /* MOZA menubalk onderin (live voor iedereen, telefoon en tablet). Tegels en hamburger bovenaan wijken. */
 #mz-onder{display:none}
+#mz-kop{display:none}
 @media (max-width:1024px){
   /* Kop compact: Toko Buku-strook en tabbladen/tegels weg */
   html.mz-balk body #header .moza-toko a.mt-link{display:none!important}
@@ -32,21 +33,32 @@
   html.mz-balk.moza-dark #mz-onder a,html.mz-balk.moza-dark #mz-onder button{color:#ECECF1}
   html.mz-balk.moza-dark #mz-onder .ag{background:#E06FA3;color:#111}
   html.mz-balk.moza-dark #mz-onder [aria-current="page"]{color:#AEB9F2;box-shadow:inset 0 3px 0 #AEB9F2}
-  /* Kop bovenin overal gelijk aan de voorpagina */
-  html.mz-balk body #mzmob .hdi .mzk-cart{display:inline-flex;align-items:center;gap:4px;height:40px;padding:0 11px;margin:0 4px;border:2px solid #111;border-radius:999px;color:#111;text-decoration:none!important;font:900 15px/1 "Hanken Grotesk",system-ui,sans-serif;box-sizing:border-box}
-  html.mz-balk body #mzmob .hdi .mzk-cart svg{width:18px;height:18px}
-  html.mz-balk body #header .header-display-mobile .mzk-aa{width:44px;height:44px;border:0;background:none;color:#111;display:inline-flex;align-items:center;justify-content:center;padding:0;cursor:pointer}
-  html.mz-balk body #header .header-display-mobile .mzk-aa svg{width:26px;height:26px}
-  html.mz-balk body #header .header-display-mobile .mzk-don{display:inline-flex;align-items:center;height:44px;padding:0 14px;margin-left:4px;border-radius:999px;background:#1F3BD1;color:#fff!important;font:900 15px/1 "Hanken Grotesk",system-ui,sans-serif;text-decoration:none!important}
-  html.mz-balk.moza-dark body #mzmob .hdi .mzk-cart{border-color:#ECECF1;color:#ECECF1}
-  html.mz-balk.moza-dark body #header .header-display-mobile .mzk-aa{color:#ECECF1}
-  /* volgorde zoals op de voorpagina: logo links, dan Aa, nachtstand, mandje, Doneer */
-  html.mz-balk.mzk-kop body #header .header-display-mobile{justify-content:flex-start!important;align-items:center!important;gap:2px}
-  html.mz-balk.mzk-kop body #header .header-display-mobile>.header-title-nav-wrapper{order:0;margin-right:auto!important}
-  html.mz-balk.mzk-kop body #header .header-display-mobile>.mzk-aa{order:1}
-  html.mz-balk.mzk-kop body #header .header-display-mobile>.moza-theme{order:2;background:none!important;color:#111!important;border:0!important;width:44px!important;height:44px!important}
-  html.mz-balk.mzk-kop body #header .header-display-mobile>.header-actions{order:3;margin:0 2px!important}
-  html.mz-balk.mzk-kop body #header .header-display-mobile>.mzk-don{order:4}
-  html.mz-balk.mzk-kop.moza-dark body #header .header-display-mobile>.moza-theme{color:#ECECF1!important}
+  /* Vaste kop: overal gelijk aan de voorpagina (logo, Aa, nachtstand, mandje, Doneer, gele weerregel met zoeken). Verspringt nooit. */
+  html.mz-balk #mz-kop{position:fixed;top:0;left:0;right:0;z-index:1001;height:109px;background:#fff;color:#111;font-family:"Hanken Grotesk",system-ui,sans-serif;box-sizing:border-box;-webkit-text-size-adjust:100%}
+  html.mz-balk #mz-kop *{box-sizing:border-box}
+  html.mz-balk #mz-kop .r1{display:flex;align-items:center;gap:2px;height:64px;padding:0 12px 0 16px;margin:0}
+  html.mz-balk #mz-kop .logo{display:flex;width:44px;height:44px;flex:none;border-radius:50%;text-decoration:none!important}
+  html.mz-balk #mz-kop .logo .moza-logo{display:block;width:44px;height:44px}
+  html.mz-balk #mz-kop .sp{flex:1}
+  html.mz-balk #mz-kop .ib{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;flex:none;padding:0;margin:0;border:0;background:none;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  html.mz-balk #mz-kop .ib svg{width:23px;height:23px}
+  html.mz-balk #mz-kop .cart{display:inline-flex;align-items:center;gap:4px;height:40px;padding:0 11px;margin:0 4px;flex:none;border:2px solid currentColor;border-radius:999px;color:inherit;text-decoration:none!important;font:900 15px/1 "Hanken Grotesk",system-ui,sans-serif}
+  html.mz-balk #mz-kop .cart svg{width:18px;height:18px}
+  html.mz-balk #mz-kop .cart b{font-weight:900}
+  html.mz-balk #mz-kop .don{display:inline-flex;align-items:center;height:44px;padding:0 14px;margin:0 0 0 4px;flex:none;border-radius:999px;background:#1F3BD1;color:#fff!important;font:900 15px/1 "Hanken Grotesk",system-ui,sans-serif;text-decoration:none!important}
+  html.mz-balk #mz-kop .r2{display:flex;align-items:stretch;height:45px;padding:0 0 0 16px;margin:0;background:#E9F25A;color:#111;border-bottom:1px solid #111}
+  html.mz-balk #mz-kop .wx{flex:1;min-width:0;display:flex;align-items:center;overflow:hidden;white-space:nowrap;font:300 14px/1.3 "Hanken Grotesk",system-ui,sans-serif;color:#111}
+  html.mz-balk #mz-kop .wx .wxc{display:inline-flex!important;align-items:center;gap:5px;white-space:nowrap}
+  html.mz-balk #mz-kop .wx .wxf{display:none!important}
+  html.mz-balk #mz-kop .wx b{font-weight:800}
+  html.mz-balk #mz-kop .wx svg{width:16px;height:16px;flex:none}
+  html.mz-balk #mz-kop .zk{display:inline-flex;align-items:center;justify-content:center;width:44px;flex:none;padding:0;margin:0;border:0;border-left:1px solid #111;background:none;color:#111;cursor:pointer}
+  html.mz-balk #mz-kop .zk svg{width:22px;height:22px}
+  html.mz-balk.moza-dark #mz-kop{background:#17181D;color:#ECECF1}
+  /* De oude koppen blijven op hun plek staan, maar onzichtbaar en niet aanklikbaar (het menu van Meer blijft wel zichtbaar) */
+  html.mz-balk.mzk-vast body #mzmob header.hd>*{visibility:hidden!important;pointer-events:none!important}
+  html.mz-balk.mzk-vast body #header .header-announcement-bar-wrapper,
+  html.mz-balk.mzk-vast body #header .moza-toko{visibility:hidden!important;pointer-events:none!important}
+  html.mz-balk.mzk-vast body #header .header-announcement-bar-wrapper{height:64px!important;min-height:64px!important;max-height:64px!important;overflow:hidden!important}
+  html.mz-balk.mzk-vast body #header .moza-toko{height:45px!important;min-height:45px!important;max-height:45px!important;overflow:hidden!important}
 }
-
