@@ -160,3 +160,7 @@ html.mz-nieuw body #siteWrapper #page .blog-item-content > div:has(> .mzh-wrap) 
   html.mz-nieuw.moza-dark #mz-nb .mzs-tag{background:#7E8FD9}
   html.mz-nieuw.moza-dark #mz-nb .mzs-tag.roze{background:#E06FA3}
 }
+
+/* Footer: oude opbouw, logo weg, kop Mis niets */
+html.mz-nieuw body .mzf .mzf-logo{display:none!important}
+html.mz-nieuw body .mzf .mzf-nb .mz-misniets{margin:4px 0 6px!important;font:900 26px/1.1 'Hanken Grotesk',system-ui,sans-serif!important;letter-spacing:-.02em!important;color:#fff!important;text-transform:none!important}

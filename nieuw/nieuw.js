@@ -118,6 +118,15 @@
       h.addEventListener('click',t);h.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();t()}})});
   }
 
-  function start(){balk();var b=0;(function q(){bronnen();if(++b<20)setTimeout(q,500)})();var m=0;(function v(){if(voorpagina()||++m>40)return;setTimeout(v,250)})();var n=0;(function g(){if(deelknop()||++n>40)return;setTimeout(g,250)})()}
+  /* ---------- Footer: oude opbouw, zonder logo, met kop Mis niets ---------- */
+  function footer(){
+    var c=document.querySelector('.mzf .mzf-nb');if(!c)return false;
+    if(c.querySelector('.mz-misniets'))return true;
+    var h=document.createElement('h2');h.className='mz-misniets';h.textContent='Mis niets';
+    var l=c.querySelector('.mzf-h');c.insertBefore(h,l?l.nextSibling:c.firstChild);
+    return true;
+  }
+
+  function start(){balk();var f=0;(function w(){if(footer()||++f>40)return;setTimeout(w,250)})();var b=0;(function q(){bronnen();if(++b<20)setTimeout(q,500)})();var m=0;(function v(){if(voorpagina()||++m>40)return;setTimeout(v,250)})();var n=0;(function g(){if(deelknop()||++n>40)return;setTimeout(g,250)})()}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
 })();
