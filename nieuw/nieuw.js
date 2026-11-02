@@ -88,7 +88,7 @@
     if(document.getElementById('mz-start'))return true;
     var box=document.createElement('section');box.id='mz-start';box.setAttribute('aria-label','Net binnen');
     col.insertBefore(box,col.firstChild);
-    fetch('/lezen?format=json').then(function(r){return r.json()}).then(function(j){
+    fetch('/lezen?format=json&v='+Math.floor(Date.now()/300000)).then(function(r){return r.json()}).then(function(j){
       var L=(j.items||[]).map(info);if(!L.length)return;
       var a=L[0],h='';
       h+='<a class="mzs-lead" href="'+esc(a.url)+'">'+(a.img?'<img src="'+esc(a.img)+'?format=750w" alt="" loading="eager">':'')+
