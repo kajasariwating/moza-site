@@ -94,7 +94,7 @@
       h+='<a class="mzs-lead" href="'+esc(a.url)+'">'+(a.img?'<img src="'+esc(a.img)+'?format=750w" alt="" loading="eager">':'')+
          '<span class="mzs-lt">'+label(a)+'<span class="mzs-h">'+esc(a.titel)+'</span></span></a>';
       h+='<div class="mzs-kop"><h2>Net binnen</h2><a href="/lezen">Alles →</a></div><div class="mzs-streep" aria-hidden="true"><i></i><i></i><i></i></div><ul class="mzs-list">';
-      L.slice(1,8).forEach(function(i){
+      L.slice(1,5).forEach(function(i){
         /* Geen fotootjes onder de hero, net als op desktop: label en datum, dan de kop */
         h+='<li><a href="'+esc(i.url)+'"><span class="mzs-tx"><span class="mzs-r">'+label(i)+'<span class="mzs-d">'+i.dag+'</span></span><span class="mzs-t">'+esc(i.titel)+'</span></span></a></li>';
       });
@@ -103,7 +103,7 @@
       var r=document.querySelector('#mzmob .cols .col.r'),o5=r&&r.querySelector('.sec.o5');
       if(r&&!document.getElementById('mz-nb')){var nb=document.createElement('section');nb.id='mz-nb';nb.setAttribute('aria-label','Net binnen');
         var k='<div class="mzs-kop"><h2>Net binnen</h2><a href="/lezen">Alles →</a></div><div class="mzs-streep" aria-hidden="true"><i></i><i></i><i></i></div><ul>';
-        L.slice(0,7).forEach(function(i){k+='<li><a href="'+esc(i.url)+'"><span class="mzs-r">'+label(i)+'<span class="mzs-d">'+i.dag+'</span></span><span class="mzs-t">'+esc(i.titel)+'</span></a></li>'});
+        L.slice(1,6).forEach(function(i){k+='<li><a href="'+esc(i.url)+'"><span class="mzs-r">'+label(i)+'<span class="mzs-d">'+i.dag+'</span></span><span class="mzs-t">'+esc(i.titel)+'</span></a></li>'});
         nb.innerHTML=k+'</ul>';r.insertBefore(nb,o5||r.firstChild);}
     }).catch(function(){box.remove()});
     return true;
@@ -117,15 +117,15 @@
   function meer2(){
     if(P!=='/')return true;
     var cols=document.querySelector('#mzmob .cols');if(!cols)return false;
-    var pop=document.querySelector('#mzmob section.mzpop');
-    if(!pop&&++meer2.n<30)return false;
     if(document.getElementById('mz-meer'))return true;
     var box=document.createElement('div');box.id='mz-meer';cols.parentNode.insertBefore(box,cols.nextSibling);
     var vak={};['opk','week','pop','peil','kb','boek'].forEach(function(k){var e=document.createElement('section');e.className='mzh-'+k;box.appendChild(e);vak[k]=e});
     /* Meest gelezen vandaag: de lijst die de site al bijhoudt */
-    if(pop){var L=[].slice.call(pop.querySelectorAll('a[href]')).slice(0,4);
-      vak.pop.innerHTML=kop('Meest gelezen vandaag')+'<ol>'+L.map(function(a,i){var t=(a.innerText||'').replace(/^\s*\d+\s*/,'').trim();return '<li><a href="'+esc(a.getAttribute('href'))+'"><b>'+(i+1)+'</b><span>'+esc(t)+'</span></a></li>'}).join('')+'</ol>'}
-    else vak.pop.remove();
+    /* De lijst wordt door de site later gevuld: blijf kijken tot er links in staan (max. 20 s) */
+    var pt=0;(function vul(){var pop=document.querySelector('#mzmob section.mzpop');
+      var L=pop?[].slice.call(pop.querySelectorAll('a[href]')).filter(function(a){return (a.textContent||'').trim().length>3}).slice(0,4):[];
+      if(L.length<3){if(++pt<80){setTimeout(vul,250);return}vak.pop.remove();return}
+      vak.pop.innerHTML=kop('Meest gelezen vandaag')+'<ol>'+L.map(function(a,i){var t=(a.textContent||'').replace(/\s+/g,' ').replace(/^\s*\d+\s*/,'').trim();return '<li><a href="'+esc(a.getAttribute('href'))+'"><b>'+(i+1)+'</b><span>'+esc(t)+'</span></a></li>'}).join('')+'</ol>'})();
     /* Peiling */
     var pl=window.MOZA_POLL;
     if(pl&&pl.q&&pl.url)vak.peil.innerHTML='<a href="'+esc(pl.url)+'"><span class="mzh-lab">Peiling van de maand</span><h3>'+esc(pl.q)+'</h3><span class="mzh-go">Doe mee →</span></a>';else vak.peil.remove();
@@ -160,7 +160,6 @@
     }).catch(function(){vak.boek.remove()});
     return true;
   }
-  meer2.n=0;
 
   /* ---------- Bronnen ingeklapt ---------- */
   function bronnen(){
