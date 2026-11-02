@@ -122,7 +122,9 @@ html.mz-nieuw .moza-bronnen:not(.mzb-dicht) .mb-head::after{content:"\2212"}
   html.mz-nieuw body #siteWrapper .moza-dateline .md-sh,html.mz-nieuw body #siteWrapper .moza-dateline .md-share,
   html.mz-nieuw body #siteWrapper .mzd-top .mzd-wa,html.mz-nieuw body #siteWrapper .mzd-top .mzd-sh,
   html.mz-nieuw body #siteWrapper section.mzd-inv{display:none!important}
-  html.mz-nieuw body #siteWrapper *:has(> .mzd-top){grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  html.mz-nieuw body #siteWrapper #page .blog-item-content > div:has(> .mzh-wrap) :is(.mzd-wa,.mzd-sh){display:none!important}
+  html.mz-nieuw body #siteWrapper #page .blog-item-content > div:has(> .mzh-wrap){grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  html.mz-nieuw body #siteWrapper #page .blog-item-content > div:has(> .mzh-wrap) .mz-save{border-right:0!important}
   /* Rubriek-hero: zelfde opbouw, minder hoog */
   html.mz-nieuw body .mzr-hero{padding-top:18px!important;padding-bottom:18px!important}
 }
