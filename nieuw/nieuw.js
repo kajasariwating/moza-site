@@ -275,6 +275,22 @@
     return true;
   }
 
+  /* ---------- Computer: hoofdmenu en tegelrij zoals de mockup ---------- */
+  function dmenu(){
+    var wrap=document.querySelector('#header .header-display-desktop .header-title-nav-wrapper');if(!wrap)return false;
+    if(document.getElementById('mz-dnav'))return true;
+    var L=[['/','Voorpagina',/^\/$/],['/lezen','Net binnen',/^\/lezen(\/|$)/],['/nieuws/maluku','Maluku',/^\/nieuws\/maluku/],['/weten','Kennisbank',/^\/(weten|kennisbank)(\/|$)/],['/podium','Podium',/^\/podium/],['/beeldbank','Beeldbank',/^\/beeldbank/],['/store','Toko Buku',/^\/(store|cart|boekenplank)/]];
+    if(P!=='/'&&/^\/nieuws\/maluku/.test(P))L[1][2]=/^$/;
+    var n=document.createElement('nav');n.id='mz-dnav';n.setAttribute('aria-label','Hoofdmenu');
+    n.innerHTML=L.map(function(x){return '<a href="'+x[0]+'"'+(x[2].test(P)?' aria-current="page"':'')+'>'+x[1]+'</a>'}).join('')+'<button type="button" class="mzd-meer" aria-label="Meer: alle onderdelen">Meer</button>';
+    n.querySelector('.mzd-meer').addEventListener('click',function(){var m=document.querySelector('#mztabs button.meer');if(m)m.click();else location.href='/lezen'});
+    wrap.appendChild(n);
+    var act=document.querySelector('#header .header-display-desktop .header-actions--right');
+    if(act&&!document.getElementById('mz-ddon')){var d=document.createElement('a');d.id='mz-ddon';d.href='/doneer';d.textContent='Doneer';act.appendChild(d)}
+    H.classList.add('mz-dmenu');
+    return true;
+  }
+
   /* ---------- Bronnen ingeklapt ---------- */
   function bronnen(){
     var L=document.querySelectorAll('aside.moza-bronnen:not([data-mzb])');
@@ -295,6 +311,6 @@
     return true;
   }
 
-  function start(){balk();var f=0;(function w(){if(footer()||++f>40)return;setTimeout(w,250)})();var b=0;(function q(){bronnen();if(++b<20)setTimeout(q,500)})();var m=0;(function v(){if(voorpagina()||++m>40)return;setTimeout(v,250)})();var h2=0;(function w2(){if(meer2()||++h2>60)return;setTimeout(w2,250)})();var n=0;(function g(){if(deelknop()||++n>40)return;setTimeout(g,250)})();var rk=0;(function k(){if(artikelKop()||++rk>60)return;setTimeout(k,250)})();var ar=0;(function k2(){if(artikelRechts()||++ar>60)return;setTimeout(k2,250)})();var ph=0;setTimeout(function k3(){if(paginaHero()||++ph>40)return;setTimeout(k3,250)},1500)}
+  function start(){balk();var f=0;(function w(){if(footer()||++f>40)return;setTimeout(w,250)})();var b=0;(function q(){bronnen();if(++b<20)setTimeout(q,500)})();var m=0;(function v(){if(voorpagina()||++m>40)return;setTimeout(v,250)})();var h2=0;(function w2(){if(meer2()||++h2>60)return;setTimeout(w2,250)})();var n=0;(function g(){if(deelknop()||++n>40)return;setTimeout(g,250)})();var rk=0;(function k(){if(artikelKop()||++rk>60)return;setTimeout(k,250)})();var ar=0;(function k2(){if(artikelRechts()||++ar>60)return;setTimeout(k2,250)})();var dm=0;(function k4(){if(dmenu()||++dm>40)return;setTimeout(k4,250)})();var ph=0;setTimeout(function k3(){if(paginaHero()||++ph>40)return;setTimeout(k3,250)},1500)}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
 })();
