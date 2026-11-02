@@ -257,6 +257,19 @@
     return true;
   }
 
+  /* ---------- Hero's van de overige pagina's: compact en in de kleur uit de mockup ---------- */
+  var KLEUR=[[/^\/(events|agenda|evenementen)$/,'lb'],[/^\/weten$/,'bl'],[/^\/podium$/,'rz'],[/^\/store$/,'rz'],[/^\/nieuws\/maluku$/,'bl'],[/^\/sejarah-maluku$/,'lb'],[/^\/begrippen$/,'lb'],[/^\/organisaties$/,'bl'],[/^\/beeldbank$/,'zw'],[/^\/onderzoek$/,'lb'],[/^\/(doneer|maandelijks-doneren)$/,'rz'],[/^\/over-moza$/,'rz']];
+  function paginaHero(){
+    var kl=null;KLEUR.forEach(function(k){if(!kl&&k[0].test(P))kl=k[1]});if(!kl)return true;
+    var h1=[].filter.call(document.querySelectorAll('#page h1, main h1, #siteWrapper h1'),function(h){return !h.closest('#header')&&h.getClientRects().length&&!/Marquee/.test(h.className)})[0];
+    if(!h1)return false;
+    var e=h1,hero=null;for(var i=0;i<4&&e&&e!==document.body;i++){if(/(^|[\s-])hero(\s|$)/.test(String(e.className))){hero=e;break}e=e.parentElement}
+    if(!hero){var p=h1.parentElement;hero=/^(in|wrap|mdn-in|inner)$/.test(String(p.className).trim())?p.parentElement:p}
+    if(!hero||hero.classList.contains('mz-ph'))return true;
+    hero.classList.add('mz-ph','mz-ph-'+kl);H.classList.add('mz-ph-pagina');
+    return true;
+  }
+
   /* ---------- Bronnen ingeklapt ---------- */
   function bronnen(){
     var L=document.querySelectorAll('aside.moza-bronnen:not([data-mzb])');
@@ -277,6 +290,6 @@
     return true;
   }
 
-  function start(){balk();var f=0;(function w(){if(footer()||++f>40)return;setTimeout(w,250)})();var b=0;(function q(){bronnen();if(++b<20)setTimeout(q,500)})();var m=0;(function v(){if(voorpagina()||++m>40)return;setTimeout(v,250)})();var h2=0;(function w2(){if(meer2()||++h2>60)return;setTimeout(w2,250)})();var n=0;(function g(){if(deelknop()||++n>40)return;setTimeout(g,250)})();var rk=0;(function k(){if(artikelKop()||++rk>60)return;setTimeout(k,250)})();var ar=0;(function k2(){if(artikelRechts()||++ar>60)return;setTimeout(k2,250)})()}
+  function start(){balk();var f=0;(function w(){if(footer()||++f>40)return;setTimeout(w,250)})();var b=0;(function q(){bronnen();if(++b<20)setTimeout(q,500)})();var m=0;(function v(){if(voorpagina()||++m>40)return;setTimeout(v,250)})();var h2=0;(function w2(){if(meer2()||++h2>60)return;setTimeout(w2,250)})();var n=0;(function g(){if(deelknop()||++n>40)return;setTimeout(g,250)})();var rk=0;(function k(){if(artikelKop()||++rk>60)return;setTimeout(k,250)})();var ar=0;(function k2(){if(artikelRechts()||++ar>60)return;setTimeout(k2,250)})();var ph=0;(function k3(){if(paginaHero()||++ph>40)return;setTimeout(k3,250)})()}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
 })();
