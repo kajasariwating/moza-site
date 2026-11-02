@@ -164,3 +164,8 @@ html.mz-nieuw body #siteWrapper #page .blog-item-content > div:has(> .mzh-wrap) 
 /* Footer: oude opbouw, logo weg, kop Mis niets */
 html.mz-nieuw body .mzf .mzf-logo{display:none!important}
 html.mz-nieuw body .mzf .mzf-nb .mz-misniets{margin:4px 0 6px!important;font:900 26px/1.1 'Hanken Grotesk',system-ui,sans-serif!important;letter-spacing:-.02em!important;color:#fff!important;text-transform:none!important}
+
+/* Net binnen onder de hero: zonder fotootjes, net als desktop */
+html.mz-nieuw #mz-start .mzs-list a{display:block;padding:13px 0}
+html.mz-nieuw #mz-start .mzs-tx{gap:6px}
+html.mz-nieuw #mz-start .mzs-r{display:flex;align-items:center;gap:8px;flex-wrap:wrap}

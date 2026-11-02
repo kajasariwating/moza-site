@@ -95,8 +95,8 @@
          '<span class="mzs-lt">'+label(a)+'<span class="mzs-h">'+esc(a.titel)+'</span></span></a>';
       h+='<div class="mzs-kop"><h2>Net binnen</h2><a href="/lezen">Alles →</a></div><div class="mzs-streep" aria-hidden="true"><i></i><i></i><i></i></div><ul class="mzs-list">';
       L.slice(1,8).forEach(function(i){
-        h+='<li><a href="'+esc(i.url)+'">'+(i.img?'<img src="'+esc(i.img)+'?format=300w" alt="" loading="lazy">':'<span class="mzs-noimg"></span>')+
-           '<span class="mzs-tx">'+label(i)+'<span class="mzs-t">'+esc(i.titel)+'</span><span class="mzs-d">'+i.dag+'</span></span></a></li>';
+        /* Geen fotootjes onder de hero, net als op desktop: label en datum, dan de kop */
+        h+='<li><a href="'+esc(i.url)+'"><span class="mzs-tx"><span class="mzs-r">'+label(i)+'<span class="mzs-d">'+i.dag+'</span></span><span class="mzs-t">'+esc(i.titel)+'</span></span></a></li>';
       });
       box.innerHTML=h+'</ul>';
       /* Desktop: rechts een lijst zonder foto's */
