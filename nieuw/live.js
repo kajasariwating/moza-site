@@ -32,9 +32,11 @@
   function lijst(){
     if(P!=='/'||H.classList.contains('mz-nieuw'))return true;
     var ul=document.querySelector('#mzmob ul.mzx-list'),nb=document.querySelector('#mzmob .col.r .sec.o5'),hero=document.querySelector('#mzmob a.hero.o1');
-    if(!ul||!nb||!hero||nb.querySelectorAll('a[href^="/lezen/"]').length<1)return false;
+    var heeftNb=nb&&nb.querySelectorAll('a[href^="/lezen/"]').length>0;
+    if(!ul||!hero)return false;
+    if(!heeftNb&&++lijst.w<12)return false; /* op de telefoon staat Net binnen er niet: dan alleen de hero overslaan */
     var weg={};weg[(hero.getAttribute('href')||'').replace(/\/+$/,'')]=1;
-    [].forEach.call(nb.querySelectorAll('a[href^="/lezen/"]'),function(a){weg[a.getAttribute('href').replace(/\/+$/,'')]=1});
+    if(heeftNb)[].forEach.call(nb.querySelectorAll('a[href^="/lezen/"]'),function(a){weg[a.getAttribute('href').replace(/\/+$/,'')]=1});
     fetch('/lezen?format=json&v='+Math.floor(Date.now()/300000)).then(function(r){return r.json()}).then(function(j){
       var L=(j.items||[]).filter(function(i){return !weg[(i.fullUrl||'').replace(/\/+$/,'')]}).slice(0,5);if(L.length<3)return;
       var html=L.map(function(i){
@@ -49,6 +51,7 @@
     }).catch(function(){});
     return true;
   }
+  lijst.w=0;
   var n2=0;(function k2(){if(lijst()||++n2>60)return;setTimeout(k2,250)})();
 
 })();
