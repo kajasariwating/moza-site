@@ -187,7 +187,10 @@
     }).catch(function(){vak.week.remove()});
     /* Nieuw in de Kennisbank */
     fetch('/kennisbank?format=json').then(function(r){return r.json()}).then(function(j){
-      var K=(j.items||[]).slice().sort(function(a,b){return b.publishOn-a.publishOn}).slice(0,3);if(!K.length){vak.kb.remove();return}
+      var ETEN=/^(recept|koken|moluks eten|eten|keuken|sambal|sago|sagomeel|sagopalm|sagokoekjes|sagu lempeng|ikan bakar|ikan asar|gerookte vis|vis|kokos|hapjes|kue|kenari|colo-colo|koho-koho|bagea|papeda)$/i;
+      var eten=function(i){return /hoe maak je|\b(eten|recepten?|keuken|sambals?|sago|sagu|ikan|hapjes|koken|ingrediënten|papeda)\b/i.test(i.title||'')||(i.tags||[]).some(function(t){return ETEN.test(String(t).trim())})};
+      /* Nieuw in de Kennisbank: niets over eten */
+      var K=(j.items||[]).filter(function(i){return !eten(i)}).sort(function(a,b){return b.publishOn-a.publishOn}).slice(0,3);if(!K.length){vak.kb.remove();return}
       vak.kb.innerHTML=kop('Nieuw in de Kennisbank','/weten','Alles')+'<ul>'+K.map(function(i){return '<li><a href="'+esc(i.fullUrl)+'">'+esc(dec(i.title))+'</a></li>'}).join('')+'</ul>';
     }).catch(function(){vak.kb.remove()});
     /* De boekenplank: dezelfde boeken als het oude Toko Buku-blok, anders de nieuwste op voorraad */

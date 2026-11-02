@@ -328,5 +328,5 @@ html.mz-nieuw body .moza-hero .mzrk-tag{display:inline-block;background:#C9D3FF;
 html.mz-nieuw body .moza-hero .mzrk-tag.roze{background:#FF7AB6}
 /* Geen eigen foto: effen donker vlak met de kop */
 html.mz-nieuw body .moza-hero.mzrk-vlak img{display:none!important}
-html.mz-nieuw body .moza-hero.mzrk-vlak{background:#111;min-height:0}
-html.mz-nieuw body .moza-hero.mzrk-vlak .moza-hero-t{position:static!important;background:none!important;padding-top:36px}
+html.mz-nieuw body .moza-hero.mzrk-vlak{background:#111;min-height:0!important;height:auto!important;aspect-ratio:auto!important}
+html.mz-nieuw body .moza-hero.mzrk-vlak .moza-hero-t{position:static!important;background:none!important;padding-top:40px!important;padding-bottom:28px!important}
