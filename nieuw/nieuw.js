@@ -293,6 +293,6 @@
     return true;
   }
 
-  function start(){balk();var f=0;(function w(){if(footer()||++f>40)return;setTimeout(w,250)})();var b=0;(function q(){bronnen();if(++b<20)setTimeout(q,500)})();var m=0;(function v(){if(voorpagina()||++m>40)return;setTimeout(v,250)})();var h2=0;(function w2(){if(meer2()||++h2>60)return;setTimeout(w2,250)})();var n=0;(function g(){if(deelknop()||++n>40)return;setTimeout(g,250)})();var rk=0;(function k(){if(artikelKop()||++rk>60)return;setTimeout(k,250)})();var ar=0;(function k2(){if(artikelRechts()||++ar>60)return;setTimeout(k2,250)})();var ph=0;(function k3(){if(paginaHero()||++ph>40)return;setTimeout(k3,250)})()}
+  function start(){balk();var f=0;(function w(){if(footer()||++f>40)return;setTimeout(w,250)})();var b=0;(function q(){bronnen();if(++b<20)setTimeout(q,500)})();var m=0;(function v(){if(voorpagina()||++m>40)return;setTimeout(v,250)})();var h2=0;(function w2(){if(meer2()||++h2>60)return;setTimeout(w2,250)})();var n=0;(function g(){if(deelknop()||++n>40)return;setTimeout(g,250)})();var rk=0;(function k(){if(artikelKop()||++rk>60)return;setTimeout(k,250)})();var ar=0;(function k2(){if(artikelRechts()||++ar>60)return;setTimeout(k2,250)})();var ph=0;setTimeout(function k3(){if(paginaHero()||++ph>40)return;setTimeout(k3,250)},1500)}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
 })();
