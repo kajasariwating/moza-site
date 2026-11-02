@@ -7,7 +7,7 @@ t.innerHTML="<script id=\"mz-debug\">(function(){window.__mzErr=[];window.addEve
   s.text=n.textContent;p.insertBefore(s,cs);}
  else{p.insertBefore(n,cs);}});
 /* Live voor iedereen: menubalk onderin op telefoon en tablet (vaste versie) */
-try{(function(){var B='https://cdn.jsdelivr.net/gh/kajasariwating/moza-site@cf70b0d774e8118257525bb1579bbc404f417647/nieuw/';
+try{(function(){var B='https://cdn.jsdelivr.net/gh/kajasariwating/moza-site@ec69abdbb55bf90e35e963376a9968f14d985264/nieuw/';
  var l=document.createElement('link');l.rel='stylesheet';l.href=B+'balk.css';document.head.appendChild(l);
  var j=document.createElement('script');j.src=B+'balk.js';j.async=true;document.head.appendChild(j);
  var l2=document.createElement('link');l2.rel='stylesheet';l2.href=B+'live.css';document.head.appendChild(l2);
