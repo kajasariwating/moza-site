@@ -169,3 +169,82 @@ html.mz-nieuw body .mzf .mzf-nb .mz-misniets{margin:4px 0 6px!important;font:900
 html.mz-nieuw #mz-start .mzs-list a{display:block;padding:13px 0}
 html.mz-nieuw #mz-start .mzs-tx{gap:6px}
 html.mz-nieuw #mz-start .mzs-r{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+
+/* ---------- Voorpagina zoals de mockup: oude blokken weg ---------- */
+html.mz-nieuw #mzmob section.mzv-band,html.mz-nieuw #mzmob section.mzv-kaart,html.mz-nieuw #mzmob section.mzx-mal,
+html.mz-nieuw #mzmob #mz-agtop,html.mz-nieuw #mzmob section.mzpop,html.mz-nieuw #mzmob .col.r .steun,
+html.mz-nieuw #mzmob .col.r section.ag,html.mz-nieuw #mzmob .col.r .bk,html.mz-nieuw #mzmob .cols a.hero.o1,
+html.mz-nieuw #mzmob .cols ul.mzx-list,html.mz-nieuw #mzmob .cols a.mzx-all,html.mz-nieuw #mzmob .cols .mzv-duo,
+html.mz-nieuw #mzmob .cols section.sec.o4,html.mz-nieuw #mzmob .cols div.list.o2{display:none!important}
+#mz-meer{display:none}
+html.mz-nieuw #mz-meer{display:grid;gap:0;font-family:"Hanken Grotesk",system-ui,sans-serif;color:#111;padding:0 16px 24px}
+html.mz-nieuw #mz-meer a{text-decoration:none!important;color:inherit}
+html.mz-nieuw #mz-meer>section{padding:22px 0 0}
+html.mz-nieuw #mz-meer .mzh-kop{display:flex;align-items:baseline;justify-content:space-between;margin:0 0 12px}
+html.mz-nieuw #mz-meer .mzh-kop h2{margin:0;font-size:22px;font-weight:900;letter-spacing:-.02em;color:inherit}
+html.mz-nieuw #mz-meer .mzh-kop a{font-size:15px;font-weight:800;color:#1F3BD1}
+html.mz-nieuw #mz-meer ul,html.mz-nieuw #mz-meer ol{list-style:none;margin:0;padding:0}
+html.mz-nieuw #mz-meer .mzh-go{display:inline-block;margin-top:10px;font-weight:800}
+html.mz-nieuw #mz-meer .mzh-lab{display:inline-block;background:#E9F25A;color:#111;font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:2px 6px}
+/* Op de kaart */
+html.mz-nieuw .mzh-opk>a{display:block;border:2px solid #111;padding:16px 18px 18px;background:#fff}
+html.mz-nieuw .mzh-live{background:#FF4D2E;color:#fff;font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:2px 6px}
+html.mz-nieuw .mzh-kick{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;margin-left:6px}
+html.mz-nieuw .mzh-opk strong{display:block;font-size:52px;line-height:1;font-weight:900;letter-spacing:-.03em;margin:12px 0 8px}
+html.mz-nieuw .mzh-opk p{margin:0;font-size:16px;line-height:1.4}
+/* Deze week te doen */
+html.mz-nieuw .mzh-week li{margin:0 0 10px}
+html.mz-nieuw .mzh-week li a{display:flex;border:2px solid #111;background:#fff}
+html.mz-nieuw .mzh-dt{flex:none;width:58px;background:#FF7AB6;border-right:2px solid #111;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 0}
+html.mz-nieuw .mzh-dt i{font-style:normal;font-size:11px;font-weight:800;text-transform:uppercase}
+html.mz-nieuw .mzh-dt b{font-size:22px;font-weight:900;line-height:1.1}
+html.mz-nieuw .mzh-ev{padding:10px 12px;display:flex;flex-direction:column;gap:3px;min-width:0}
+html.mz-nieuw .mzh-ev b{font-size:16px;font-weight:800;line-height:1.25}
+html.mz-nieuw .mzh-ev small{font-size:13px;color:#555}
+/* Meest gelezen */
+html.mz-nieuw .mzh-pop ol{border:2px solid #111;background:#fff}
+html.mz-nieuw .mzh-pop li{border-bottom:1px solid #E2E0DA}
+html.mz-nieuw .mzh-pop li:last-child{border-bottom:0}
+html.mz-nieuw .mzh-pop li a{display:flex;gap:12px;padding:12px 14px;font-size:15px;font-weight:800;line-height:1.3}
+html.mz-nieuw .mzh-pop li b{color:#1F3BD1;font-size:20px;font-weight:900;min-width:16px}
+/* Peiling */
+html.mz-nieuw .mzh-peil>a{display:block;border:2px solid #1F3BD1;padding:16px 18px 18px;background:#fff}
+html.mz-nieuw .mzh-peil h3{margin:10px 0 0;font-size:20px;line-height:1.2;font-weight:900;color:inherit}
+html.mz-nieuw .mzh-peil .mzh-go{color:#1F3BD1}
+/* Kennisbank */
+html.mz-nieuw .mzh-kb li{border-bottom:1px solid #E2E0DA}
+html.mz-nieuw .mzh-kb li a{display:block;padding:12px 0;font-size:16px;font-weight:800;line-height:1.3}
+/* Boekenplank */
+html.mz-nieuw .mzh-sub{margin:-6px 0 12px;font-size:14px;color:#555}
+html.mz-nieuw .mzh-bks{display:grid;grid-auto-flow:column;grid-auto-columns:42%;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:6px}
+html.mz-nieuw .mzh-bks a{scroll-snap-align:start;display:flex;flex-direction:column;gap:5px}
+html.mz-nieuw .mzh-bks img{width:100%;aspect-ratio:2/3;object-fit:cover;border:2px solid #111;display:block;background:#eee}
+html.mz-nieuw .mzh-bks .mzh-lab{align-self:flex-start}
+html.mz-nieuw .mzh-bks b{font-size:15px;font-weight:800;line-height:1.25}
+html.mz-nieuw .mzh-pr{font-size:15px;font-weight:800;color:#1F3BD1}
+/* nacht */
+html.mz-nieuw.moza-dark #mz-meer{color:#ECECF1}
+html.mz-nieuw.moza-dark .mzh-opk>a,html.mz-nieuw.moza-dark .mzh-week li a,html.mz-nieuw.moza-dark .mzh-pop ol,html.mz-nieuw.moza-dark .mzh-peil>a{background:#17181D;border-color:#ECECF1}
+html.mz-nieuw.moza-dark .mzh-peil>a{border-color:#7E8FD9}
+html.mz-nieuw.moza-dark .mzh-dt{border-color:#ECECF1;color:#111}
+html.mz-nieuw.moza-dark .mzh-ev small,html.mz-nieuw.moza-dark .mzh-sub{color:#A9ABB6}
+html.mz-nieuw.moza-dark .mzh-pop li,html.mz-nieuw.moza-dark .mzh-kb li{border-color:#2E3140}
+html.mz-nieuw.moza-dark #mz-meer .mzh-kop a,html.mz-nieuw.moza-dark .mzh-pop li b,html.mz-nieuw.moza-dark .mzh-pr,html.mz-nieuw.moza-dark .mzh-peil .mzh-go{color:#AEB9F2}
+/* Computer: hero links (nieuwste stuk), Net binnen rechts, dan drie kolommen */
+@media (min-width:1025px){
+  html.mz-nieuw #mz-start{display:block;margin:0 0 28px}
+  html.mz-nieuw #mz-start .mzs-kop,html.mz-nieuw #mz-start .mzs-streep,html.mz-nieuw #mz-start .mzs-list{display:none}
+  html.mz-nieuw #mz-start a{text-decoration:none!important}
+  html.mz-nieuw #mz-start .mzs-lead{display:block;background:#111;border:2px solid #111}
+  html.mz-nieuw #mz-start .mzs-lead img{display:block;width:100%;aspect-ratio:16/9;height:auto;object-fit:cover}
+  html.mz-nieuw #mz-start .mzs-lt{display:flex;flex-direction:column;gap:10px;padding:18px 22px 22px;color:#fff}
+  html.mz-nieuw #mz-start .mzs-h{font-size:38px;line-height:1.08;font-weight:900;letter-spacing:-.02em;color:#fff}
+  html.mz-nieuw #mz-start .mzs-tag{align-self:flex-start;background:#C9D3FF;color:#111;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:3px 7px}
+  html.mz-nieuw #mz-start .mzs-tag.roze{background:#FF7AB6}
+  html.mz-nieuw #mz-start .mzs-cat{font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#C9D3FF}
+  html.mz-nieuw #mz-meer{max-width:var(--mzh-w,1290px);margin:0 auto;padding:0 0 40px;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:32px}
+  html.mz-nieuw .mzh-peil{grid-column:1}
+  html.mz-nieuw .mzh-kb{grid-column:2 / span 2}
+  html.mz-nieuw .mzh-boek{grid-column:1 / -1}
+  html.mz-nieuw .mzh-bks{grid-auto-flow:row;grid-template-columns:repeat(5,minmax(0,1fr));overflow:visible}
+}

@@ -109,6 +109,59 @@
     return true;
   }
 
+
+  /* ---------- Voorpagina: de rest zoals in de mockup (alle schermen) ---------- */
+  var DAG=['zo','ma','di','wo','do','vr','za'];
+  function dagnr(t){var d=new Date(t);return {d:DAG[d.getDay()],n:d.getDate(),m:MND[d.getMonth()],u:('0'+d.getHours()).slice(-2)+'.'+('0'+d.getMinutes()).slice(-2)}}
+  function kop(h,href,lbl){return '<div class="mzh-kop"><h2>'+h+'</h2>'+(href?'<a href="'+href+'">'+lbl+' →</a>':'')+'</div>'}
+  function meer2(){
+    if(P!=='/')return true;
+    var cols=document.querySelector('#mzmob .cols');if(!cols)return false;
+    var pop=document.querySelector('#mzmob section.mzpop');
+    if(!pop&&++meer2.n<30)return false;
+    if(document.getElementById('mz-meer'))return true;
+    var box=document.createElement('div');box.id='mz-meer';cols.parentNode.insertBefore(box,cols.nextSibling);
+    var vak={};['opk','week','pop','peil','kb','boek'].forEach(function(k){var e=document.createElement('section');e.className='mzh-'+k;box.appendChild(e);vak[k]=e});
+    /* Meest gelezen vandaag: de lijst die de site al bijhoudt */
+    if(pop){var L=[].slice.call(pop.querySelectorAll('a[href]')).slice(0,4);
+      vak.pop.innerHTML=kop('Meest gelezen vandaag')+'<ol>'+L.map(function(a,i){var t=(a.innerText||'').replace(/^\s*\d+\s*/,'').trim();return '<li><a href="'+esc(a.getAttribute('href'))+'"><b>'+(i+1)+'</b><span>'+esc(t)+'</span></a></li>'}).join('')+'</ol>'}
+    else vak.pop.remove();
+    /* Peiling */
+    var pl=window.MOZA_POLL;
+    if(pl&&pl.q&&pl.url)vak.peil.innerHTML='<a href="'+esc(pl.url)+'"><span class="mzh-lab">Peiling van de maand</span><h3>'+esc(pl.q)+'</h3><span class="mzh-go">Doe mee →</span></a>';else vak.peil.remove();
+    /* Op de kaart: het cijfer uit de laatste Kaart van de week */
+    fetch('/lezen?format=json&v='+Math.floor(Date.now()/300000)).then(function(r){return r.json()}).then(function(j){
+      var k=(j.items||[]).filter(function(i){return (i.tags||[]).some(function(t){return /^kaart van de week$/i.test(t)})})[0];
+      var ex=k&&dec((k.excerpt||'').replace(/<[^>]+>/g,'')).trim();var zin=ex&&(ex.split(/\.\s/)[0].replace(/\.$/,'')+'.');var m=zin&&/\d{1,3}(?:\.\d{3})+|\d{2,}/.exec(zin);
+      if(!m){vak.opk.remove();return}
+      vak.opk.innerHTML='<a href="/kaarten"><span class="mzh-live">Live</span> <span class="mzh-kick">Op de kaart</span><strong>'+esc(m[0])+'</strong><p>'+esc(zin)+'</p><span class="mzh-go">Bekijk de kaarten →</span></a>';
+    }).catch(function(){vak.opk.remove()});
+    /* Deze week te doen */
+    fetch('/evenementen?format=json').then(function(r){return r.json()}).then(function(j){
+      var nu=Date.now(),U=(j.upcoming||[]).filter(function(e){return e.startDate>=nu-6*3600e3}).sort(function(a,b){return a.startDate-b.startDate});
+      var W=U.filter(function(e){return e.startDate<nu+7*864e5});if(W.length<3)W=U;W=W.slice(0,3);
+      if(!W.length){vak.week.remove();return}
+      vak.week.innerHTML=kop('Deze week te doen','/events','Agenda')+'<ul>'+W.map(function(e){var d=dagnr(e.startDate),l=e.location||{},st=((l.addressLine2||'').split(',')[0]||'').trim();
+        return '<li><a href="'+esc(e.fullUrl)+'"><span class="mzh-dt"><i>'+d.d+'</i><b>'+d.n+'</b><i>'+d.m+'</i></span><span class="mzh-ev"><b>'+esc(dec(e.title))+'</b><small>'+d.u+(l.addressTitle?' · '+esc(l.addressTitle):'')+(st&&st!==l.addressTitle?', '+esc(st):'')+'</small></span></a></li>'}).join('')+'</ul>';
+    }).catch(function(){vak.week.remove()});
+    /* Nieuw in de Kennisbank */
+    fetch('/kennisbank?format=json').then(function(r){return r.json()}).then(function(j){
+      var K=(j.items||[]).slice().sort(function(a,b){return b.publishOn-a.publishOn}).slice(0,3);if(!K.length){vak.kb.remove();return}
+      vak.kb.innerHTML=kop('Nieuw in de Kennisbank','/weten','Alles')+'<ul>'+K.map(function(i){return '<li><a href="'+esc(i.fullUrl)+'">'+esc(dec(i.title))+'</a></li>'}).join('')+'</ul>';
+    }).catch(function(){vak.kb.remove()});
+    /* De boekenplank: dezelfde boeken als het oude Toko Buku-blok, anders de nieuwste op voorraad */
+    fetch('/store?format=json').then(function(r){return r.json()}).then(function(j){
+      var I=j.items||[],keus=[].slice.call(document.querySelectorAll('#mzmob section.mzv-band .bks a[href*="/store/p/"]')).map(function(a){return a.getAttribute('href').split('?')[0]});
+      var B=keus.length?keus.map(function(u){return I.filter(function(i){return i.fullUrl===u})[0]}).filter(Boolean):[];
+      I.forEach(function(i){var v=(i.variants||[])[0]||{};if(B.length<5&&B.indexOf(i)<0&&(v.unlimited||v.qtyInStock>0))B.push(i)});
+      B=B.slice(0,5);if(!B.length){vak.boek.remove();return}
+      vak.boek.innerHTML=kop('De boekenplank','/store','Toko Buku')+'<p class="mzh-sub">Elke aankoop steunt MOZA.nu.</p><div class="mzh-bks">'+B.map(function(i){var v=(i.variants||[])[0]||{},p=v.onSale&&v.salePriceMoney?v.salePriceMoney.value:(v.priceMoney||{}).value,lab=((i.tags||[]).filter(function(t){return /^label:/i.test(t)})[0]||'').replace(/^label:\s*/i,'');
+        return '<a href="'+esc(i.fullUrl)+'">'+(i.assetUrl?'<img src="'+esc(i.assetUrl)+'?format=300w" alt="" loading="lazy">':'')+(lab?'<span class="mzh-lab">'+esc(lab)+'</span>':'')+'<b>'+esc(dec(i.title))+'</b>'+(p?'<span class="mzh-pr">€ '+String(Number(p).toFixed(2)).replace('.',',')+'</span>':'')+'</a>'}).join('')+'</div>';
+    }).catch(function(){vak.boek.remove()});
+    return true;
+  }
+  meer2.n=0;
+
   /* ---------- Bronnen ingeklapt ---------- */
   function bronnen(){
     var L=document.querySelectorAll('aside.moza-bronnen:not([data-mzb])');
@@ -127,6 +180,6 @@
     return true;
   }
 
-  function start(){balk();var f=0;(function w(){if(footer()||++f>40)return;setTimeout(w,250)})();var b=0;(function q(){bronnen();if(++b<20)setTimeout(q,500)})();var m=0;(function v(){if(voorpagina()||++m>40)return;setTimeout(v,250)})();var n=0;(function g(){if(deelknop()||++n>40)return;setTimeout(g,250)})()}
+  function start(){balk();var f=0;(function w(){if(footer()||++f>40)return;setTimeout(w,250)})();var b=0;(function q(){bronnen();if(++b<20)setTimeout(q,500)})();var m=0;(function v(){if(voorpagina()||++m>40)return;setTimeout(v,250)})();var h2=0;(function w2(){if(meer2()||++h2>60)return;setTimeout(w2,250)})();var n=0;(function g(){if(deelknop()||++n>40)return;setTimeout(g,250)})()}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
 })();
