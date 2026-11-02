@@ -263,7 +263,9 @@
     var kl=null;KLEUR.forEach(function(k){if(!kl&&k[0].test(P))kl=k[1]});if(!kl)return true;
     var h1=[].filter.call(document.querySelectorAll('#page h1, main h1, #siteWrapper h1'),function(h){return !h.closest('#header')&&h.getClientRects().length&&!/Marquee/.test(h.className)})[0];
     if(!h1)return false;
-    var e=h1,hero=null;for(var i=0;i<4&&e&&e!==document.body;i++){if(/(^|[\s-])hero(\s|$)/.test(String(e.className))){hero=e;break}e=e.parentElement}
+    var hero=h1.closest('#mzkop');
+    var e=h1;for(var i=0;!hero&&i<4&&e&&e!==document.body;i++){if(/(^|[\s-])hero(\s|$)/.test(String(e.className))){hero=e;break}e=e.parentElement}
+    if(!hero){e=h1.parentElement;for(var j=0;j<5&&e&&e.id!=='siteWrapper';j++){var b=e.getBoundingClientRect(),bg=getComputedStyle(e).backgroundColor;if(b.width>innerWidth*.85&&b.height<700&&bg!=='rgba(0, 0, 0, 0)'&&bg!=='rgb(255, 255, 255)'){hero=e;break}e=e.parentElement}}
     if(!hero){var p=h1.parentElement;hero=/^(in|wrap|mdn-in|inner)$/.test(String(p.className).trim())?p.parentElement:p}
     if(!hero||hero.classList.contains('mz-ph'))return true;
     hero.classList.add('mz-ph','mz-ph-'+kl);H.classList.add('mz-ph-pagina');
