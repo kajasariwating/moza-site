@@ -33,7 +33,7 @@
     if(P!=='/'||H.classList.contains('mz-nieuw'))return true;
     var ul=document.querySelector('#mzmob ul.mzx-list'),nb=document.querySelector('#mzmob .col.r .sec.o5'),hero=document.querySelector('#mzmob a.hero.o1');
     if(!ul||!hero)return false;
-    if(!nb&&++lijst.w<12)return false; /* op de telefoon staat Net binnen er niet */
+    if(!nb&&++lijst.w<4)return false; /* op de telefoon staat Net binnen er niet */
     var heroU=(hero.getAttribute('href')||'').replace(/\/+$/,'');
     fetch('/lezen?format=json&v='+Math.floor(Date.now()/300000)).then(function(r){return r.json()}).then(function(j){
       var U=function(i){return (i.fullUrl||'').replace(/\/+$/,'')};
@@ -47,16 +47,16 @@
           var zetNb=function(){if(tl.innerHTML!==nh)tl.innerHTML=nh};zetNb();
           var t1=Date.now();new MutationObserver(function(m,o){if(Date.now()-t1>20000){o.disconnect();return}zetNb()}).observe(tl,{childList:true})}}
       /* onder de hero: de 5 nieuwste die niet al in de hero of in Net binnen staan */
-      var L=A.filter(function(i){return NB.indexOf(i)<0}).slice(0,5);if(L.length<3)return;
+      var L=A.filter(function(i){return NB.indexOf(i)<0}).slice(0,5);if(L.length<3){H.classList.remove('mz-lw');return}
       var html=L.map(function(i){
         var rub=rubVan(i);
         var d=new Date(i.publishOn),dag=d.getDate()+' '+MND[d.getMonth()];
         var k=rub?'<b class="rb" style="background:'+(rub==='Dit weekend'?'#FF7AB6':'#C9D3FF')+';color:#111">'+esc(rub)+'</b>':(((i.categories||[])[0])?'<b class="rb" style="background:#1F3BD1;color:#fff">'+esc((i.categories||[])[0])+'</b>':'');
         return '<li><a href="'+esc(i.fullUrl)+'"><span class="k">'+k+'</span><span class="t">'+esc(dec(i.title))+'<small class="w">'+dag+'</small></span></a></li>'}).join('');
       var zet=function(){if(ul.innerHTML!==html)ul.innerHTML=html};
-      zet();
+      zet();H.classList.remove('mz-lw');
       var t0=Date.now();new MutationObserver(function(m,o){if(Date.now()-t0>20000){o.disconnect();return}zet()}).observe(ul,{childList:true});
-    }).catch(function(){});
+    }).catch(function(){H.classList.remove('mz-lw')});
     return true;
   }
   lijst.w=0;
