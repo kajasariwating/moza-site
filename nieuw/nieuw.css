@@ -356,3 +356,39 @@ html.mz-nieuw.moza-dark #mz-akop .mzak-cat{color:#AEB9F2}
 html.mz-nieuw.moza-dark #mz-akop .mzr-big{color:#AEB9F2}
 html.mz-nieuw.moza-dark body .moza-hero .moza-credit{color:#A9ABB6!important}
 @media (max-width:1024px){html.mz-nieuw #mz-akop{padding:14px 0 10px}}
+/* ---------- Artikel: twee kolommen, rechts peiling, Meest gelezen, Steun MOZA ---------- */
+html.mz-nieuw body .moza-right.mz-ar-aan>*:not(#mz-arechts){display:none!important}
+html.mz-nieuw body .moza-right.mz-ar-aan{display:block!important}
+html.mz-nieuw #mz-arechts{font-family:"Hanken Grotesk",system-ui,sans-serif;color:#111;display:flex;flex-direction:column;gap:22px}
+html.mz-nieuw #mz-arechts a{text-decoration:none!important;color:inherit}
+html.mz-nieuw #mz-arechts .mzar-k{display:block;font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;margin:0 0 8px}
+html.mz-nieuw #mz-arechts b{display:block;font-size:18px;font-weight:900;line-height:1.25}
+html.mz-nieuw #mz-arechts .mzar-bt{display:inline-block;margin-top:12px;background:#111;color:#fff;font-size:14px;font-weight:800;padding:8px 12px}
+html.mz-nieuw .mzar-peil{display:block;background:#C9D3FF;border:2px solid #1F3BD1;padding:16px 18px 18px}
+html.mz-nieuw .mzar-peil .mzar-k{color:#1F3BD1}
+html.mz-nieuw .mzar-steun{display:block;background:#111;color:#fff!important;padding:16px 18px 18px;box-shadow:6px 6px 0 #FF7AB6}
+html.mz-nieuw .mzar-steun .mzar-k{color:#FF7AB6}
+html.mz-nieuw .mzar-steun b{font-size:16px!important;font-weight:700!important}
+html.mz-nieuw .mzar-steun .mzar-bt{background:#1F3BD1!important}
+html.mz-nieuw .mzar-pop h3{margin:0 0 10px;font-size:18px;font-weight:900;color:inherit;font-family:inherit}
+html.mz-nieuw .mzar-pop ol{list-style:none;margin:0;padding:0;border:2px solid #111}
+html.mz-nieuw .mzar-pop li{border-bottom:1px solid #E2E0DA;margin:0}
+html.mz-nieuw .mzar-pop li:last-child{border-bottom:0}
+html.mz-nieuw .mzar-pop li a{display:flex;gap:10px;padding:10px 12px;font-size:14px;font-weight:800;line-height:1.3}
+html.mz-nieuw .mzar-pop li b{display:inline!important;font-size:18px!important;color:#1F3BD1;min-width:14px}
+html.mz-nieuw.moza-dark #mz-arechts{color:#ECECF1}
+html.mz-nieuw.moza-dark .mzar-peil{background:#2A3260;border-color:#AEB9F2}
+html.mz-nieuw.moza-dark .mzar-peil .mzar-k{color:#AEB9F2}
+html.mz-nieuw.moza-dark .mzar-pop ol{border-color:#ECECF1}
+html.mz-nieuw.moza-dark .mzar-pop li{border-color:#2E3140}
+html.mz-nieuw.moza-dark .mzar-pop li b{color:#AEB9F2}
+html.mz-nieuw.moza-dark #mz-arechts .mzar-bt{background:#ECECF1;color:#111}
+@media (min-width:1025px){
+  html.mz-nieuw body .blog-item-content-wrapper.moza-has-side{grid-template-columns:minmax(0,1fr) 300px!important;column-gap:56px!important;max-width:1232px!important;margin-left:auto!important;margin-right:auto!important}
+  html.mz-nieuw body .blog-item-content-wrapper.moza-has-side>.moza-left{display:none!important}
+  html.mz-nieuw body .blog-item-content-wrapper.moza-has-side>.blog-item-content{grid-column:1!important}
+  html.mz-nieuw body .blog-item-content-wrapper.moza-has-side>.moza-right{grid-column:2!important;grid-row:1!important;align-self:start;position:sticky;top:16px}
+}
+@media (max-width:1024px){
+  html.mz-nieuw body .moza-right.mz-ar-aan{padding:0 16px;margin:24px 0}
+}
