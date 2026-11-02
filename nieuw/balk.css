@@ -32,5 +32,13 @@
   html.mz-balk.moza-dark #mz-onder a,html.mz-balk.moza-dark #mz-onder button{color:#ECECF1}
   html.mz-balk.moza-dark #mz-onder .ag{background:#E06FA3;color:#111}
   html.mz-balk.moza-dark #mz-onder [aria-current="page"]{color:#AEB9F2;box-shadow:inset 0 3px 0 #AEB9F2}
+  /* Kop bovenin overal gelijk aan de voorpagina */
+  html.mz-balk body #mzmob .hdi .mzk-cart{display:inline-flex;align-items:center;gap:4px;height:40px;padding:0 11px;margin:0 4px;border:2px solid #111;border-radius:999px;color:#111;text-decoration:none!important;font:900 15px/1 "Hanken Grotesk",system-ui,sans-serif;box-sizing:border-box}
+  html.mz-balk body #mzmob .hdi .mzk-cart svg{width:18px;height:18px}
+  html.mz-balk body #header .header-display-mobile .mzk-aa{width:44px;height:44px;border:0;background:none;color:#111;display:inline-flex;align-items:center;justify-content:center;padding:0;cursor:pointer}
+  html.mz-balk body #header .header-display-mobile .mzk-aa svg{width:26px;height:26px}
+  html.mz-balk body #header .header-display-mobile .mzk-don{display:inline-flex;align-items:center;height:44px;padding:0 14px;margin-left:4px;border-radius:999px;background:#1F3BD1;color:#fff!important;font:900 15px/1 "Hanken Grotesk",system-ui,sans-serif;text-decoration:none!important}
+  html.mz-balk.moza-dark body #mzmob .hdi .mzk-cart{border-color:#ECECF1;color:#ECECF1}
+  html.mz-balk.moza-dark body #header .header-display-mobile .mzk-aa{color:#ECECF1}
 }
 

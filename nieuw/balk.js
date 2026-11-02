@@ -41,5 +41,25 @@
     document.body.appendChild(n);
   }
 
+  /* Kop bovenin op telefoon en tablet overal gelijk: logo, Leeshulp (Aa), nachtstand, winkelmandje, Doneer */
+  var AA='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 19 8 5l5 14M4.8 14h6.4"/><path d="M15 19l3.5-9 3.5 9M16 16.5h5"/></svg>';
+  function aantal(){var q=document.querySelector('#header .icon-cart-quantity');var n=q?parseInt(q.textContent,10):0;return isNaN(n)?0:n}
+  function kop(){
+    if(window.matchMedia&&!matchMedia('(max-width:1024px)').matches)return true;
+    if(P==='/'){
+      var hdi=document.querySelector('#mzmob header.hd .hdi'),don=hdi&&hdi.querySelector('a.don');if(!don)return false;
+      if(!hdi.querySelector('.mzk-cart')){var c=document.createElement('a');c.className='mzk-cart';c.href='/cart';c.setAttribute('aria-label','Winkelmandje');c.innerHTML=ic('toko')+'<b>'+aantal()+'</b>';hdi.insertBefore(c,don)}
+      return true;
+    }
+    var th=document.querySelector('#header .header-display-mobile .moza-theme');if(!th)return false;
+    var box=th.parentNode;if(box.querySelector('.mzk-aa'))return true;
+    var aa=document.createElement('button');aa.type='button';aa.className='mzk-aa';aa.setAttribute('aria-label','Leeshulp');aa.innerHTML=AA;
+    aa.addEventListener('click',function(){var b=document.querySelector('#header .mz-lbtn')||document.querySelector('.mm-lees');if(b)b.click()});
+    box.insertBefore(aa,th);
+    var d=document.createElement('a');d.className='mzk-don';d.href='/doneer';d.textContent='Doneer';box.appendChild(d);
+    H.classList.add('mzk-kop');
+    return true;
+  }
+  var kk=0;(function k(){if(kop()||++kk>40)return;setTimeout(k,250)})();
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',balk);else balk();
 })();
