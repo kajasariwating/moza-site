@@ -16,7 +16,7 @@ t.innerHTML=%(html)s;
 # Testschakelaar (haalt altijd de nieuwste testversie van main, max. 5 minuten oud in de browser): ?nieuw=1 zet de nieuwe vormgeving aan (onthouden in deze browser), ?nieuw=0 zet hem uit.
 SCHAKELAAR = r"""
 /* Live voor iedereen: menubalk onderin op telefoon en tablet (vaste versie) */
-try{(function(){var B='https://cdn.jsdelivr.net/gh/kajasariwating/moza-site@2def6cd08a8a2b6c2089969fabe6f38768fb2aef/nieuw/';
+try{(function(){var B='https://cdn.jsdelivr.net/gh/kajasariwating/moza-site@dde520d991fbb23c175fe88abc061291f094d2c9/nieuw/';
  var l=document.createElement('link');l.rel='stylesheet';l.href=B+'balk.css';document.head.appendChild(l);
  var j=document.createElement('script');j.src=B+'balk.js';j.async=true;document.head.appendChild(j);
  var l2=document.createElement('link');l2.rel='stylesheet';l2.href=B+'live.css';document.head.appendChild(l2);
