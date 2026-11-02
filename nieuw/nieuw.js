@@ -22,10 +22,9 @@
     return '';
   }
   function meer(){
-    var b=document.querySelector('#header .header-display-mobile .header-burger-btn')||document.querySelector('#header .header-burger-btn');
-    if(b&&b.getClientRects().length){b.click();return}
-    var d=document.querySelector('#mzmob nav.dnav button, #mzmob nav.dnav a, .moza-kompas');
+    var d=document.querySelector('#mzmob nav.dnav button, #mzmob nav.dnav a');
     if(d){d.click();return}
+    var b=document.querySelector('#header .header-display-mobile .header-burger-btn')||document.querySelector('#header .header-burger-btn');
     if(b){b.click();return}
     location.href='/lezen';
   }
