@@ -121,11 +121,21 @@
     var box=document.createElement('div');box.id='mz-meer';cols.parentNode.insertBefore(box,cols.nextSibling);
     var vak={};['opk','week','pop','peil','kb','boek'].forEach(function(k){var e=document.createElement('section');e.className='mzh-'+k;box.appendChild(e);vak[k]=e});
     /* Meest gelezen vandaag: de lijst die de site al bijhoudt */
-    /* De lijst wordt door de site later gevuld: blijf kijken tot er links in staan (max. 20 s) */
-    var pt=0;(function vul(){var pop=document.querySelector('#mzmob section.mzpop');
-      var L=pop?[].slice.call(pop.querySelectorAll('a[href]')).filter(function(a){return (a.textContent||'').trim().length>3}).slice(0,4):[];
-      if(L.length<3){if(++pt<80){setTimeout(vul,250);return}vak.pop.remove();return}
-      vak.pop.innerHTML=kop('Meest gelezen vandaag')+'<ol>'+L.map(function(a,i){var t=(a.textContent||'').replace(/\s+/g,' ').replace(/^\s*\d+\s*/,'').trim();return '<li><a href="'+esc(a.getAttribute('href'))+'"><b>'+(i+1)+'</b><span>'+esc(t)+'</span></a></li>'}).join('')+'</ol>'})();
+    /* Meest gelezen vandaag: zelfde bron als de site (GoatCounter, cache 10 min), de hero zelf niet */
+    (function(){
+      var GC='https://moza.goatcounter.com',KEY=window.MOZA_GC_KEY||'',d=new Date(),ymd;
+      try{ymd=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Amsterdam',year:'numeric',month:'2-digit',day:'2-digit'}).format(d)}catch(e){ymd=d.toISOString().slice(0,10)}
+      var ck='mgc:top:'+ymd,cv=null;try{cv=JSON.parse(localStorage.getItem(ck))}catch(e){}
+      var lijst=cv&&Date.now()-cv.t<600e3?Promise.resolve(cv.v):(KEY?fetch(GC+'/api/v0/stats/hits?start='+ymd+'&limit=40',{headers:{'Authorization':'Bearer '+KEY,'Content-Type':'application/json'}}).then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(j){
+        var l=(j.hits||[]).filter(function(x){return !x.event&&/^\/(lezen|kennisbank)\/./.test(x.path||'')}).map(function(x){return {t:String(x.title||'').replace(/\s+[—|-]\s+MOZA.*$/,''),u:String(x.path).replace(/\/+$/,''),n:+(x.count!=null?x.count:x.count_unique)||0}}).filter(function(x){return x.n>=2}).sort(function(a,b){return b.n-a.n}).slice(0,6);
+        try{localStorage.setItem(ck,JSON.stringify({t:Date.now(),v:l}))}catch(e){}return l}):Promise.reject());
+      Promise.all([lijst,fetch('/lezen?format=json&v='+Math.floor(Date.now()/300000)).then(function(r){return r.json()}).catch(function(){return {}})]).then(function(r){
+        var items=(r[1].items||[]),hero=items[0]&&items[0].fullUrl,T={};items.forEach(function(i){T[i.fullUrl]=dec(i.title)});
+        var L=(r[0]||[]).filter(function(x){return x.u!==hero}).slice(0,4);
+        if(L.length<3)throw 0;
+        vak.pop.innerHTML=kop('Meest gelezen vandaag')+'<ol>'+L.map(function(x,i){return '<li><a href="'+esc(x.u)+'"><b>'+(i+1)+'</b><span>'+esc(T[x.u]||x.t)+'</span></a></li>'}).join('')+'</ol>';
+      }).catch(function(){vak.pop.remove()});
+    })();
     /* Peiling */
     var pl=window.MOZA_POLL;
     if(pl&&pl.q&&pl.url)vak.peil.innerHTML='<a href="'+esc(pl.url)+'"><span class="mzh-lab">Peiling van de maand</span><h3>'+esc(pl.q)+'</h3><span class="mzh-go">Doe mee →</span></a>';else vak.peil.remove();
