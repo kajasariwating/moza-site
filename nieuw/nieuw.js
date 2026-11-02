@@ -61,6 +61,47 @@
     return true;
   }
 
-  function start(){balk();var n=0;(function g(){if(deelknop()||++n>40)return;setTimeout(g,250)})()}
+
+  /* ---------- Voorpagina (mobiel): groot stuk bovenaan + Net binnen mét rubrieken ---------- */
+  var RUB=['Kaart van de week','Achter de foto','Leeswijzer','Woord van de week','Dit weekend','Deze week toen','Jullie zeiden','MOZA deze maand'];
+  var MND=['jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
+  function esc(t){return String(t||'').replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+  function dec(t){var d=document.createElement('textarea');d.innerHTML=t||'';return d.value}
+  function info(it){
+    var tags=it.tags||[],rub=null;
+    if(tags.some(function(t){return /^rubriek$/i.test(t)}))RUB.forEach(function(r){if(!rub&&tags.some(function(t){return t.toLowerCase()===r.toLowerCase()}))rub=r});
+    var t=dec(it.title);
+    if(rub&&t.toLowerCase().indexOf(rub.toLowerCase()+':')===0){t=t.slice(rub.length+1).trim();t=t.charAt(0).toUpperCase()+t.slice(1)}
+    var c=(it.categories||[])[0]||'';
+    var d=new Date(it.publishOn||it.addedOn);
+    return {rub:rub,titel:t,cat:c,url:it.fullUrl,img:it.assetUrl,dag:d.getDate()+' '+MND[d.getMonth()]};
+  }
+  function label(i){
+    if(i.rub)return '<span class="mzs-tag'+(i.rub==='Dit weekend'?' roze':'')+'">'+esc(i.rub)+'</span>';
+    return i.cat?'<span class="mzs-cat">'+esc(i.cat)+'</span>':'';
+  }
+  function voorpagina(){
+    if(P!=='/')return true;
+    var col=document.querySelector('#mzmob .cols .col.l');
+    if(!col)return false;
+    if(document.getElementById('mz-start'))return true;
+    var box=document.createElement('section');box.id='mz-start';box.setAttribute('aria-label','Net binnen');
+    col.insertBefore(box,col.firstChild);
+    fetch('/lezen?format=json').then(function(r){return r.json()}).then(function(j){
+      var L=(j.items||[]).map(info);if(!L.length)return;
+      var a=L[0],h='';
+      h+='<a class="mzs-lead" href="'+esc(a.url)+'">'+(a.img?'<img src="'+esc(a.img)+'?format=750w" alt="" loading="eager">':'')+
+         '<span class="mzs-lt">'+label(a)+'<span class="mzs-h">'+esc(a.titel)+'</span></span></a>';
+      h+='<div class="mzs-kop"><h2>Net binnen</h2><a href="/lezen">Alles →</a></div><div class="mzs-streep" aria-hidden="true"><i></i><i></i><i></i></div><ul class="mzs-list">';
+      L.slice(1,8).forEach(function(i){
+        h+='<li><a href="'+esc(i.url)+'">'+(i.img?'<img src="'+esc(i.img)+'?format=300w" alt="" loading="lazy">':'<span class="mzs-noimg"></span>')+
+           '<span class="mzs-tx">'+label(i)+'<span class="mzs-t">'+esc(i.titel)+'</span><span class="mzs-d">'+i.dag+'</span></span></a></li>';
+      });
+      box.innerHTML=h+'</ul>';
+    }).catch(function(){box.remove()});
+    return true;
+  }
+
+  function start(){balk();var m=0;(function v(){if(voorpagina()||++m>40)return;setTimeout(v,250)})();var n=0;(function g(){if(deelknop()||++n>40)return;setTimeout(g,250)})()}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
 })();
