@@ -231,6 +231,8 @@
     /* Deze week toen en Dit weekend: de grote datum of de dagen uit de rubriekopmaak onder de kop */
     var big=document.querySelector('.mzr-hero .mzr-big'),sub=document.querySelector('.mzr-hero .mzr-sub');
     if(big||sub){var g=document.createElement('div');g.className='mzak-groot';if(big)g.appendChild(big);if(sub)g.appendChild(sub);kop.appendChild(g)}
+    /* de balk Live kaart hoort niet boven de kop: zet hem onder de foto */
+    var fl=kop.previousElementSibling;if(fl&&fl.classList.contains('mzfl'))hero.parentNode.insertBefore(fl,hero.nextSibling);
     /* vaste rubriekafbeelding met tekst: geen foto bovenaan */
     var img=hero.querySelector('img');
     if(!img||VASTE.test(img.getAttribute('src')||img.src||''))hero.classList.add('mzak-geen');
