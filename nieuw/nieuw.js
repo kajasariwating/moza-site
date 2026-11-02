@@ -206,26 +206,34 @@
   }
 
 
-  /* ---------- Rubriekstukken: kop zoals de andere artikelen in Lezen ---------- */
+  /* ---------- Artikelen in Lezen (ook rubrieken): kop zoals de mockup ----------
+     label(s) + kop + datum en knoppen, daaronder pas de foto met de maker eronder */
   var VASTE=/\/cover-(kaart-van-de-week|achter-de-foto|leeswijzer|woord-van-de-week|dit-weekend|deze-week-toen|jullie-zeiden|moza-deze-maand)\.png/i;
-  function rubriekKop(){
-    if(!H.classList.contains('mzr'))return !!document.querySelector('.blog-item-content')&&document.readyState==='complete';
-    var hero=document.querySelector('.moza-hero');if(!hero)return false;
-    if(hero.getAttribute('data-mzrk'))return true;hero.setAttribute('data-mzrk','1');
-    /* label met de rubrieknaam (lichtblauw, Dit weekend roze) vooraan in de rij met chips */
-    var NM={dwt:'Deze week toen',dw:'Dit weekend',kvdw:'Kaart van de week',adf:'Achter de foto',lw:'Leeswijzer',wvdw:'Woord van de week',jz:'Jullie zeiden',mdm:'MOZA deze maand'},naam='';
-    for(var k in NM)if(H.classList.contains('mzr-'+k))naam=NM[k];
-    var rij=hero.querySelector('.moza-chiprow .blog-item-meta-wrapper')||hero.querySelector('.moza-chiprow');
-    if(naam&&rij){var c=document.createElement('span');c.className='mzs-tag mzrk-tag'+(/^dit weekend/i.test(naam)?' roze':'');c.textContent=naam;rij.insertBefore(c,rij.firstChild)}
-    /* vaste rubriekafbeelding (met tekst) niet als foto: neem de eerste foto uit de tekst, anders een effen vlak */
+  var NM={dwt:'Deze week toen',dw:'Dit weekend',kvdw:'Kaart van de week',adf:'Achter de foto',lw:'Leeswijzer',wvdw:'Woord van de week',jz:'Jullie zeiden',mdm:'MOZA deze maand'};
+  function artikelKop(){
+    if(!/^\/lezen\/[^\/]+/.test(P)||/^\/lezen\/(category|tag)\//.test(P))return true;
+    var hero=document.querySelector('.moza-hero'),ht=hero&&hero.querySelector('.moza-hero-t'),dl=document.querySelector('.moza-dateline');
+    if(!hero||!ht||!dl)return false;
+    var rub=H.classList.contains('mzr');
+    if(rub&&!document.querySelector('.mzr-hero'))return false; /* wacht op de rubriekopmaak */
+    if(document.getElementById('mz-akop'))return true;
+    var kop=document.createElement('header');kop.id='mz-akop';
+    hero.parentNode.insertBefore(kop,hero);
+    /* labels: rubriek (lichtblauw, Dit weekend roze) en de categorieën in blauwe kapitalen */
+    var lab=document.createElement('div');lab.className='mzak-lab';
+    var naam='';for(var k in NM)if(H.classList.contains('mzr-'+k))naam=NM[k];
+    var cats=[].map.call(ht.querySelectorAll('.blog-item-category'),function(a){return a.textContent.trim()}).filter(Boolean);
+    lab.innerHTML=(naam?'<span class="mzs-tag'+(/^dit weekend/i.test(naam)?' roze':'')+'">'+esc(naam)+'</span>':'')+(cats.length?'<span class="mzak-cat">'+cats.map(esc).join(' · ')+'</span>':'');
+    kop.appendChild(lab);
+    var h1=ht.querySelector('h1');if(h1)kop.appendChild(h1);
+    kop.appendChild(dl);
+    ht.style.display='none';
+    /* Deze week toen en Dit weekend: de grote datum of de dagen uit de rubriekopmaak onder de kop */
+    var big=document.querySelector('.mzr-hero .mzr-big'),sub=document.querySelector('.mzr-hero .mzr-sub');
+    if(big||sub){var g=document.createElement('div');g.className='mzak-groot';if(big)g.appendChild(big);if(sub)g.appendChild(sub);kop.appendChild(g)}
+    /* vaste rubriekafbeelding met tekst: geen foto bovenaan */
     var img=hero.querySelector('img');
-    if(img&&VASTE.test(img.getAttribute('src')||img.src||'')){
-      var fig=document.querySelector('.blog-item-content .sqs-html-content figure img');
-      if(fig){var f=fig.closest('figure'),cap=f&&f.nextElementSibling,cr=hero.querySelector('.moza-credit');
-        img.removeAttribute('srcset');img.src=(fig.getAttribute('src')||fig.src).split('?')[0]+'?format=1500w';
-        var m=cap&&/Beeld:\s*([^.<]+)/.exec(cap.textContent||'');if(cr)cr.innerHTML=m?'<b>Beeld:</b> '+esc(m[1].trim()):'';
-        if(f)f.classList.add('mzr-hide');if(cap&&cap.tagName==='P'&&/Beeld:/.test(cap.textContent))cap.classList.add('mzr-hide');}
-      else{hero.classList.add('mzrk-vlak');var cr2=hero.querySelector('.moza-credit');if(cr2)cr2.remove()}}
+    if(!img||VASTE.test(img.getAttribute('src')||img.src||''))hero.classList.add('mzak-geen');
     return true;
   }
 
@@ -249,6 +257,6 @@
     return true;
   }
 
-  function start(){balk();var f=0;(function w(){if(footer()||++f>40)return;setTimeout(w,250)})();var b=0;(function q(){bronnen();if(++b<20)setTimeout(q,500)})();var m=0;(function v(){if(voorpagina()||++m>40)return;setTimeout(v,250)})();var h2=0;(function w2(){if(meer2()||++h2>60)return;setTimeout(w2,250)})();var n=0;(function g(){if(deelknop()||++n>40)return;setTimeout(g,250)})();var rk=0;(function k(){if(rubriekKop()||++rk>40)return;setTimeout(k,250)})()}
+  function start(){balk();var f=0;(function w(){if(footer()||++f>40)return;setTimeout(w,250)})();var b=0;(function q(){bronnen();if(++b<20)setTimeout(q,500)})();var m=0;(function v(){if(voorpagina()||++m>40)return;setTimeout(v,250)})();var h2=0;(function w2(){if(meer2()||++h2>60)return;setTimeout(w2,250)})();var n=0;(function g(){if(deelknop()||++n>40)return;setTimeout(g,250)})();var rk=0;(function k(){if(artikelKop()||++rk>60)return;setTimeout(k,250)})()}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
 })();

@@ -324,12 +324,6 @@ html.mz-nieuw.mzr body .blog-item-content-wrapper{display:flex!important}
 html.mz-nieuw.mzr body .blog-item-content{max-width:none!important;margin:0!important;padding:0!important}
 html.mz-nieuw.mzr body .blog-item-content .sqs-html-content>p{font-size:19px;line-height:1.65}
 html.mz-nieuw.mzr body .blog-item-content .sqs-html-content>p:first-child{font-size:inherit}
-html.mz-nieuw body .moza-hero .mzrk-tag{display:inline-block;background:#C9D3FF;color:#111;font:800 11px/1 "Hanken Grotesk",system-ui,sans-serif;letter-spacing:.1em;text-transform:uppercase;padding:5px 7px;margin:0 8px 0 0;align-self:center}
-html.mz-nieuw body .moza-hero .mzrk-tag.roze{background:#FF7AB6}
-/* Geen eigen foto: effen donker vlak met de kop */
-html.mz-nieuw body .moza-hero.mzrk-vlak img{display:none!important}
-html.mz-nieuw body .moza-hero.mzrk-vlak{background:#111;min-height:0!important;height:auto!important;aspect-ratio:auto!important}
-html.mz-nieuw body .moza-hero.mzrk-vlak .moza-hero-t{position:static!important;background:none!important;padding-top:40px!important;padding-bottom:28px!important}
 /* Peiling: gekleurd blok (dag blauw, nacht roze) */
 html.mz-nieuw body .mzh-peil>a{background:#1F3BD1!important;border:2px solid #111!important;color:#fff!important;box-shadow:6px 6px 0 #111}
 html.mz-nieuw body .mzh-peil h3{color:#fff!important}
@@ -338,3 +332,27 @@ html.mz-nieuw.moza-dark body .mzh-peil>a{background:#FF7AB6!important;border-col
 html.mz-nieuw.moza-dark body .mzh-peil h3{color:#111!important}
 html.mz-nieuw.moza-dark body .mzh-peil .mzh-go{color:#111!important}
 html.mz-nieuw.moza-dark body .mzh-peil .mzh-lab{background:#111!important;color:#E9F25A!important}
+/* ---------- Artikelkop zoals de mockup ---------- */
+html.mz-nieuw #mz-akop{font-family:"Hanken Grotesk",system-ui,sans-serif;color:#111;padding:18px 0 14px}
+html.mz-nieuw #mz-akop .mzak-lab{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:0 0 10px}
+html.mz-nieuw #mz-akop .mzs-tag{background:#C9D3FF;color:#111;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:4px 7px}
+html.mz-nieuw #mz-akop .mzs-tag.roze{background:#FF7AB6}
+html.mz-nieuw #mz-akop .mzak-cat{font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#1F3BD1}
+html.mz-nieuw body #mz-akop h1{margin:0 0 14px!important;font:900 clamp(28px,4.2vw,44px)/1.08 "Hanken Grotesk",system-ui,sans-serif!important;letter-spacing:-.02em!important;color:#111!important;text-shadow:none!important}
+html.mz-nieuw body #mz-akop h1 span{background:none!important;color:inherit!important;padding:0!important;box-shadow:none!important}
+html.mz-nieuw body #mz-akop .moza-dateline{margin:0!important;border-top:0!important}
+html.mz-nieuw #mz-akop .mzak-groot{margin:22px 0 0}
+html.mz-nieuw #mz-akop .mzr-big{font-size:clamp(48px,8vw,88px);font-weight:900;letter-spacing:-.05em;line-height:.95;color:#1F3BD1}
+html.mz-nieuw #mz-akop .mzr-sub{font-family:Fraunces,Georgia,serif;font-style:italic;font-weight:600;font-size:22px;color:#FF7AB6;margin-top:6px}
+/* Foto onder de kop, maker eronder; geen tekst over de foto */
+html.mz-nieuw body .moza-hero{display:block!important;background:none!important;height:auto!important;aspect-ratio:auto!important;margin:6px 0 18px!important}
+html.mz-nieuw body .moza-hero .moza-hero-t{display:none!important}
+html.mz-nieuw body .moza-hero img{display:block;width:100%!important;height:auto!important;aspect-ratio:3/2;object-fit:cover;position:static!important}
+html.mz-nieuw body .moza-hero .moza-credit{position:static!important;display:block;background:none!important;color:#555!important;font:400 13px/1.4 "Hanken Grotesk",system-ui,sans-serif!important;padding:6px 0 0!important}
+html.mz-nieuw body .moza-hero .moza-credit b{font-weight:700}
+html.mz-nieuw body .moza-hero.mzak-geen{display:none!important}
+html.mz-nieuw.moza-dark #mz-akop,html.mz-nieuw.moza-dark body #mz-akop h1{color:#ECECF1!important}
+html.mz-nieuw.moza-dark #mz-akop .mzak-cat{color:#AEB9F2}
+html.mz-nieuw.moza-dark #mz-akop .mzr-big{color:#AEB9F2}
+html.mz-nieuw.moza-dark body .moza-hero .moza-credit{color:#A9ABB6!important}
+@media (max-width:1024px){html.mz-nieuw #mz-akop{padding:14px 0 10px}}
