@@ -27,17 +27,56 @@
     if(b){b.click();return}
     location.href='/lezen';
   }
+  /* Op een artikel (een losse pagina in Lezen, Kennisbank, Podium en dergelijke) wordt Toko Buku in de balk een Deel-knop */
+  function artikel(){var b=document.body;return !!(b&&b.classList.contains('view-item')&&!/^\/(store|cart|checkout|events|evenementen)(\/|$)/.test(P))}
+  function meta(n){var m=document.querySelector('meta[property="'+n+'"]')||document.querySelector('meta[name="'+n+'"]');return m?(m.getAttribute('content')||'').trim():''}
+  function deelData(){
+    var h=document.querySelector('h1.entry-title,.blog-item-title h1,article h1,h1');
+    var t=(meta('og:title')||(h?h.textContent:document.title)).replace(/\s+[—|-]\s+MOZA\.nu\s*$/,'').trim();
+    var k=document.querySelector('.mz-kort p,.moza-kort p,[class*="inhetkort"] p');
+    var e=(meta('og:description')||meta('description')||(k?k.textContent:'')).trim();
+    var u=(document.querySelector('link[rel="canonical"]')||{}).href||location.href.split('#')[0];u=u.replace(/[?&]nieuw=\d/,'');
+    return {t:t,e:e,u:u,tekst:t+(e&&e!==t?'\n'+e:'')+'\n'+u};
+  }
+  function deelOpen(){
+    var d=deelData(),z=document.getElementById('mz-deel');
+    if(!z){z=document.createElement('div');z.id='mz-deel';z.innerHTML='<div class="dk" data-x></div><section role="dialog" aria-modal="true" aria-labelledby="mz-deel-h">'+
+      '<div class="kop"><h2 id="mz-deel-h">Deel dit artikel</h2><button type="button" class="x" data-x aria-label="Sluiten"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>'+
+      '<span class="lbl">Dit bericht staat al klaar</span><div class="msg"></div>'+
+      '<a class="wa" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l1.4-4.2A8 8 0 1 1 8.4 19z"/></svg>Stuur via WhatsApp</a>'+
+      '<div class="twee"><a class="fb" target="_blank" rel="noopener">Facebook</a><button type="button" class="kp">Kopieer link</button></div>'+
+      '<button type="button" class="ander">Andere app kiezen</button></section>';
+      document.body.appendChild(z);
+      [].forEach.call(z.querySelectorAll('[data-x]'),function(b){b.addEventListener('click',deelDicht)});
+      z.querySelector('.wa').addEventListener('click',function(){setTimeout(deelDicht,300)});
+      z.querySelector('.fb').addEventListener('click',function(){setTimeout(deelDicht,300)});
+      document.addEventListener('keydown',function(e){if(e.key==='Escape'&&z.classList.contains('on'))deelDicht()});
+    }
+    var m=z.querySelector('.msg');m.innerHTML='';var b=document.createElement('b');b.textContent=d.t;m.appendChild(b);
+    if(d.e&&d.e!==d.t){m.appendChild(document.createElement('br'));m.appendChild(document.createTextNode(d.e))}
+    m.appendChild(document.createElement('br'));var l=document.createElement('span');l.className='u';l.textContent=d.u.replace(/^https?:\/\/(www\.)?/,'');m.appendChild(l);
+    z.querySelector('.wa').href='https://wa.me/?text='+encodeURIComponent(d.tekst);
+    z.querySelector('.fb').href='https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(d.u);
+    var kp=z.querySelector('.kp');kp.textContent='Kopieer link';kp.onclick=function(){
+      var ok=function(){kp.textContent='Link gekopieerd'};
+      if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(d.u).then(ok,function(){prompt('Kopieer de link',d.u)});else prompt('Kopieer de link',d.u)};
+    var an=z.querySelector('.ander');an.style.display=navigator.share?'':'none';
+    an.onclick=function(){navigator.share({title:d.t,text:d.t+(d.e?'\n'+d.e:''),url:d.u}).then(deelDicht,function(){})};
+    z.classList.add('on');H.classList.add('mz-deel-open');setTimeout(function(){z.querySelector('.wa').focus()},50);
+  }
+  function deelDicht(){var z=document.getElementById('mz-deel');if(z)z.classList.remove('on');H.classList.remove('mz-deel-open')}
   function balk(){
     if(document.getElementById('mz-onder')||!document.body)return;
-    var a=actief(),n=document.createElement('nav');
+    var a=actief(),n=document.createElement('nav'),art=artikel();
     n.id='mz-onder';n.setAttribute('aria-label','Hoofdmenu');
     function item(k,href,lbl,inner){return '<a href="'+href+'"'+(a===k?' aria-current="page"':'')+'>'+inner+lbl+'</a>'}
     n.innerHTML=item('home','/','Voorpagina',ic('home'))+
       item('agenda','/events','Agenda','<span class="ag">'+ic('agenda')+'</span>')+
-      item('toko','/store','Toko Buku',ic('toko'))+
+      (art?'<button type="button" class="deel" data-deel aria-label="Deel dit artikel"><span class="dl">'+ic('deel')+'</span>Deel</button>':item('toko','/store','Toko Buku',ic('toko')))+
       item('kaart','/kaarten','Kaarten',ic('kaart')+'<span class="live" aria-hidden="true"></span>')+
-      '<button type="button" aria-label="Meer: menu en zoeken">'+ic('meer')+'Meer</button>';
-    n.querySelector('button').addEventListener('click',meer);
+      '<button type="button" data-meer aria-label="Meer: menu en zoeken">'+ic('meer')+'Meer</button>';
+    n.querySelector('[data-meer]').addEventListener('click',meer);
+    var dk=n.querySelector('[data-deel]');if(dk)dk.addEventListener('click',deelOpen);
     document.body.appendChild(n);
   }
 

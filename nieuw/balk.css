@@ -61,4 +61,32 @@
   html.mz-balk.mzk-vast body #header .moza-toko{visibility:hidden!important;pointer-events:none!important}
   html.mz-balk.mzk-vast body #header .header-announcement-bar-wrapper{height:64px!important;min-height:64px!important;max-height:64px!important;overflow:hidden!important}
   html.mz-balk.mzk-vast body #header .moza-toko{height:45px!important;min-height:45px!important;max-height:45px!important;overflow:hidden!important}
+  /* Deel-knop op artikelen en het deelvenster */
+  html.mz-balk #mz-onder .dl{display:flex;background:#1F3BD1;color:#fff;padding:0 6px}
+  html.mz-balk #mz-onder button.deel{color:#1F3BD1;font-weight:900}
+  html.mz-balk.moza-dark #mz-onder button.deel{color:#AEB9F2}
+  html.mz-balk #mz-deel{display:none;position:fixed;inset:0;z-index:9995;font-family:"Hanken Grotesk",system-ui,sans-serif}
+  html.mz-balk #mz-deel.on{display:block}
+  html.mz-balk #mz-deel .dk{position:absolute;inset:0;background:rgba(17,17,17,.55)}
+  html.mz-balk #mz-deel section{position:absolute;left:0;right:0;bottom:0;background:#fff;color:#111;border-top:3px solid #111;padding:14px 16px calc(24px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:12px;box-sizing:border-box;max-height:90vh;overflow-y:auto}
+  html.mz-balk #mz-deel .kop{display:flex;align-items:center;justify-content:space-between}
+  html.mz-balk #mz-deel h2{margin:0;font:900 22px/1.2 "Hanken Grotesk",system-ui,sans-serif;letter-spacing:-.02em;color:inherit}
+  html.mz-balk #mz-deel .x{width:44px;height:44px;display:flex;align-items:center;justify-content:center;border:0;background:none;color:inherit;padding:0;cursor:pointer}
+  html.mz-balk #mz-deel .x svg{width:22px;height:22px}
+  html.mz-balk #mz-deel .lbl{font:800 11px/1 "Hanken Grotesk",system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#555}
+  html.mz-balk #mz-deel .msg{background:#F4F2EC;border:2px solid #111;padding:12px;font:400 15px/1.45 "Hanken Grotesk",system-ui,sans-serif;color:#111;word-break:break-word}
+  html.mz-balk #mz-deel .msg b{font-weight:900}
+  html.mz-balk #mz-deel .msg .u{color:#1F3BD1;font-weight:800}
+  html.mz-balk #mz-deel .wa{height:52px;display:flex;align-items:center;justify-content:center;gap:8px;background:#1F3BD1;color:#fff!important;text-decoration:none!important;font:900 17px/1 "Hanken Grotesk",system-ui,sans-serif}
+  html.mz-balk #mz-deel .wa svg{width:22px;height:22px}
+  html.mz-balk #mz-deel .twee{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  html.mz-balk #mz-deel .fb,html.mz-balk #mz-deel .kp{height:48px;display:flex;align-items:center;justify-content:center;border:2px solid #111;background:#fff;color:#111!important;text-decoration:none!important;font:900 15px/1 "Hanken Grotesk",system-ui,sans-serif;box-sizing:border-box;cursor:pointer;padding:0}
+  html.mz-balk #mz-deel .ander{height:44px;border:0;background:none;color:#111;font:800 15px/1 "Hanken Grotesk",system-ui,sans-serif;text-decoration:underline;cursor:pointer}
+  html.mz-balk.moza-dark #mz-deel section{background:#17181D;color:#ECECF1;border-top-color:#ECECF1}
+  html.mz-balk.moza-dark #mz-deel .lbl{color:#B5B5BD}
+  html.mz-balk.moza-dark #mz-deel .msg{background:#24262D;border-color:#ECECF1;color:#ECECF1}
+  html.mz-balk.moza-dark #mz-deel .msg .u{color:#AEB9F2}
+  html.mz-balk.moza-dark #mz-deel .fb,html.mz-balk.moza-dark #mz-deel .kp{background:#17181D;border-color:#ECECF1;color:#ECECF1!important}
+  html.mz-balk.moza-dark #mz-deel .ander{color:#ECECF1}
+  html.mz-deel-open body{overflow:hidden}
 }
