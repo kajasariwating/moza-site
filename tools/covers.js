@@ -104,6 +104,9 @@
   function klik(e){var r=e.getBoundingClientRect(),o={bubbles:true,cancelable:true,clientX:r.x+r.width/2,clientY:r.y+r.height/2,view:window};
     ['pointerdown','mousedown','pointerup','mouseup','click'].forEach(function(t){e.dispatchEvent(t.indexOf('pointer')===0?new PointerEvent(t,o):new MouseEvent(t,o));});}
   function wacht(fn,ms){var t0=Date.now();return new Promise(function(res,rej){(function k(){var v;try{v=fn();}catch(e){}if(v)return res(v);if(Date.now()-t0>ms)return rej(new Error('time-out'));setTimeout(k,300);})();});}
+  /* het bestandsveld van Squarespace zelf, nooit dat van ons paneel */
+  function sqInput(){return [].filter.call(document.querySelectorAll('input[type=file][accept*="image"]'),function(i){return !i.closest('#mzc');})[0];}
+  function editorFotos(){return [].filter.call(document.querySelectorAll('img'),function(i){return zichtbaar(i)&&!i.closest('#mzc')&&/squarespace-cdn|^blob:/.test(i.src);}).length;}
   function editorOpen(t){var k=t.slice(0,25);return leaf(/^Edit /).some(function(e){return e.textContent.trim().slice(5).indexOf(k)===0;});}
   function product(id){return fetch('/api/commerce/products/'+id).then(function(r){return r.json();});}
   async function sluitAlles(){
@@ -129,15 +132,15 @@
       var naam=await wacht(function(){return leaf(/./).filter(function(e){return e.textContent.trim()===b.titel&&!e.closest('#mzc');})[0];},10000);
       var rijEl=naam; while(rijEl&&!rijEl.querySelector('img'))rijEl=rijEl.parentElement;
       stap('Editor openen…'); klik(rijEl.querySelector('img'));
-      await wacht(function(){return editorOpen(b.titel)&&document.querySelector('input[type=file][accept*="image"]');},15000);
+      await wacht(function(){return editorOpen(b.titel)&&sqInput();},15000);
       stap('Foto uploaden…');
-      var inp=document.querySelector('input[type=file][accept*="image"]'); var d=new DataTransfer();
+      var inp=sqInput(); var fotosVoor=editorFotos(); var d=new DataTransfer();
       files.forEach(function(f){d.items.add(f);}); inp.files=d.files; inp.dispatchEvent(new Event('change',{bubbles:true}));
-      await sleep(1500);
+      await wacht(function(){return editorFotos()>=fotosVoor+files.length;},45000);
       await wacht(function(){return ![].some.call(document.querySelectorAll('img'),function(i){return /^blob:/.test(i.src)&&zichtbaar(i);});},45000);
       await sleep(1500);
       stap('Opslaan…');
-      var save=await wacht(function(){return [].filter.call(document.querySelectorAll('button,[role=button]'),function(e){return /^save/i.test(e.textContent.trim())&&zichtbaar(e);})[0];},10000);
+      var save=await wacht(function(){return [].filter.call(document.querySelectorAll('button,[role=button]'),function(e){return /^save/i.test(e.textContent.trim())&&zichtbaar(e)&&!e.disabled&&e.getAttribute('aria-disabled')!=='true';})[0];},20000);
       save.click(); await sleep(800);
       var keus=voor.visibility&&voor.visibility.state==='VISIBLE'?'Publish':'Save as Hidden';
       var optie=[].filter.call(document.querySelectorAll('body *'),function(e){return e.textContent.trim()===keus&&zichtbaar(e)&&!e.closest('#mzc');}).pop();
