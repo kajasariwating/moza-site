@@ -1,0 +1,56 @@
+<script id="mzm-cfg">
+(function(){
+/* Vulkanen op de Molukken. Gegevens: Smithsonian Global Volcanism Program (GVP), opgehaald 4 november 2026.
+   [GVP-nummer, naam, eiland, provincie (m = Maluku, u = Maluku Utara), breedte, lengte, hoogte in m, jaar laatste uitbarsting of null] */
+var V=[
+ [265040,'Wurlali','Damar','m',-7.125,128.675,868,1892],
+ [265050,'Teon','Teon','m',-6.976,129.144,728,1904],
+ [265060,'Nila','Nila','m',-6.73,129.5,781,1968],
+ [265070,'Serua','Serua','m',-6.312,130.017,608,1921],
+ [265080,'Manuk','Manuk','m',-5.543,130.303,257,null],
+ [265090,'Banda Api','Banda Api','m',-4.523,129.881,596,1988],
+ [268001,'Tarakan','Halmahera','u',1.832,127.825,317,null],
+ [268010,'Dukono','Halmahera','u',1.6992,127.8783,1273,2026],
+ [268020,'Tobaru','Halmahera','u',1.63,127.67,1035,null],
+ [268030,'Ibu','Halmahera','u',1.4941,127.6324,1357,2026],
+ [268040,'Gamkonora','Halmahera','u',1.38,127.53,1635,2007],
+ [268050,'Todoko-Ranu','Halmahera','u',1.2389,127.4556,979,null],
+ [268051,'Jailolo','Halmahera','u',1.08,127.439,993,null],
+ [268052,'Hiri','Hiri','u',0.8971,127.317,687,null],
+ [268060,'Gamalama','Ternate','u',0.81,127.3322,1714,2018],
+ [268061,'Kie Matubu','Tidore','u',0.6623,127.4029,1713,1210],
+ [268062,'Mare','Mare','u',0.57,127.4,308,null],
+ [268063,'Moti','Moti','u',0.454,127.411,927,null],
+ [268070,'Kie Besi','Makian','u',0.32,127.4,1357,1988]
+];
+var PROV={m:'Maluku',u:'Maluku Utara'};
+function col(y){return y==null?'#E9F25A':y>=2000?'#FF4D2E':y>=1900?'#FF7AB6':'#E9F25A'}
+function jaar(y){return y==null?'onbekend':String(y)}
+function nl(a){return a.length<2?a.join(''):a.slice(0,-1).join(', ')+' en '+a[a.length-1]}
+mzKaart({id:'vulkanen',path:'/kaarten/vulkanen',live:false,
+ kicker:'Kaart · Vulkanen',title:'Vulkanen op de Molukken',serif:'vuur onder de eilanden',
+ lead:'Op de Molukken liggen veel vulkanen. Sommige zijn al eeuwen stil, andere barsten bijna elk jaar uit. Deze kaart laat zien waar ze liggen en wanneer ze voor het laatst uitbarstten.',
+ tabs:[['alle','Alle vulkanen'],['m','Maluku'],['u','Maluku Utara']],tabLabel:'Kies een provincie',
+ stats:['Vulkanen','Hoogste','Laatste uitbarsting','Actief sinds 2000'],
+ legend:'<span><i style="background:#FF4D2E"></i>Uitbarsting in 2000 of later</span><span><i style="background:#FF7AB6"></i>Tussen 1900 en 2000</span><span><i style="background:#E9F25A"></i>Voor 1900 of onbekend</span>',
+ sideTitle:'Alle vulkanen',sideNote:'Klik op een vulkaan om in te zoomen. Jaartallen volgens het Global Volcanism Program, stand november 2026.',
+ bounds:[[-7.6,126.6],[2.3,131]],attr:'Vulkanen: Smithsonian Global Volcanism Program',
+ updLabel:'Gegevens van november 2026 · bekeken ',
+ mapLabel:'Kaart van de Molukken met vulkanen',
+ update:function(X){var L=X.L,esc=X.esc,t=X.state.tab;X.layer.clearLayers();
+  var f=V.filter(function(v){return t==='alle'||v[3]===t}).map(function(v){return {n:v[0],nm:v[1],ei:v[2],pr:PROV[v[3]],la:v[4],lo:v[5],h:v[6],y:v[7]}});
+  f.forEach(function(v){L.circleMarker([v.la,v.lo],{radius:9,color:'#111',weight:2,fillColor:col(v.y),fillOpacity:.95}).bindPopup('<b>'+esc(v.nm)+'</b> · '+esc(v.ei)+'<br>'+esc(v.pr)+'<br>Hoogte: '+X.num(v.h,0)+' meter<br>Laatste uitbarsting: '+esc(jaar(v.y))+'<br><a href="https://volcano.si.edu/volcano.cfm?vn='+v.n+'" target="_blank" rel="noopener">Meer bij het Global Volcanism Program →</a>').addTo(X.layer)});
+  X.stat(0,String(f.length),t==='alle'?'op de hele Molukken':'in '+PROV[t]);
+  var hi=f.slice().sort(function(a,b){return b.h-a.h})[0];X.stat(1,hi?X.num(hi.h,0)+' m':'–',hi?hi.nm+' ('+hi.ei+')':'');
+  var ys=f.filter(function(v){return v.y!=null}),mx=Math.max.apply(null,ys.map(function(v){return v.y}));
+  var la=ys.filter(function(v){return v.y===mx}).map(function(v){return v.nm});X.stat(2,ys.length?String(mx):'–',la.length?nl(la):'');
+  var r=f.filter(function(v){return v.y!=null&&v.y>=2000});X.stat(3,String(r.length),r.length?nl(r.map(function(v){return v.nm})):'geen');
+  X.side(f.slice().sort(function(a,b){return (b.y||0)-(a.y||0)||b.h-a.h}).map(function(v){return '<button type="button" class="row" data-la="'+v.la+'" data-lo="'+v.lo+'" data-z="10"><span class="nm">'+esc(v.nm)+'<small>'+esc(v.ei)+' · '+X.num(v.h,0)+' m</small></span><span class="n">'+esc(v.y==null?'?':String(v.y))+'</span></button>'}).join(''));
+  X.load(null);return Promise.resolve()},
+ info:[['Wat zie je hier?',['Elke stip is een vulkaan die in de laatste 12.000 jaar actief is geweest. Het getal is het jaar van de laatste bekende uitbarsting. Een vraagteken betekent dat er geen uitbarsting bekend is uit de tijd dat mensen het opschreven.','In Maluku Utara liggen de vulkanen op een rij langs de westkant van Halmahera en op de kleine eilanden ervoor, zoals Ternate en Tidore. In Maluku liggen ze in een boog in de Bandazee, van Banda Api tot Damar.']],
+  ['Wat zie je niet?',['Dit is geen waarschuwingssysteem. Het officiële alarmniveau van elke vulkaan vind je bij de Indonesische vulkaandienst <a href="https://magma.esdm.go.id" target="_blank" rel="noopener">MAGMA Indonesia</a>. Meldingen van uitbarstingen zie je ook op de kaart <a href="/kaarten/rampen">Natuurrampen</a>.','Een vulkaan die lang stil is, kan toch weer uitbarsten.']],
+  ['Waar komen de gegevens vandaan?',['Van het <a href="https://volcano.si.edu" target="_blank" rel="noopener">Global Volcanism Program</a> van het Smithsonian Institution in de Verenigde Staten. Dat houdt een lijst bij van alle vulkanen op aarde. MOZA heeft de gegevens in november 2026 overgenomen en verandert ze niet.']]],
+ reads:{title:'Lees meer',re:/vulka|gunung api|uitbarst|gamalama|banda api|dukono/i},
+ cta:['<b>Heb jij foto’s of verhalen over een vulkaan op de Molukken?</b> Deel ze met MOZA.','Stuur het in →','/uploaden']});
+})();
+</script>

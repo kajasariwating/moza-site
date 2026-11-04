@@ -1,0 +1,33 @@
+<script id="mzm-cfg">
+(function(){
+/* De Molukken vanuit de ruimte. Beeld: NASA GIBS (satelliet Terra, MODIS). Bewolking per plaats: Open-Meteo. */
+var P=[['Ambon',-3.69,128.18,9],['Saparua',-3.57,128.66,10],['Seram',-3.2,129.4,8],['Buru',-3.4,126.6,8],['Banda',-4.53,129.9,10],['Kei',-5.6,132.75,9],['Aru',-6.1,134.4,8],['Tanimbar',-7.6,131.4,8],['Kisar',-8.06,127.18,10],['Sula',-2.0,125.6,8],['Ternate',0.79,127.38,10],['Halmahera',1.0,128.0,7]];
+var OFF={d0:0,d1:1,d2:2};
+function datum(X){return new Date(Date.now()-(OFF[X.state.tab]||0)*864e5).toISOString().slice(0,10)}
+function wolk(v){return v==null?'–':v<25?'helder':v<60?'half bewolkt':v<90?'bewolkt':'zwaar bewolkt'}
+mzKaart({id:'satelliet',path:'/kaarten/satelliet',
+ kicker:'Live · Satellietbeeld',title:'De Molukken vanuit de ruimte',serif:'elke dag een nieuwe foto',
+ lead:'Elke dag vliegt een satelliet van NASA over de Molukken en maakt een foto. Je ziet de eilanden, de zee, de wolken en soms rook van branden. Kies een dag en zoom in op je eiland.',
+ tabs:[['d0','Vandaag'],['d1','Gisteren'],['d2','Eergisteren']],tabLabel:'Kies een dag',
+ stats:['Foto van','Ambon','Ternate','Tual'],
+ legend:'<span style="font-size:12px">Wit is bewolking. Zwarte stroken zijn plekken waar de satelliet die dag niet langs kwam.</span>',
+ sideTitle:'Zoom in op',sideNote:'Achter elke plaats staat hoe bewolkt het daar nu is, volgens Open-Meteo.',
+ bounds:[[-8.6,124.8],[2.4,135]],attr:'Satellietbeeld: NASA GIBS (Terra/MODIS) · Bewolking: Open-Meteo',refresh:60,
+ mapLabel:'Satellietfoto van de Molukken',
+ update:function(X){var L=X.L,esc=X.esc,d=datum(X);X.layer.clearLayers();
+  L.tileLayer('https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_CorrectedReflectance_TrueColor/default/'+d+'/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg',{maxNativeZoom:9,maxZoom:12,zIndex:5}).addTo(X.layer);
+  L.tileLayer('https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Coastlines_15m/default/default/GoogleMapsCompatible_Level13/{z}/{y}/{x}.png',{maxNativeZoom:13,maxZoom:14,opacity:.6,zIndex:6}).addTo(X.layer);
+  L.tileLayer('https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Reference_Labels_15m/default/default/GoogleMapsCompatible_Level13/{z}/{y}/{x}.png',{maxNativeZoom:13,maxZoom:14,zIndex:7}).addTo(X.layer);
+  X.stat(0,new Intl.DateTimeFormat('nl-NL',{weekday:'long',day:'numeric',month:'long'}).format(new Date(d+'T12:00:00Z')),'de satelliet komt rond 10.30 uur Maluku-tijd langs');
+  return fetch('https://api.open-meteo.com/v1/forecast?latitude='+P.map(function(p){return p[1]}).join(',')+',-5.63&longitude='+P.map(function(p){return p[2]}).join(',')+',132.75&current=cloud_cover&timezone=Asia%2FJayapura').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(j){j=[].concat(j);
+   var c=function(i){var x=j[i]&&j[i].current;return x?x.cloud_cover:null};
+   X.stat(1,c(0)==null?'–':c(0)+'%','bewolking nu · '+wolk(c(0)));X.stat(2,c(10)==null?'–':c(10)+'%','bewolking nu · '+wolk(c(10)));X.stat(3,c(P.length)==null?'–':c(P.length)+'%','bewolking nu · '+wolk(c(P.length)));
+   X.side(P.map(function(p,i){return '<button type="button" class="row" data-la="'+p[1]+'" data-lo="'+p[2]+'" data-z="'+p[3]+'"><span class="nm">'+esc(p[0])+'<small>'+esc(wolk(c(i)))+'</small></span><span class="n">'+(c(i)==null?'–':c(i)+'%')+'</span></button>'}).join(''));
+   X.load(null)})},
+ info:[['Wat zie je hier?',['Een echte foto van de Molukken, gemaakt door de satelliet Terra van NASA. Die komt elke dag rond half elf in de ochtend (Maluku-tijd) over. Je ziet het zoals een astronaut het zou zien.','Witte vlekken zijn wolken. Grijze of bruine slierten boven het land kunnen rook zijn van branden. Waar het brandt, zie je op de kaart <a href="/kaarten/bosbranden">Bosbranden</a>.']],
+  ['Wat zie je niet?',['Zit er een wolk boven je eiland, dan zie je het eiland niet. Probeer dan een andere dag.','De foto van vandaag verschijnt een paar uur nadat de satelliet is langsgekomen. Is hij er nog niet, kies dan Gisteren. Inzoomen gaat tot ongeveer 250 meter per pixel: huizen en straten zie je niet.']],
+  ['Waar komt het beeld vandaan?',['Van NASA, via <a href="https://worldview.earthdata.nasa.gov" target="_blank" rel="noopener">NASA Worldview en GIBS</a>. De beelden zijn vrij te gebruiken. De bewolking per plaats komt van <a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo</a>.']]],
+ reads:{title:'Lees meer',re:/satelliet|ruimte|wolk|rook|weer/i},
+ cta:['<b>Zag jij iets bijzonders op de satellietfoto?</b> Laat het de redactie weten.','Stuur het in →','/uploaden']});
+})();
+</script>
