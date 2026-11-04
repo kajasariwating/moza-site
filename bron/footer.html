@@ -733,7 +733,8 @@ var preOrder=(it.tags||[]).some(function(t){return /^label:.*(pre-?order|verwach
 var imgs=(it.items||[]).map(function(x){return x.assetUrl}).filter(function(u){return u&&!/\/$/.test(u)}).map(function(u){return u.replace(/^http:/,'https:')});
 var desc=(window.__MZADV__&&window.__MZADV__[slug])||(it.seoData&&it.seoData.seoDescription)||'';
 var o={"@context":"https://schema.org","@type":"Product","@id":URL0+"#product","name":title,"url":URL0,"image":imgs,"description":desc,"sku":v.sku||undefined,
-"offers":{"@type":"Offer","url":URL0,"priceCurrency":"EUR","price":price?String(price):undefined,"availability":preOrder?"https://schema.org/PreOrder":(inStock?"https://schema.org/InStock":"https://schema.org/OutOfStock"),"itemCondition":/tweedehands|beschadigd/i.test(title+' '+slug)?"https://schema.org/UsedCondition":"https://schema.org/NewCondition","seller":ORG}};
+"offers":{"@type":"Offer","url":URL0,"priceCurrency":"EUR","price":price?String(price):undefined,"availability":preOrder?"https://schema.org/PreOrder":(inStock?"https://schema.org/InStock":"https://schema.org/OutOfStock"),"itemCondition":/tweedehands|beschadigd/i.test(title+' '+slug)?"https://schema.org/UsedCondition":"https://schema.org/NewCondition","seller":ORG,"shippingDetails":{"@type":"OfferShippingDetails","shippingRate":{"@type":"MonetaryAmount","value":"4.95","currency":"EUR"},"shippingDestination":{"@type":"DefinedRegion","addressCountry":"NL"}},"hasMerchantReturnPolicy":{"@type":"MerchantReturnPolicy","applicableCountry":"NL","returnPolicyCategory":"https://schema.org/MerchantReturnFiniteReturnWindow","merchantReturnDays":14,"returnMethod":"https://schema.org/ReturnByMail"}}};
+var vwd=window.mzVerwacht&&window.mzVerwacht(it.tags);if(preOrder&&vwd)o.offers.availabilityStarts=vwd.iso;
 if(specs){
 var isbn='',pages='',lang='',form='',date='';
 [].forEach.call(specs.querySelectorAll('li'),function(li){var x=txt(li);var c=li.className;
@@ -786,7 +787,19 @@ if(p==='/store/p/doneer-aan-moza'){var m=/bedrag-eigen-(\d{1,4})/.exec(location.
 var k=0;(function fill(){var i=document.getElementById('mdp-own-in');if(i&&i.offsetParent){i.value=m[1];i.dispatchEvent(new Event('input',{bubbles:true}));i.dispatchEvent(new Event('change',{bubbles:true}));return}if(++k<40)setTimeout(fill,250)})()}
 })();
 </script>
-<script id="mz-preorder">(function(){var P=location.pathname;function vt(it){var v=(String(it.excerpt||"").replace(/<[^>]+>/g,"|").split("|").filter(function(x){return /^\s*(verschijnt|verwacht)/i.test(x)})[0]||"Verschijnt binnenkort").trim();return v}function verw(it){var l="";(it.tags||[]).some(function(g){var m=/^label:\s*(verwacht.*)$/i.exec(g);if(m){l=m[1];return true}});if(!l)return "";var vs=it.variants||[];if(vs.some(function(v){return v.unlimited||(v.qtyInStock||0)>0}))return "";return "Weer op voorraad "+l.replace(/^verwacht\s*/i,"")}function isPre(it){return (it.tags||[]).some(function(g){return /^label:\s*pre-?order/i.test(g)})}if(/^\/store\/p\//.test(P)){fetch(P+"?format=json").then(function(r){return r.json()}).then(function(j){var it=j.item||{};var vw=verw(it);if(vw){var n2=0;(function fx(){var el=document.querySelector(".moza-buyline .moza-stock");if(el){el.className="moza-stock is-pre";el.innerHTML="<i style=\"background:#1F3BD1\"></i>"+vw;return}if(++n2<40)setTimeout(fx,150)})();return}if(!isPre(it))return;var v=vt(it);var txt="Pre-order · "+v.charAt(0).toLowerCase()+v.slice(1);var n=0;(function fix(){var el=document.querySelector(".moza-buyline .moza-stock");if(el){el.className="moza-stock is-pre";el.innerHTML="<i style=\"background:#1F3BD1\"></i>"+txt;return}if(++n<40)setTimeout(fix,150)})()}).catch(function(){});return}if(!/^\/store\/?$/.test(P)&&!/^\/store\/[^p]/.test(P))return;fetch("/store?format=json").then(function(r){return r.json()}).then(function(j){var M={};(j.items||[]).forEach(function(it){if(isPre(it))M[it.urlId]=vt(it);else{var w=verw(it);if(w)M[it.urlId]="@"+w}});if(!Object.keys(M).length)return;function run(){document.querySelectorAll("article.tk-card").forEach(function(c){var a=c.querySelector("a.tk-ti");if(!a)return;var u=(a.getAttribute("href")||"").split("/").pop();if(!M[u])return;var isV=M[u].charAt(0)==="@",tx=isV?M[u].slice(1):M[u];var st=c.querySelector(".tk-st");if(st&&st.textContent!==tx){st.textContent=tx;st.className="tk-st";st.style.color="#1F3BD1"}if(isV)return;var by=c.querySelector(".tk-buy");if(by&&by.textContent!=="Pre-order →")by.textContent="Pre-order →"})}run();new MutationObserver(run).observe(document.body,{childList:true,subtree:true})}).catch(function(){})})();</script>
+<script id="mz-verwacht-js">
+/* Leest een label als "Verwacht 8 november" en geeft de datum terug zolang die niet meer dan 3 dagen voorbij is. */
+window.mzVerwacht=function(tags){
+  var MND=['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
+  var l=null;(tags||[]).some(function(g){var m=/^label:\s*verwacht\s+(?:rond\s+)?(\d{1,2})\s+([a-z]+)\s*(\d{4})?/i.exec(g);if(m){l=m;return true;}});
+  if(!l)return null;var mi=MND.indexOf(l[2].toLowerCase());if(mi<0)return null;
+  var nu=new Date(),j=l[3]?+l[3]:nu.getFullYear(),t=Date.UTC(j,mi,+l[1]);
+  if(!l[3]&&t<Date.now()-60*864e5)t=Date.UTC(j+1,mi,+l[1]);
+  if(Date.now()>t+3*864e5)return null;
+  var d=new Date(t);return {tekst:d.getUTCDate()+' '+MND[mi],iso:d.toISOString().slice(0,10)};
+};
+</script>
+<script id="mz-preorder">(function(){var P=location.pathname;function vt(it){var v=(String(it.excerpt||"").replace(/<[^>]+>/g,"|").split("|").filter(function(x){return /^\s*(verschijnt|verwacht)/i.test(x)})[0]||"Verschijnt binnenkort").trim();return v}function verw(it){var d=window.mzVerwacht&&window.mzVerwacht(it.tags);if(d)return "Verwacht rond "+d.tekst;var l="";(it.tags||[]).some(function(g){var m=/^label:\s*(verwacht.*)$/i.exec(g);if(m){l=m[1];return true}});if(!l)return "";var vs=it.variants||[];if(vs.some(function(v){return v.unlimited||(v.qtyInStock||0)>0}))return "";return "Weer op voorraad "+l.replace(/^verwacht\s*/i,"")}function isPre(it){return (it.tags||[]).some(function(g){return /^label:\s*pre-?order/i.test(g)})}if(/^\/store\/p\//.test(P)){fetch(P+"?format=json").then(function(r){return r.json()}).then(function(j){var it=j.item||{};var vw=verw(it);if(vw){var n2=0;(function fx(){var el=document.querySelector(".moza-buyline .moza-stock");if(el){el.className="moza-stock is-pre";el.innerHTML="<i style=\"background:#1F3BD1\"></i>"+vw;return}if(++n2<40)setTimeout(fx,150)})();return}if(!isPre(it))return;var v=vt(it);var txt="Pre-order · "+v.charAt(0).toLowerCase()+v.slice(1);var n=0;(function fix(){var el=document.querySelector(".moza-buyline .moza-stock");if(el){el.className="moza-stock is-pre";el.innerHTML="<i style=\"background:#1F3BD1\"></i>"+txt;return}if(++n<40)setTimeout(fix,150)})()}).catch(function(){});return}if(!/^\/store\/?$/.test(P)&&!/^\/store\/[^p]/.test(P))return;fetch("/store?format=json").then(function(r){return r.json()}).then(function(j){var M={};(j.items||[]).forEach(function(it){if(isPre(it))M[it.urlId]=vt(it);else{var w=verw(it);if(w)M[it.urlId]="@"+w}});if(!Object.keys(M).length)return;function run(){document.querySelectorAll("article.tk-card").forEach(function(c){var a=c.querySelector("a.tk-ti");if(!a)return;var u=(a.getAttribute("href")||"").split("/").pop();if(!M[u])return;var isV=M[u].charAt(0)==="@",tx=isV?M[u].slice(1):M[u];var st=c.querySelector(".tk-st");if(st&&st.textContent!==tx){st.textContent=tx;st.className="tk-st";st.style.color="#1F3BD1"}if(isV)return;var by=c.querySelector(".tk-buy");if(by&&by.textContent!=="Pre-order →")by.textContent="Pre-order →"})}run();new MutationObserver(run).observe(document.body,{childList:true,subtree:true})}).catch(function(){})})();</script>
 
 <!-- MOZA organisaties: zoekmodule op /organisaties en intro op /organisatie-aanmelden. Data staat in ORGS hieronder (één regel per organisatie). -->
 <style id="mzorg-css">
@@ -1495,6 +1508,8 @@ html.moza-dark #mzag .ev .mzig{background:#12151F}
 .mz-verzend{display:flex;gap:10px;align-items:flex-start;margin:14px 0 4px;font:700 15px/1.4 'Hanken Grotesk',system-ui,sans-serif;color:#111}
 .mz-verzend svg{flex:0 0 22px;width:22px;height:22px;margin-top:1px}
 .mz-verzend b{font-weight:900}
+.mz-verzend-k{display:block;margin-top:3px;font-weight:500;font-size:13.5px;color:#555}
+html.moza-dark .mz-verzend-k{color:#A8AAB6}
 html.moza-dark .mz-verzend{color:#ECECF1}
 </style>
 <script id="mz-verzend-js">
@@ -1514,6 +1529,7 @@ html.moza-dark .mz-verzend{color:#ECECF1}
     var kd=new Date(Date.UTC(j,3,27)).getUTCDay()===0?426:427; if(md===kd)return true;
     return [p+D,p+39*D,p+50*D].indexOf(t)>=0;}
   function tekst(pre){
+    if(pre&&pre.tekst)return 'Verwacht rond <b>'+pre.tekst+'</b>. We versturen je boek zodra het binnen is.';
     if(pre)return 'Pre-order: we versturen het boek zodra het binnen is.';
     var o={};new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Amsterdam',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date()).forEach(function(x){o[x.type]=x.value;});
     var vandaag=Date.UTC(+o.year,+o.month-1,+o.day),min=(+o.hour)*60+(+o.minute),D=864e5;
@@ -1526,7 +1542,7 @@ html.moza-dark .mz-verzend{color:#ECECF1}
   var ICOON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h11v10H3z"/><path d="M14 10h4l3 3v3h-7"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>';
   var pre=false,klaar=false;
   fetch(location.pathname+'?format=json').then(function(r){return r.json();}).then(function(j){
-    var it=j&&j.item||{};pre=(it.tags||[]).some(function(t){return /^label:.*(pre-?order|verwacht)/i.test(t);});klaar=true;zet();
+    var it=j&&j.item||{};pre=(it.tags||[]).some(function(t){return /^label:.*(pre-?order|verwacht)/i.test(t);});if(pre)pre=(window.mzVerwacht&&window.mzVerwacht(it.tags))||true;klaar=true;zet();
   }).catch(function(){klaar=true;zet();});
   function zet(){
     if(!klaar)return;
@@ -1536,7 +1552,7 @@ html.moza-dark .mz-verzend{color:#ECECF1}
     if(!el){el=document.createElement('p');el.className='mz-verzend';el.setAttribute('role','status');}
     var na=cart.nextElementSibling&&cart.nextElementSibling.classList.contains('mz-save')?cart.nextElementSibling:cart;
     if(el.previousElementSibling!==na)na.after(el);
-    var h=ICOON+'<span>'+tekst(pre)+'</span>';if(el.innerHTML!==h)el.innerHTML=h;
+    var h=ICOON+'<span>'+tekst(pre)+'<small class="mz-verzend-k">Verzending € 4,95 met PostNL binnen Nederland · Retourneren binnen 14 dagen</small></span>';if(el.innerHTML!==h)el.innerHTML=h;
   }
   var n=0,iv=setInterval(function(){zet();if(++n>20){clearInterval(iv);setInterval(zet,60000);}},500);
 })();
@@ -1646,5 +1662,63 @@ html.moza-dark #mz-rec button.open,html.moza-dark #mz-rec button.verstuur{backgr
     return true;
   }
   var n=0;(function k(){if(bouw()||++n>40)return;setTimeout(k,300);})();
+})();
+</script>
+
+<style id="mz-leeftijd-css">
+.mz-lft{display:inline-block;margin:0 0 8px;padding:3px 9px;border:2px solid #111;background:#E9F25A;color:#111;font:900 12.5px/1.3 'Hanken Grotesk',system-ui,sans-serif;letter-spacing:.02em}
+.product-meta .moza-author+.mz-lft{margin-left:10px}
+.tk-cover .mz-lft-b{position:absolute;left:10px;bottom:10px;z-index:2;padding:3px 7px;border:2px solid #111;background:#fff;color:#111;font:900 11.5px/1.2 'Hanken Grotesk',system-ui,sans-serif}
+.mz-age{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:12px 0 0}
+.mz-age span{font:800 14px 'Hanken Grotesk',system-ui,sans-serif;margin-right:2px}
+.mz-age button{font:800 14px 'Hanken Grotesk',system-ui,sans-serif;padding:8px 13px;border:2px solid currentColor;background:transparent;color:inherit;cursor:pointer;min-height:40px}
+.mz-age button[aria-pressed=true]{background:#E9F25A;color:#111;border-color:#111}
+.mz-age-uit{display:none!important}
+</style>
+<script id="mz-leeftijd-js">
+/* Leeftijd bij kinderboeken: label op de boekpagina, op de kaartjes en een filter op Kinderboeken en Jeugd. De leeftijd komt uit de boektekst ("Voor kinderen van 4 tot 6 jaar", "vanaf 3 jaar"). */
+(function(){
+  var P=location.pathname;
+  function lft(html){
+    var d=document.createElement('div');d.innerHTML=html||'';var t=(d.textContent||'').replace(/\s+/g,' ');
+    var m=t.match(/(?:kinderen|kleuters|peuters)[^.]{0,40}?(?:van(?:\s+ongeveer)?\s+(\d{1,2})\s*(?:tot|-|–)\s*(\d{1,2})\s*jaar|vanaf\s+(\d{1,2})\s*jaar)/i);
+    if(m)return m[1]?{a:+m[1],b:+m[2]}:{a:+m[3],b:99};
+    m=t.match(/geschikt vanaf\s+(\d{1,2})\s*jaar/i);if(m)return {a:+m[1],b:99};
+    var li=[].map.call(d.querySelectorAll('li'),function(x){return x.textContent.trim();});
+    for(var i=0;i<li.length;i++){m=li[i].match(/^(?:fictie\s+|non-?fictie\s+)?(\d{1,2})\s*[-–]\s*(\d{1,2})\s*jaar$/i);if(m)return {a:+m[1],b:+m[2]};}
+    return null;
+  }
+  function lang(x){return x.b<99?x.a+'–'+x.b+' jaar':'Vanaf '+x.a+' jaar';}
+  function kort(x){return x.b<99?x.a+'–'+x.b+' jr':x.a+'+';}
+  /* boekpagina */
+  if(/^\/store\/p\/[^\/]+\/?$/.test(P)){
+    fetch(P.replace(/\/$/,'')+'?format=json').then(function(r){return r.json();}).then(function(j){
+      var x=lft(j.item&&(j.item.body||j.item.excerpt));if(!x)return;var n=0;
+      (function zet(){var ti=document.querySelector('.product-detail .product-title');if(!ti){if(++n<40)setTimeout(zet,250);return;}
+        if(document.querySelector('.mz-lft'))return;var s=document.createElement('span');s.className='mz-lft';s.textContent=lang(x);
+        var au=ti.parentNode.querySelector('.moza-author');if(au&&au.nextElementSibling===ti)au.after(s);else ti.before(s);})();
+    }).catch(function(){});
+    return;
+  }
+  if(!/^\/store(\/[^p][^\/]*)?\/?$/.test(P))return;
+  var filter=/^\/store\/(kinderboeken|jeugd)\/?$/.test(P);
+  var A={},BAK=[['0–3',0,3],['4–6',4,6],['7–9',7,9],['10–12',10,12],['13+',13,99]],keuze=-1;
+  function alles(u,n){return fetch(u).then(function(r){return r.json();}).then(function(j){(j.items||[]).forEach(function(it){var x=lft(it.body||it.excerpt);if(x)A[it.urlId]=x;});
+    var nx=j.pagination&&j.pagination.nextPage&&j.pagination.nextPageUrl;if(nx&&n<15)return alles(nx+(nx.indexOf('?')>-1?'&':'?')+'format=json',n+1);});}
+  function slug(c){var a=c.querySelector('a.tk-ti,a.tk-cover');return a?(a.getAttribute('href')||'').split('/').pop():'';}
+  function past(x,i){var b=BAK[i];return x&&x.a<=b[2]&&x.b>=b[1];}
+  function run(){
+    document.querySelectorAll('article.tk-card').forEach(function(c){var x=A[slug(c)];
+      if(x&&!c.querySelector('.mz-lft-b')){var cv=c.querySelector('.tk-cover');if(cv){var b=document.createElement('span');b.className='mz-lft-b';b.textContent=kort(x);b.setAttribute('aria-label',lang(x));cv.appendChild(b);}}
+      if(filter&&c.closest('.tk-grid')){var uit=keuze>=0&&!past(x,keuze);if(c.classList.contains('mz-age-uit')!==uit)c.classList.toggle('mz-age-uit',uit);}
+    });
+    if(filter&&!document.querySelector('.mz-age')){var bar=document.querySelector('.tk-bar');if(!bar)return;
+      var w=document.createElement('div');w.className='mz-age';w.setAttribute('role','group');w.setAttribute('aria-label','Leeftijd');
+      w.innerHTML='<span>Leeftijd:</span><button type="button" data-i="-1" aria-pressed="true">Alle</button>'+BAK.map(function(b,i){return '<button type="button" data-i="'+i+'" aria-pressed="false">'+b[0]+' jaar</button>';}).join('');
+      w.addEventListener('click',function(e){var k=e.target.closest('button');if(!k)return;e.stopPropagation();keuze=+k.dataset.i;
+        [].forEach.call(w.querySelectorAll('button'),function(x){x.setAttribute('aria-pressed',x===k?'true':'false');});run();},true);
+      bar.appendChild(w);}
+  }
+  alles('/store?format=json',0).then(function(){run();var bezig=false;new MutationObserver(function(){if(bezig)return;bezig=true;setTimeout(function(){bezig=false;run();},120);}).observe(document.body,{childList:true,subtree:true});}).catch(function(){});
 })();
 </script>
