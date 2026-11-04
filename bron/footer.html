@@ -1693,7 +1693,7 @@ html.moza-dark #mz-rec button.open,html.moza-dark #mz-rec button.verstuur{backgr
   /* boekpagina */
   if(/^\/store\/p\/[^\/]+\/?$/.test(P)){
     fetch(P.replace(/\/$/,'')+'?format=json').then(function(r){return r.json();}).then(function(j){
-      var x=lft(j.item&&(j.item.body||j.item.excerpt));if(!x)return;var n=0;
+      var x=lft(j.item&&(j.item.excerpt||j.item.body));if(!x)return;var n=0;
       (function zet(){var ti=document.querySelector('.product-detail .product-title');if(!ti){if(++n<40)setTimeout(zet,250);return;}
         if(document.querySelector('.mz-lft'))return;var s=document.createElement('span');s.className='mz-lft';s.textContent=lang(x);
         var au=ti.parentNode.querySelector('.moza-author');if(au&&au.nextElementSibling===ti)au.after(s);else ti.before(s);})();
@@ -1703,7 +1703,7 @@ html.moza-dark #mz-rec button.open,html.moza-dark #mz-rec button.verstuur{backgr
   if(!/^\/store(\/[^p][^\/]*)?\/?$/.test(P))return;
   var filter=/^\/store\/(kinderboeken|jeugd)\/?$/.test(P);
   var A={},BAK=[['0–3',0,3],['4–6',4,6],['7–9',7,9],['10–12',10,12],['13+',13,99]],keuze=-1;
-  function alles(u,n){return fetch(u).then(function(r){return r.json();}).then(function(j){(j.items||[]).forEach(function(it){var x=lft(it.body||it.excerpt);if(x)A[it.urlId]=x;});
+  function alles(u,n){return fetch(u).then(function(r){return r.json();}).then(function(j){(j.items||[]).forEach(function(it){var x=lft(it.excerpt||it.body);if(x)A[it.urlId]=x;});
     var nx=j.pagination&&j.pagination.nextPage&&j.pagination.nextPageUrl;if(nx&&n<15)return alles(nx+(nx.indexOf('?')>-1?'&':'?')+'format=json',n+1);});}
   function slug(c){var a=c.querySelector('a.tk-ti,a.tk-cover');return a?(a.getAttribute('href')||'').split('/').pop():'';}
   function past(x,i){var b=BAK[i];return x&&x.a<=b[2]&&x.b>=b[1];}
