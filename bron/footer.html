@@ -1632,7 +1632,7 @@ html.moza-dark #mz-rec button.open,html.moza-dark #mz-rec button.verstuur{backgr
     if(!na){var nn=0;(function zet(){var x=document.querySelector('.moza-pextra');if(x){x.parentNode.insertBefore(s,x);return;}if(++nn<30)setTimeout(zet,400);})();}
     var f=s.querySelector('form'),keuze=0;
     s.querySelector('.open').onclick=function(){f.classList.toggle('aan');if(f.classList.contains('aan'))f.querySelector('input').focus();};
-    if(/^#recensie/.test(location.hash)){f.classList.add('aan');setTimeout(function(){s.scrollIntoView({block:'start'});try{f.querySelector('input').focus({preventScroll:true});}catch(x){}},600);}
+    if(/^#recensie/.test(location.hash)){f.classList.add('aan');var naar=function(){window.scrollTo({top:s.getBoundingClientRect().top+window.pageYOffset-90,behavior:'auto'});};setTimeout(function(){naar();try{f.querySelector('input').focus({preventScroll:true});}catch(x){}},700);setTimeout(naar,1600);setTimeout(naar,2800);}
     [].forEach.call(s.querySelectorAll('.sterren button'),function(b){b.onclick=function(){keuze=+b.dataset.n;[].forEach.call(s.querySelectorAll('.sterren button'),function(x){var aan=+x.dataset.n<=keuze;x.classList.toggle('aan',aan);x.setAttribute('aria-checked',+x.dataset.n===keuze?'true':'false');});};});
     f.onsubmit=function(e){e.preventDefault();var mel=f.querySelector('.melding');
       var naam=f.querySelector('#mzr-naam').value.trim(),tekst=f.querySelector('#mzr-tekst').value.trim(),mail=f.querySelector('#mzr-mail').value.trim();
