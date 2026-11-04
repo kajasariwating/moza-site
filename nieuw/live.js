@@ -30,40 +30,63 @@
   var RUBS=['Kaart van de week','Achter de foto','Leeswijzer','Woord van de week','Dit weekend','Deze week toen','Jullie zeiden','MOZA deze maand'];
   function dec(t){var d=document.createElement('textarea');d.innerHTML=t||'';return d.value}
   /* Voorpagina: hero, Net binnen en de lijst eronder komen uit drie scripts die elkaar overschrijven.
-     Dit stuk wacht tot de echte hero bekend is (window.MZX_HERO) en Net binnen er staat,
-     sorteert op publicatiedatum (nieuwste eerst) en houdt het resultaat 30 s vast. (4-11-2026) */
+     Hero = meest gelezen stuk van de laatste 3 dagen (max 14 dagen oud), 3 uur onthouden, zodat een
+     trage teller niet terugvalt op het nieuwste stuk. Net binnen en de lijst slaan de hero over,
+     staan op publicatiedatum (nieuwste eerst) en worden 30 s vastgehouden. (4-11-2026) */
+  var GC='https://moza.goatcounter.com',HK='mz-hero-best';
+  function nrm(u){try{return new URL(u,location.href).pathname.replace(/\/+$/,'')}catch(e){return String(u||'').replace(/\/+$/,'')}}
+  function ymdA(t){try{return new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Amsterdam'}).format(new Date(t))}catch(e){return new Date(t).toISOString().slice(0,10)}}
+  function isRubI(i){return (i.tags||[]).some(function(t){return /^rubriek$/i.test(t)})}
+  function besteHero(items){
+    try{var c=JSON.parse(localStorage.getItem(HK)||'null');if(c&&Date.now()-c.t<108e5&&c.u&&items.some(function(i){return nrm(i.fullUrl)===c.u}))return Promise.resolve(c.u)}catch(e){}
+    var now=Date.now(),start=ymdA(now-3*864e5);
+    var cand=items.filter(function(i){return !isRubI(i)&&now-(i.publishOn||0)<14*864e5&&!(i.tags||[]).some(function(t){return /^geen[\s-]*hero$/i.test(t)})&&!/boekenplank/i.test((i.title||'')+' '+(i.urlId||''))}).slice(0,12);
+    if(!cand.length)return Promise.resolve(null);
+    var to=new Promise(function(r){setTimeout(function(){r(null)},6000)});
+    var tel=Promise.all(cand.map(function(i){return fetch(GC+'/counter/'+encodeURIComponent(nrm(i.fullUrl))+'.json?start='+start).then(function(r){return r.ok?r.json():{count:0}}).then(function(j){return {u:nrm(i.fullUrl),n:parseInt(String(j.count||0).replace(/\D/g,''),10)||0}}).catch(function(){return {u:nrm(i.fullUrl),n:0}})}));
+    return Promise.race([tel,to]).then(function(l){if(!l)return null;var b=l.slice().sort(function(x,y){return y.n-x.n})[0];if(!b||b.n<1)return null;
+      try{localStorage.setItem(HK,JSON.stringify({t:Date.now(),u:b.u}))}catch(e){}return b.u});
+  }
+  function zetHero(hero,i){
+    if(nrm(hero.getAttribute('href'))===nrm(i.fullUrl))return;
+    hero.setAttribute('href',i.fullUrl);if(i.assetUrl)hero.style.backgroundImage='url("'+i.assetUrl+'?format=1500w")';
+    var l=hero.querySelector('.lab');if(l)l.textContent=String((i.categories||[])[0]||'nieuws').toLowerCase();
+    var h=hero.querySelector('h1');if(h)h.textContent=dec(i.title);
+    var u=nrm(i.fullUrl);window.MZX_HERO=u;
+    try{sessionStorage.setItem('mzx-hero2:'+ymdA(Date.now()),JSON.stringify({t:Date.now(),u:u}))}catch(e){}
+    try{document.dispatchEvent(new CustomEvent('mzx:hero',{detail:u}))}catch(e){}
+  }
   function lijst(){
     if(P!=='/'||H.classList.contains('mz-nieuw'))return true;
     var ul=document.querySelector('#mzmob ul.mzx-list'),hero=document.querySelector('#mzmob a.hero.o1');
     if(!ul||!hero)return false;
-    if(typeof window.MZX_HERO==='undefined'&&++lijst.h<24)return false; /* max 6 s op de hero wachten */
-    var nb=document.querySelector('#mzmob section.sec.o5');
-    if(!nb&&++lijst.w<12)return false; /* op de telefoon staat Net binnen er niet */
-    var heroU=String(window.MZX_HERO||hero.getAttribute('href')||'').replace(/^https?:\/\/[^\/]+/,'').replace(/\/+$/,'');
+    if(typeof window.MZX_HERO==='undefined'&&++lijst.h<24)return false; /* max 6 s op mzx-js wachten */
+    if(!document.querySelector('#mzmob section.sec.o5')&&++lijst.w<12)return false; /* op de telefoon staat Net binnen er niet */
     fetch('/lezen?format=json&v='+Math.floor(Date.now()/300000)).then(function(r){return r.json()}).then(function(j){
-      var U=function(i){return (i.fullUrl||'').replace(/\/+$/,'')};
       var rubVan=function(i){var tags=i.tags||[],rub=null;if(tags.some(function(t){return /^rubriek$/i.test(t)}))RUBS.forEach(function(r){if(!rub&&tags.some(function(t){return t.toLowerCase()===r.toLowerCase()}))rub=r});return rub};
       var now=Date.now();
-      var A=(j.items||[]).filter(function(i){return i.fullUrl&&U(i)!==heroU&&(i.publishOn||0)<=now})
-        .sort(function(a,b){return (b.publishOn||0)-(a.publishOn||0)});
-      /* Net binnen: de 3 nieuwste, met Kaart van de week en MOZA deze maand, zonder de andere rubrieken */
-      var NB=[],nh='';
-      if(nb){NB=A.filter(function(i){var r=rubVan(i);return !r||r==='Kaart van de week'||r==='MOZA deze maand'}).slice(0,3);
-        nh=NB.map(function(i){var d=new Date(i.publishOn);return '<a class="" href="'+esc(i.fullUrl)+'"><span class="d">'+d.getDate()+' '+MND[d.getMonth()]+'</span><span class="t">'+esc(dec(i.title))+'</span></a>'}).join('')}
-      /* onder de hero: de 5 nieuwste die niet al in de hero of in Net binnen staan */
-      var L=A.filter(function(i){return NB.indexOf(i)<0}).slice(0,5);if(L.length<3){H.classList.remove('mz-lw');return}
-      var html=L.map(function(i){
-        var rub=rubVan(i);
-        var d=new Date(i.publishOn),dag=d.getDate()+' '+MND[d.getMonth()];
-        var k=rub?'<b class="rb" style="background:'+(rub==='Dit weekend'?'#FF7AB6':'#C9D3FF')+';color:#111">'+esc(rub)+'</b>':(((i.categories||[])[0])?'<b class="rb" style="background:#1F3BD1;color:#fff">'+esc((i.categories||[])[0])+'</b>':'');
-        return '<li><a href="'+esc(i.fullUrl)+'"><span class="k">'+k+'</span><span class="t">'+esc(dec(i.title))+'<small class="w">'+dag+'</small></span></a></li>'}).join('');
-      /* Net binnen wordt door mzmob-js soms helemaal opnieuw opgebouwd (nieuwe .tl), daarom de hele sectie volgen */
+      var ALL=(j.items||[]).filter(function(i){return i.fullUrl&&(i.publishOn||0)<=now}).sort(function(a,b){return (b.publishOn||0)-(a.publishOn||0)});
       var zet=function(){
+        var hr=document.querySelector('#mzmob a.hero.o1');if(!hr)return;var heroU=nrm(hr.getAttribute('href'));
+        var A=ALL.filter(function(i){return nrm(i.fullUrl)!==heroU});
+        var s=document.querySelector('#mzmob section.sec.o5'),tl=s&&s.querySelector('.tl');
+        /* Net binnen: de 3 nieuwste, met Kaart van de week en MOZA deze maand, zonder de andere rubrieken */
+        var NB=s?A.filter(function(i){var r=rubVan(i);return !r||r==='Kaart van de week'||r==='MOZA deze maand'}).slice(0,3):[];
+        var nh=NB.map(function(i){var d=new Date(i.publishOn);return '<a class="" href="'+esc(i.fullUrl)+'"><span class="d">'+d.getDate()+' '+MND[d.getMonth()]+'</span><span class="t">'+esc(dec(i.title))+'</span></a>'}).join('');
+        /* onder de hero: de 5 nieuwste die niet al in de hero of in Net binnen staan */
+        var L=A.filter(function(i){return NB.indexOf(i)<0}).slice(0,5);if(L.length<3)return;
+        var html=L.map(function(i){
+          var rub=rubVan(i),d=new Date(i.publishOn),dag=d.getDate()+' '+MND[d.getMonth()];
+          var k=rub?'<b class="rb" style="background:'+(rub==='Dit weekend'?'#FF7AB6':'#C9D3FF')+';color:#111">'+esc(rub)+'</b>':(((i.categories||[])[0])?'<b class="rb" style="background:#1F3BD1;color:#fff">'+esc((i.categories||[])[0])+'</b>':'');
+          return '<li><a href="'+esc(i.fullUrl)+'"><span class="k">'+k+'</span><span class="t">'+esc(dec(i.title))+'<small class="w">'+dag+'</small></span></a></li>'}).join('');
         var u=document.querySelector('#mzmob ul.mzx-list');if(u&&u.innerHTML!==html)u.innerHTML=html;
-        var s=document.querySelector('#mzmob section.sec.o5'),tl=s&&s.querySelector('.tl');if(tl&&nh&&tl.innerHTML!==nh)tl.innerHTML=nh};
+        if(tl&&nh&&tl.innerHTML!==nh)tl.innerHTML=nh;
+      };
       zet();H.classList.remove('mz-lw');
       var t0=Date.now(),mo=new MutationObserver(function(){if(Date.now()-t0>30000){mo.disconnect();return}zet()});
-      mo.observe(document.getElementById('mzmob')||document.body,{childList:true,subtree:true});
+      mo.observe(document.getElementById('mzmob')||document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['href']});
+      /* hero rechtzetten als mzx-js op het nieuwste stuk is teruggevallen */
+      besteHero(ALL).then(function(u){if(!u)return;var it=ALL.filter(function(i){return nrm(i.fullUrl)===u})[0];var hr=document.querySelector('#mzmob a.hero.o1');if(it&&hr){zetHero(hr,it);zet()}});
     }).catch(function(){H.classList.remove('mz-lw')});
     return true;
   }
