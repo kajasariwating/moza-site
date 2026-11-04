@@ -1579,7 +1579,7 @@ html.moza-dark #mz-rec button.open,html.moza-dark #mz-rec button.verstuur{backgr
 <script id="mz-rec-js">
 /* Recensies in de Toko Buku. Insturen via een Google Formulier; tonen alleen wat in de Sheet op "Ja" staat (tabblad met alleen boek, naam, sterren, tekst, datum). */
 (function(){
-  var CFG={form:'https://docs.google.com/forms/d/e/1FAIpQLSdn50Boqnq_SAJL17WyumRmJqNhhN9sB9IbG9IbL5pqo7uJQA/formResponse',velden:{boek:'entry.75094983',naam:'entry.493752397',sterren:'entry.1596120347',tekst:'entry.1699090494',email:'entry.1025330682'},csv:''};
+  var CFG={form:'https://docs.google.com/forms/d/e/1FAIpQLSdn50Boqnq_SAJL17WyumRmJqNhhN9sB9IbG9IbL5pqo7uJQA/formResponse',velden:{boek:'entry.75094983',naam:'entry.493752397',sterren:'entry.1596120347',tekst:'entry.1699090494',email:'entry.1025330682'},csv:'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaygeGbGKtyUiZSdBP2qd5Ufp00JzGQJ4Yx1FKl0vWaSFMrnura6hjzIaaKlM4ErHofzgYmhnEeu-B/pub?gid=1025790068&single=true&output=csv'};
   /* csv: de 'Publiceren op internet'-link van tabblad Blad1 (CSV). Leeg = de recensies staan uit. */
   var m=location.pathname.match(/^\/store\/p\/([^\/]+)\/?$/);if(!m||!CFG.form||!CFG.csv)return;
   var slug=decodeURIComponent(m[1]);
