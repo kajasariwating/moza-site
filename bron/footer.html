@@ -729,10 +729,11 @@ var title=(it.title||'').trim();
 crumbs([["Home","/"],["Toko Buku","/store"],[title,p]]);
 var v=(it.variants||[])[0]||{};var price=v.onSale&&v.salePriceMoney&&Number(v.salePriceMoney.value)>0?v.salePriceMoney.value:(v.priceMoney?v.priceMoney.value:(v.price?(v.price/100).toFixed(2):''));
 var inStock=(it.variants||[]).some(function(x){return x.unlimited||x.qtyInStock>0});
+var preOrder=!inStock&&(it.tags||[]).some(function(t){return /^label:.*(pre-?order|verwacht)/i.test(t)});
 var imgs=(it.items||[]).map(function(x){return x.assetUrl}).filter(function(u){return u&&!/\/$/.test(u)}).map(function(u){return u.replace(/^http:/,'https:')});
 var desc=(window.__MZADV__&&window.__MZADV__[slug])||(it.seoData&&it.seoData.seoDescription)||'';
 var o={"@context":"https://schema.org","@type":"Product","@id":URL0+"#product","name":title,"url":URL0,"image":imgs,"description":desc,"sku":v.sku||undefined,
-"offers":{"@type":"Offer","url":URL0,"priceCurrency":"EUR","price":price?String(price):undefined,"availability":inStock?"https://schema.org/InStock":"https://schema.org/OutOfStock","itemCondition":/tweedehands|beschadigd/i.test(title+' '+slug)?"https://schema.org/UsedCondition":"https://schema.org/NewCondition","seller":ORG}};
+"offers":{"@type":"Offer","url":URL0,"priceCurrency":"EUR","price":price?String(price):undefined,"availability":inStock?"https://schema.org/InStock":(preOrder?"https://schema.org/PreOrder":"https://schema.org/OutOfStock"),"itemCondition":/tweedehands|beschadigd/i.test(title+' '+slug)?"https://schema.org/UsedCondition":"https://schema.org/NewCondition","seller":ORG}};
 if(specs){
 var isbn='',pages='',lang='',form='',date='';
 [].forEach.call(specs.querySelectorAll('li'),function(li){var x=txt(li);var c=li.className;
