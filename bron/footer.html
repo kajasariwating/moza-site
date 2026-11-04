@@ -1491,3 +1491,44 @@ html.moza-dark #mzag .ev .mzig{background:#12151F}
   var t=0,iv=setInterval(function(){run();if(++t>10)clearInterval(iv)},800);
 })();
 </script>
+<style id="mz-verzend-css">
+.mz-verzend{display:flex;gap:10px;align-items:flex-start;margin:14px 0 4px;font:700 15px/1.4 'Hanken Grotesk',system-ui,sans-serif;color:#111}
+.mz-verzend svg{flex:0 0 22px;width:22px;height:22px;margin-top:1px}
+.mz-verzend b{font-weight:900}
+html.moza-dark .mz-verzend{color:#ECECF1}
+</style>
+<script id="mz-verzend-js">
+/* Toko Buku: wanneer gaat je bestelling op de post. Werkdag voor 16:00 = vandaag, anders de volgende werkdag. */
+(function(){
+  var m=location.pathname.match(/^\/store\/p\/([^\/]+)\/?$/);if(!m)return;
+  var DAG=['zo','ma','di','wo','do','vr','za'];
+  function nu(){
+    var o={};new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Amsterdam',weekday:'short',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date()).forEach(function(p){o[p.type]=p.value;});
+    return {dag:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].indexOf(o.weekday),min:(+o.hour)*60+(+o.minute)};
+  }
+  function tekst(pre){
+    if(pre)return 'Pre-order: we versturen het boek zodra het binnen is.';
+    var t=nu(),werkdag=t.dag>=1&&t.dag<=5;
+    if(werkdag&&t.min<960){var r=960-t.min,u=Math.floor(r/60),mm=r%60;
+      return 'Bestel binnen <b>'+(u?u+' uur'+(mm?' en '+mm+' min':''):mm+' min')+'</b>, dan versturen we <b>vandaag</b>.';}
+    if(t.dag>=1&&t.dag<=4)return 'Vandaag besteld, <b>morgen</b> verstuurd.';
+    return 'Nu besteld, <b>maandag</b> verstuurd.';
+  }
+  var ICOON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h11v10H3z"/><path d="M14 10h4l3 3v3h-7"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>';
+  var pre=false,klaar=false;
+  fetch(location.pathname+'?format=json').then(function(r){return r.json();}).then(function(j){
+    var it=j&&j.item||{};pre=(it.tags||[]).some(function(t){return /^label:.*(pre-?order|verwacht)/i.test(t);});klaar=true;zet();
+  }).catch(function(){klaar=true;zet();});
+  function zet(){
+    if(!klaar)return;
+    var cart=document.querySelector('.product-detail .product-add-to-cart');if(!cart)return;
+    var knop=cart.querySelector('button,.sqs-add-to-cart-button,[role=button]');if(!knop||/uitverkocht|sold out/i.test(cart.textContent))return;
+    var el=document.querySelector('.mz-verzend');
+    if(!el){el=document.createElement('p');el.className='mz-verzend';el.setAttribute('role','status');}
+    var na=cart.nextElementSibling&&cart.nextElementSibling.classList.contains('mz-save')?cart.nextElementSibling:cart;
+    if(el.previousElementSibling!==na)na.after(el);
+    var h=ICOON+'<span>'+tekst(pre)+'</span>';if(el.innerHTML!==h)el.innerHTML=h;
+  }
+  var n=0,iv=setInterval(function(){zet();if(++n>20){clearInterval(iv);setInterval(zet,60000);}},500);
+})();
+</script>
