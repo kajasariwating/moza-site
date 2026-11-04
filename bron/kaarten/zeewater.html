@@ -1,41 +1,40 @@
 <script id="mzm-cfg">
 (function(){
-/* Zeewater rond de Molukken. Kaartlaag: NASA GIBS (MUR-zeetemperatuur van NASA JPL). Getallen per plek: Open-Meteo Marine. */
+/* Zeewater rond de Molukken. Alle getallen: Open-Meteo Marine (zeetemperatuur aan het oppervlak), op een raster van 0,75 graad. */
 var P=[['Ambon',-3.78,128.15],['Saparua',-3.62,128.68],['Banda Neira',-4.55,129.9],['Masohi (Seram)',-3.35,128.93],['Bula (Seram)',-3.08,130.52],['Namlea (Buru)',-3.2,127.1],['Tual (Kei)',-5.65,132.7],['Dobo (Aru)',-5.78,134.25],['Saumlaki (Tanimbar)',-8.0,131.32],['Kisar',-8.12,127.17],['Sanana (Sula)',-2.1,125.98],['Ternate',0.78,127.4],['Tobelo (Halmahera)',1.73,128.05],['Weda (Halmahera)',0.33,127.9]];
-var LAY={t:'GHRSST_L4_MUR_Sea_Surface_Temperature',a:'GHRSST_L4_MUR_Sea_Surface_Temperature_Anomalies'};
-var LEG={t:'<span style="display:inline-flex;align-items:center;gap:6px">Kouder <i style="width:90px;background:linear-gradient(90deg,#2c3a9e,#3fb6d6,#9be06a,#f6d43b,#e8572b,#a3131e)"></i> Warmer</span><span style="font-size:12px;opacity:.8">Kleur van het zeewater. De getallen staan in de lijst.</span>',
- a:'<span style="display:inline-flex;align-items:center;gap:6px">Kouder dan normaal <i style="width:90px;background:linear-gradient(90deg,#2b4fb3,#9fc4e8,#f4f4f4,#f2a37b,#b8202c)"></i> Warmer dan normaal</span><span style="font-size:12px;opacity:.8">Wit is normaal voor de tijd van het jaar</span>'};
-var DAY=null;
-function iso(d){return d.toISOString().slice(0,10)}
-function probe(l){var i=1;return new Promise(function(res){(function next(){if(i>7)return res(null);var d=iso(new Date(Date.now()-i*864e5));var im=new Image();im.onload=function(){res(d)};im.onerror=function(){i++;next()};im.src='https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/'+l+'/default/'+d+'/GoogleMapsCompatible_Level7/5/16/27.png'})()})}
-function lagen(X){var t=X.state.tab;return probe(LAY[t]).then(function(d){DAY=d;X.layer.clearLayers();
- if(d)X.L.tileLayer('https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/'+LAY[t]+'/default/'+d+'/GoogleMapsCompatible_Level7/{z}/{y}/{x}.png',{maxNativeZoom:7,maxZoom:14,opacity:.8,zIndex:5}).addTo(X.layer);
- var lg=X.w.querySelector('.legend');if(lg)lg.innerHTML=LEG[t];
- var dd=d?new Intl.DateTimeFormat('nl-NL',{day:'numeric',month:'long'}).format(new Date(d+'T12:00:00Z')):'–';X.stat(3,dd,d?'satellietbeeld, steeds 1 à 2 dagen oud':'beeld nu niet bereikbaar')})}
-var PTS=null;
-function punten(X){var esc=X.esc;
- return fetch('https://marine-api.open-meteo.com/v1/marine?latitude='+P.map(function(p){return p[1]}).join(',')+'&longitude='+P.map(function(p){return p[2]}).join(',')+'&current=sea_surface_temperature&timezone=Asia%2FJayapura').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(j){j=[].concat(j);
-  PTS=P.map(function(p,i){var c=j[i]&&j[i].current;return {nm:p[0],la:p[1],lo:p[2],t:c&&c.sea_surface_temperature}}).filter(function(p){return p.t!=null});
-  if(!PTS.length)throw 0;
-  var s=PTS.slice().sort(function(a,b){return b.t-a.t}),av=PTS.reduce(function(a,p){return a+p.t},0)/PTS.length;
-  X.stat(0,X.num(av)+' °C','gemiddeld op '+PTS.length+' plekken');X.stat(1,X.num(s[0].t)+' °C','zee bij '+s[0].nm);X.stat(2,X.num(s[s.length-1].t)+' °C','zee bij '+s[s.length-1].nm);
-  X.side(s.map(function(p){return '<button type="button" class="row" data-la="'+p.la+'" data-lo="'+p.lo+'" data-z="8"><span class="nm">Zee bij '+esc(p.nm)+'</span><span class="n">'+X.num(p.t)+'°</span></button>'}).join(''));
-  PTS.forEach(function(p){X.L.circleMarker([p.la,p.lo],{radius:7,color:'#111',weight:2,fillColor:'#fff',fillOpacity:1}).bindPopup('<b>Zee bij '+esc(p.nm)+'</b><br>Nu '+X.num(p.t)+' °C').addTo(X.layer)})})}
+var G=[];for(var a=-9;a<=3.01;a+=0.75)for(var b=124.5;b<=135.51;b+=0.75)G.push([+a.toFixed(2),+b.toFixed(2)]);
+var IDX={nu:null,m:36,d3:84},LBL={nu:'nu',m:'morgen om 12.00 uur',d3:'over 3 dagen om 12.00 uur'};
+function col(t){return t<28?'#1F3BD1':t<29?'#7FA3FF':t<30?'#E9F25A':t<31?'#FF7AB6':'#FF4D2E'}
+var DATA=null;
+function haal(){if(DATA)return Promise.resolve(DATA);var all=G.concat(P.map(function(p){return [p[1],p[2]]}));
+ return fetch('https://marine-api.open-meteo.com/v1/marine?latitude='+all.map(function(p){return p[0]}).join(',')+'&longitude='+all.map(function(p){return p[1]}).join(',')+'&current=sea_surface_temperature&hourly=sea_surface_temperature&forecast_days=4&timezone=Asia%2FJayapura').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(j){DATA=[].concat(j);setTimeout(function(){DATA=null},30*6e4);return DATA})}
+function waarde(o,tab){if(!o)return null;if(IDX[tab]==null)return o.current?o.current.sea_surface_temperature:null;var h=o.hourly&&o.hourly.sea_surface_temperature;return h?h[IDX[tab]]:null}
+function teken(X){var L=X.L,esc=X.esc,tab=X.state.tab;return haal().then(function(D){X.layer.clearLayers();
+ var zee=[];G.forEach(function(g,i){var o=D[i];if(!o||o.elevation>0)return;var t=waarde(o,tab);if(t==null)return;zee.push(t);
+  L.circle(g,{radius:34000,stroke:false,fillColor:col(t),fillOpacity:.8,interactive:false}).addTo(X.layer)});
+ var pts=P.map(function(p,i){return {nm:p[0],la:p[1],lo:p[2],t:waarde(D[G.length+i],tab)}}).filter(function(p){return p.t!=null});
+ if(!zee.length&&!pts.length)throw 0;
+ pts.forEach(function(p){L.circleMarker([p.la,p.lo],{radius:7,color:'#111',weight:2,fillColor:'#fff',fillOpacity:1}).bindPopup('<b>Zee bij '+esc(p.nm)+'</b><br>'+X.num(p.t)+' °C ('+LBL[tab]+')').addTo(X.layer)});
+ var av=zee.reduce(function(a,t){return a+t},0)/zee.length,s=pts.slice().sort(function(a,b){return b.t-a.t}),w=zee.filter(function(t){return t>=30}).length;
+ X.stat(0,X.num(av)+' °C','gemiddeld in de hele zee, '+LBL[tab]);X.stat(1,s.length?X.num(s[0].t)+' °C':'–',s.length?'zee bij '+s[0].nm:'');X.stat(2,s.length?X.num(s[s.length-1].t)+' °C':'–',s.length?'zee bij '+s[s.length-1].nm:'');
+ X.stat(3,Math.round(w/zee.length*100)+'%','van de zee is 30 graden of warmer');
+ X.side(s.map(function(p){return '<button type="button" class="row" data-la="'+p.la+'" data-lo="'+p.lo+'" data-z="8"><span class="nm">Zee bij '+esc(p.nm)+'</span><span class="n">'+X.num(p.t)+'°</span></button>'}).join(''));
+ X.load(null)})}
 mzKaart({id:'zeewater',path:'/kaarten/zeewater',
  kicker:'Live · Zeewater',title:'Zeewater rond de Molukken',serif:'hoe warm is de zee',
- lead:'De zee rond de Molukken is een van de warmste zeeën ter wereld. Voor vissers en voor het koraal maakt een paar graden verschil veel uit. Deze kaart laat zien hoe warm het zeewater nu is en of het warmer of kouder is dan normaal.',
- tabs:[['t','Temperatuur'],['a','Warmer of kouder dan normaal']],tabLabel:'Kies wat je ziet',
- stats:['Zeewater','Warmste plek','Koelste plek','Kaartbeeld van'],
- legend:LEG.t,
- sideTitle:'Watertemperatuur nu',sideNote:'Temperatuur aan het wateroppervlak, berekend voor de zee bij elke plaats. Vlak bij de kust kan het water anders zijn.',
- bounds:[[-9,124.5],[2.5,135.5]],attr:'Zeetemperatuur: NASA GIBS en JPL (MUR) · Open-Meteo',refresh:60,
+ lead:'De zee rond de Molukken is een van de warmste zeeën ter wereld. Voor vissers en voor het koraal maakt een paar graden verschil veel uit. Deze kaart laat zien hoe warm het zeewater nu is en hoe warm het de komende dagen wordt.',
+ tabs:[['nu','Nu'],['m','Morgen'],['d3','Over 3 dagen']],tabLabel:'Kies een moment',
+ stats:['Zeewater','Warmste plek','Koelste plek','Erg warm water'],
+ legend:'<span><i style="background:#1F3BD1"></i>Onder 28°</span><span><i style="background:#7FA3FF"></i>28 tot 29°</span><span><i style="background:#E9F25A"></i>29 tot 30°</span><span><i style="background:#FF7AB6"></i>30 tot 31°</span><span><i style="background:#FF4D2E"></i>31° of meer</span>',
+ sideTitle:'Watertemperatuur per plaats',sideNote:'Temperatuur aan het wateroppervlak, berekend voor de zee bij elke plaats. Vlak bij de kust en in baaien kan het water anders zijn.',
+ bounds:[[-9,124.5],[2.5,135.5]],attr:'Zeetemperatuur: Open-Meteo',refresh:60,
  mapLabel:'Kaart van de zee rond de Molukken met de watertemperatuur',
- onTab:function(X){X.load('Kaartbeeld laden…');lagen(X).then(function(){if(PTS)PTS.forEach(function(p){X.L.circleMarker([p.la,p.lo],{radius:7,color:'#111',weight:2,fillColor:'#fff',fillOpacity:1}).bindPopup('<b>Zee bij '+X.esc(p.nm)+'</b><br>Nu '+X.num(p.t)+' °C').addTo(X.layer)});X.load(null)})},
- update:function(X){return lagen(X).then(function(){return punten(X)}).then(function(){X.load(null)})},
- info:[['Wat zie je hier?',['Bij Temperatuur zie je hoe warm het water aan het oppervlak is. Rond de Molukken is dat meestal tussen de 26 en 31 graden.','Bij Warmer of kouder dan normaal zie je het verschil met wat gewoon is voor deze tijd van het jaar. Rood is warmer dan normaal, blauw is kouder.']],
-  ['Waarom is dit belangrijk?',['Koraal kan slecht tegen water dat lang te warm is. Dan verliest het zijn kleur. Dat heet koraalverbleking. Duurt het te lang, dan kan het koraal doodgaan. Voor vissers en voor het leven in zee is dat een groot verlies.','Waarschuwingen voor koraal vind je bij <a href="https://coralreefwatch.noaa.gov" target="_blank" rel="noopener">NOAA Coral Reef Watch</a>.']],
-  ['Waar komen de cijfers vandaan?',['De kleuren op de kaart komen uit satellietmetingen van NASA (de MUR-dataset van JPL), via <a href="https://www.earthdata.nasa.gov/engage/open-data-services-software/earthdata-developer-portal/gibs-api" target="_blank" rel="noopener">NASA GIBS</a>. Dat beeld is steeds 1 à 2 dagen oud.','De getallen in de lijst komen van <a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo</a> en worden elk uur bijgewerkt.']]],
- reads:{title:'Lees meer',re:/zee|koraal|vis(s|ch)|oceaan|klimaat/i},
+ onTab:function(X){teken(X).catch(function(){X.load('De gegevens zijn nu niet bereikbaar. Probeer het later opnieuw.')})},
+ update:function(X){return teken(X)},
+ info:[['Wat zie je hier?',['Elke gekleurde vlek is een stuk zee van ongeveer 80 bij 80 kilometer. De kleur laat zien hoe warm het water aan het oppervlak is. Rond de Molukken is dat meestal tussen de 26 en 31 graden.','Met de knoppen kies je het moment: nu, morgen of over 3 dagen. Morgen en over 3 dagen zijn een verwachting.']],
+  ['Waarom is dit belangrijk?',['Koraal kan slecht tegen water dat lang warmer is dan normaal. Dan verliest het zijn kleur. Dat heet koraalverbleking. Duurt het te lang, dan kan het koraal doodgaan. Voor vissers en voor het leven in zee is dat een groot verlies.','Deze kaart laat niet zien of het water warmer is dan normaal. Waarschuwingen voor koraal vind je bij <a href="https://coralreefwatch.noaa.gov" target="_blank" rel="noopener">NOAA Coral Reef Watch</a>.']],
+  ['Waar komen de cijfers vandaan?',['Van <a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo</a>. Die rekent met gegevens van Europese en andere weerdiensten. De cijfers worden elk uur bijgewerkt. Het zijn berekeningen, geen metingen op de plek zelf.']]],
+ reads:{title:'Lees meer',re:/zee|koraal|visser|oceaan|klimaat/i},
  cta:['<b>Duik of vis jij op de Molukken?</b> Stuur je foto’s of verhaal over de zee.','Stuur het in →','/uploaden']});
 })();
 </script>
