@@ -1,0 +1,42 @@
+<script id="mzm-cfg">
+(function(){
+/* Regen op de Molukken. Neerslag per dag: Open-Meteo (afgelopen 7 dagen en verwachting), raster van 0,75 graad plus plaatsen. */
+var PL=[['Ambon',-3.69,128.18],['Saparua',-3.57,128.66],['Masohi (Seram)',-3.3,128.96],['Bula (Seram)',-3.1,130.49],['Namlea (Buru)',-3.25,127.09],['Banda Neira',-4.53,129.9],['Tual (Kei)',-5.63,132.75],['Dobo (Aru)',-5.76,134.22],['Saumlaki (Tanimbar)',-7.98,131.3],['Kisar',-8.06,127.18],['Sanana (Sula)',-2.06,125.97],['Ternate',0.79,127.38],['Sofifi (Halmahera)',0.74,127.56],['Tobelo (Halmahera)',1.73,128.01]];
+var G=[];for(var a=-9;a<=3.01;a+=0.75)for(var b=124.5;b<=135.51;b+=0.75)G.push([+a.toFixed(2),+b.toFixed(2)]);
+var DATA=null;
+/* dagen in de reeks: 0..6 = afgelopen 7 dagen, 7 = vandaag, 8..10 = komende 3 dagen */
+var SEL={w7:[0,7],g:[6,7],v:[8,11]},LBL={w7:'afgelopen 7 dagen',g:'gisteren',v:'komende 3 dagen'};
+function col(d){return d<1?'#EDDCB8':d<5?'#BFD4FF':d<15?'#7FA3FF':d<30?'#1F3BD1':'#111'}
+function haal(){if(DATA)return Promise.resolve(DATA);var all=G.concat(PL.map(function(p){return [p[1],p[2]]}));
+ return fetch('https://api.open-meteo.com/v1/forecast?latitude='+all.map(function(p){return p[0]}).join(',')+'&longitude='+all.map(function(p){return p[1]}).join(',')+'&daily=precipitation_sum&past_days=7&forecast_days=4&timezone=Asia%2FJayapura').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(j){DATA=[].concat(j);setTimeout(function(){DATA=null},60*6e4);return DATA})}
+function som(o,s){var v=o&&o.daily&&o.daily.precipitation_sum;if(!v)return null;var t=0,n=0;for(var i=s[0];i<s[1];i++){if(v[i]!=null){t+=v[i];n++}}return n?{t:t,d:t/n}:null}
+function teken(X){var L=X.L,esc=X.esc,tab=X.state.tab,s=SEL[tab];return haal().then(function(D){X.layer.clearLayers();
+ var vals=[];G.forEach(function(g,i){var r=som(D[i],s);if(!r)return;vals.push(r);
+  L.circle(g,{radius:34000,stroke:false,fillColor:col(r.d),fillOpacity:.75,interactive:false}).addTo(X.layer)});
+ var pl=PL.map(function(p,i){var r=som(D[G.length+i],s);return r&&{nm:p[0],la:p[1],lo:p[2],t:r.t,d:r.d}}).filter(Boolean);
+ if(!vals.length||!pl.length)throw 0;
+ pl.forEach(function(p){L.circleMarker([p.la,p.lo],{radius:7,color:'#111',weight:2,fillColor:'#fff',fillOpacity:1}).bindPopup('<b>'+esc(p.nm)+'</b><br>'+X.num(p.t,0)+' mm regen ('+LBL[tab]+')').addTo(X.layer)});
+ var srt=pl.slice().sort(function(a,b){return b.t-a.t}),av=vals.reduce(function(a,r){return a+r.t},0)/vals.length,dr=vals.filter(function(r){return r.d<1}).length;
+ X.stat(0,X.num(av,0)+' mm','gemiddeld in het hele gebied, '+LBL[tab]);
+ X.stat(1,X.num(srt[0].t,0)+' mm','het natst: '+srt[0].nm);X.stat(2,X.num(srt[srt.length-1].t,0)+' mm','het droogst: '+srt[srt.length-1].nm);
+ X.stat(3,Math.round(dr/vals.length*100)+'%','van het gebied (bijna) droog');
+ X.side(srt.map(function(p){return '<button type="button" class="row" data-la="'+p.la+'" data-lo="'+p.lo+'" data-z="9"><span class="nm">'+esc(p.nm)+'<small>gemiddeld '+X.num(p.d,1)+' mm per dag</small></span><span class="n">'+X.num(p.t,0)+' mm</span></button>'}).join(''));
+ X.load(null)})}
+mzKaart({id:'regen',path:'/kaarten/regen',
+ kicker:'Live · Regen',title:'Regen op de Molukken',serif:'waar valt de regen',
+ lead:'Regen bepaalt veel op de Molukken: de oogst, het drinkwater en of er bosbranden kunnen ontstaan. Deze kaart laat zien hoeveel regen er de afgelopen week viel en hoeveel er de komende dagen verwacht wordt.',
+ tabs:[['w7','Afgelopen 7 dagen'],['g','Gisteren'],['v','Komende 3 dagen']],tabLabel:'Kies een periode',
+ stats:['Regen','Natste plaats','Droogste plaats','Droog'],
+ legend:'<span style="font-size:12px;opacity:.8">Gemiddeld per dag:</span><span><i style="background:#EDDCB8"></i>Droog (minder dan 1 mm)</span><span><i style="background:#BFD4FF"></i>1 tot 5 mm</span><span><i style="background:#7FA3FF"></i>5 tot 15 mm</span><span><i style="background:#1F3BD1"></i>15 tot 30 mm</span><span><i style="background:#111"></i>30 mm of meer</span>',
+ sideTitle:'Regen per plaats',sideNote:'Totaal aan regen in de gekozen periode. 1 millimeter is 1 liter water op een vierkante meter.',
+ bounds:[[-9,124.5],[2.5,135.5]],attr:'Regen: Open-Meteo',refresh:60,
+ mapLabel:'Kaart van de Molukken met de hoeveelheid regen',
+ onTab:function(X){teken(X).catch(function(){X.load('De gegevens zijn nu niet bereikbaar. Probeer het later opnieuw.')})},
+ update:function(X){return teken(X)},
+ info:[['Wat zie je hier?',['Elke gekleurde vlek is een gebied van ongeveer 80 bij 80 kilometer. Hoe donkerder blauw, hoe meer regen. Beige betekent dat het daar (bijna) droog was.','Met de knoppen kies je de periode: de afgelopen 7 dagen, gisteren of de komende 3 dagen. De komende dagen zijn een verwachting.']],
+  ['Waarom is dit belangrijk?',['Blijft het lang droog, dan drogen bos en land uit en kan een brand zich snel verspreiden. Kijk ook op de kaarten <a href="/kaarten/bosbranden">Bosbranden</a> en <a href="/kaarten/luchtkwaliteit">Rook en fijnstof</a>. Veel regen in korte tijd kan juist overstromingen en aardverschuivingen geven.']],
+  ['Waar komen de cijfers vandaan?',['Van <a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo</a>. Die rekent met gegevens van weerdiensten en satellieten. Het zijn berekeningen voor een gebied, geen metingen met een regenmeter. Een stevige bui op één plek kan erin ontbreken.','Tijden en dagen in Maluku-tijd (WIT).']]],
+ reads:{title:'Lees meer',re:/regen|droogte|overstroming|banjir|brand|weer/i},
+ cta:['<b>Overstroming of juist droogte bij jou op de Molukken?</b> Stuur je foto of verhaal.','Stuur het in →','/uploaden']});
+})();
+</script>

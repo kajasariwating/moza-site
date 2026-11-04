@@ -1,0 +1,47 @@
+<script id="mzm-cfg">
+(function(){
+/* Eb en vloed rond de Molukken. Zeespiegel per kwartier: Open-Meteo Marine (sea_level_height_msl, met getij). */
+var P=[['Ambon',-3.78,128.15],['Saparua',-3.62,128.68],['Banda Neira',-4.55,129.9],['Masohi (Seram)',-3.35,128.93],['Bula (Seram)',-3.08,130.52],['Namlea (Buru)',-3.2,127.1],['Tual (Kei)',-5.65,132.7],['Dobo (Aru)',-5.78,134.25],['Saumlaki (Tanimbar)',-8.0,131.32],['Kisar',-8.12,127.17],['Sanana (Sula)',-2.1,125.98],['Ternate',0.78,127.4],['Tobelo (Halmahera)',1.73,128.05],['Weda (Halmahera)',0.33,127.9]];
+var DAG={d0:0,d1:1,d2:2},DATA=null;
+function nuWIT(){var f=new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Jayapura',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}).format(new Date());return f.replace(' ','T')}
+function dagStr(n){var d=new Date(Date.now()+n*864e5);return new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Jayapura',year:'numeric',month:'2-digit',day:'2-digit'}).format(d)}
+function uur(s){return s.slice(11,16).replace(':','.')}
+function keer(t,v){var o=[];for(var i=1;i<v.length-1;i++){if(v[i]==null)continue;var a=v[i-1],b=v[i+1];if(a==null||b==null)continue;
+ if(v[i]>a&&v[i]>=b)o.push({t:t[i],h:v[i],s:'hoog'});else if(v[i]<a&&v[i]<=b)o.push({t:t[i],h:v[i],s:'laag'})}
+ return o.filter(function(e,i){var p=o[i-1],n=o[i+1];return !(p&&Math.abs(p.h-e.h)<.04)&&!(n&&Math.abs(n.h-e.h)<.04&&n.s!==e.s)})}
+function haal(){if(DATA)return Promise.resolve(DATA);
+ return fetch('https://marine-api.open-meteo.com/v1/marine?latitude='+P.map(function(p){return p[1]}).join(',')+'&longitude='+P.map(function(p){return p[2]}).join(',')+'&minutely_15=sea_level_height_msl&forecast_days=4&timezone=Asia%2FJayapura').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(j){
+  DATA=[].concat(j).map(function(x,i){var m=x.minutely_15||{},t=m.time||[],v=m.sea_level_height_msl||[];return {nm:P[i][0],la:P[i][1],lo:P[i][2],t:t,v:v,k:keer(t,v)}}).filter(function(p){return p.k.length});
+  setTimeout(function(){DATA=null},30*6e4);if(!DATA.length)throw 0;return DATA})}
+function stand(p,nu){var i=0;while(i<p.t.length-1&&p.t[i+1]<=nu)i++;var v=p.v[i],w=p.v[Math.min(i+2,p.v.length-1)];return {h:v,op:w>v}}
+function teken(X){var L=X.L,esc=X.esc,dag=dagStr(DAG[X.state.tab]||0),nu=nuWIT();return haal().then(function(D){X.layer.clearLayers();
+ D.forEach(function(p){var s=stand(p,nu),vh=p.k.filter(function(e){return e.t>nu})[0];
+  L.circleMarker([p.la,p.lo],{radius:9,color:'#111',weight:2,fillColor:s.op?'#FF7AB6':'#1F3BD1',fillOpacity:.95}).bindPopup('<b>'+esc(p.nm)+'</b><br>Het water '+(s.op?'stijgt':'zakt')+' nu'+(vh?'<br>Volgend '+vh.s+' water: '+uur(vh.t)+' uur WIT':'')).addTo(X.layer)});
+ var A=D.filter(function(p){return p.nm==='Ambon'})[0]||D[0],s=stand(A,nu),toek=A.k.filter(function(e){return e.t>nu});
+ var hw=toek.filter(function(e){return e.s==='hoog'})[0],lw=toek.filter(function(e){return e.s==='laag'})[0];
+ var vd=A.k.filter(function(e){return e.t.slice(0,10)===dag}),hs=vd.filter(function(e){return e.s==='hoog'}).map(function(e){return e.h}),ls=vd.filter(function(e){return e.s==='laag'}).map(function(e){return e.h});
+ X.stat(0,s.op?'Stijgt':'Zakt','water bij '+A.nm+' nu');
+ X.stat(1,hw?uur(hw.t):'–',hw?'volgend hoog water bij '+A.nm+(hw.t.slice(0,10)!==nu.slice(0,10)?' (morgen)':''):'');
+ X.stat(2,lw?uur(lw.t):'–',lw?'volgend laag water bij '+A.nm+(lw.t.slice(0,10)!==nu.slice(0,10)?' (morgen)':''):'');
+ X.stat(3,hs.length&&ls.length?X.num((Math.max.apply(null,hs)-Math.min.apply(null,ls))*100,0)+' cm':'–','verschil hoog en laag bij '+A.nm+', '+(DAG[X.state.tab]?(X.state.tab==='d1'?'morgen':'overmorgen'):'vandaag'));
+ X.side(D.map(function(p){var e=p.k.filter(function(x){return x.t.slice(0,10)===dag});
+  return '<button type="button" class="row" data-la="'+p.la+'" data-lo="'+p.lo+'" data-z="9"><span class="nm">'+esc(p.nm)+'<small>'+e.map(function(x){return (x.s==='hoog'?'▲ ':'▼ ')+uur(x.t)}).join(' · ')+'</small></span></button>'}).join(''));
+ X.load(null)})}
+mzKaart({id:'getij',path:'/kaarten/getij',
+ kicker:'Live · Eb en vloed',title:'Eb en vloed op de Molukken',serif:'wanneer is het hoog water',
+ lead:'Twee keer per dag komt het water op en gaat het weer terug. Voor vissers, voor wie gaat varen of zwemmen en voor wie een boot moet halen, is het handig om te weten wanneer. Deze kaart laat zien wanneer het hoog en laag water is bij 14 plaatsen.',
+ tabs:[['d0','Vandaag'],['d1','Morgen'],['d2','Overmorgen']],tabLabel:'Kies een dag',
+ stats:['Nu','Hoog water','Laag water','Getijverschil'],
+ legend:'<span><i style="background:#FF7AB6"></i>Water stijgt nu (vloed)</span><span><i style="background:#1F3BD1"></i>Water zakt nu (eb)</span><span style="font-size:12px;opacity:.8">▲ hoog water · ▼ laag water</span>',
+ sideTitle:'Hoog en laag water',sideNote:'Tijden in Maluku-tijd (WIT), afgerond op een kwartier. Het zijn berekeningen voor de zee vlak bij elke plaats. In een baai of haven kan het tijdstip een kwartier tot een half uur anders zijn.',
+ bounds:[[-8.6,125.5],[2.2,134.8]],attr:'Getij: Open-Meteo',refresh:30,
+ mapLabel:'Kaart van de Molukken met eb en vloed per plaats',
+ onTab:function(X){teken(X).catch(function(){X.load('De gegevens zijn nu niet bereikbaar. Probeer het later opnieuw.')})},
+ update:function(X){return teken(X)},
+ info:[['Wat zie je hier?',['Een roze stip betekent dat het water daar nu stijgt (vloed). Een blauwe stip betekent dat het water zakt (eb). In de lijst zie je per plaats wanneer het hoog water (▲) en laag water (▼) is.','Rond de Molukken is het meestal twee keer per dag hoog water. Op sommige plekken, zoals bij Ternate, is het verschil tussen hoog en laag water klein.']],
+  ['Wat zie je niet?',['Dit is geen getijtafel voor de scheepvaart. Ga je varen, kijk dan ook bij de havenmeester of bij de Indonesische dienst <a href="https://maritim.bmkg.go.id" target="_blank" rel="noopener">BMKG Maritim</a>.','Wind en storm kunnen het water hoger of lager maken dan op deze kaart staat.']],
+  ['Waar komen de cijfers vandaan?',['Van <a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo</a>. Die berekent de hoogte van de zee per kwartier, met het getij erin. Het zijn berekeningen, geen metingen in de haven zelf.']]],
+ reads:{title:'Lees meer',re:/zee|visser|boot|haven|kapal|vissen/i},
+ cta:['<b>Ben jij visser of schipper op de Molukken?</b> Vertel ons hoe jij met eb en vloed werkt.','Stuur het in →','/uploaden']});
+})();
+</script>
