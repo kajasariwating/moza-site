@@ -5,8 +5,8 @@
   if(window.__mzCovers){window.__mzCovers.toon();return;}
   var LIJST='/config/commerce/products/physical';
   if(location.pathname.indexOf('/config/commerce/products')!==0){
-    alert('Open eerst Products in Squarespace (Commerce → Products) en klik dan nog een keer op de bladwijzer.');
-    location.href=LIJST; return;
+    alert('MOZA covers werkt in het beheer van Squarespace, niet op de website zelf.\n\nIk open nu de productlijst. Wacht tot die geladen is en klik dan nog een keer op de bladwijzer MOZA covers.');
+    location.href='https://www.moza.nu'+LIJST; return;
   }
   var sleep=function(ms){return new Promise(function(r){setTimeout(r,ms);});};
   var esc=function(s){return String(s||'').replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});};
