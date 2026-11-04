@@ -37,7 +37,7 @@
     var ul=document.querySelector('#mzmob ul.mzx-list'),hero=document.querySelector('#mzmob a.hero.o1');
     if(!ul||!hero)return false;
     if(typeof window.MZX_HERO==='undefined'&&++lijst.h<24)return false; /* max 6 s op de hero wachten */
-    var nb=document.querySelector('#mzmob .col.r .sec.o5');
+    var nb=document.querySelector('#mzmob section.sec.o5');
     if(!nb&&++lijst.w<12)return false; /* op de telefoon staat Net binnen er niet */
     var heroU=String(window.MZX_HERO||hero.getAttribute('href')||'').replace(/^https?:\/\/[^\/]+/,'').replace(/\/+$/,'');
     fetch('/lezen?format=json&v='+Math.floor(Date.now()/300000)).then(function(r){return r.json()}).then(function(j){
@@ -60,7 +60,7 @@
       /* Net binnen wordt door mzmob-js soms helemaal opnieuw opgebouwd (nieuwe .tl), daarom de hele sectie volgen */
       var zet=function(){
         var u=document.querySelector('#mzmob ul.mzx-list');if(u&&u.innerHTML!==html)u.innerHTML=html;
-        var s=document.querySelector('#mzmob .col.r .sec.o5'),tl=s&&s.querySelector('.tl');if(tl&&nh&&tl.innerHTML!==nh)tl.innerHTML=nh};
+        var s=document.querySelector('#mzmob section.sec.o5'),tl=s&&s.querySelector('.tl');if(tl&&nh&&tl.innerHTML!==nh)tl.innerHTML=nh};
       zet();H.classList.remove('mz-lw');
       var t0=Date.now(),mo=new MutationObserver(function(){if(Date.now()-t0>30000){mo.disconnect();return}zet()});
       mo.observe(document.getElementById('mzmob')||document.body,{childList:true,subtree:true});
