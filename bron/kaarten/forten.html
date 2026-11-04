@@ -64,7 +64,7 @@ var BW={v:['VOC','#1F3BD1'],s:['Spanje','#E9F25A'],p:['Portugal','#FF7AB6']};
 var SP=[{n:'Nootmuskaat',c:[-4.54,129.89],r:26000,k:'#C9A86A',t:'Nootmuskaat groeide alleen op de Banda-eilanden.'},
  {n:'Kruidnagel, oorspronkelijk',c:[0.55,127.42],r:65000,k:'#FF4D2E',t:'Kruidnagel kwam oorspronkelijk van de eilanden in het noorden: Ternate, Tidore, Moti, Makian en Bacan.'},
  {n:'Kruidnagel in de VOC-tijd',c:[-3.6,128.45],r:42000,k:'#FF4D2E',t:'Om de prijs hoog te houden liet de VOC kruidnagel alleen nog op Ambon en de Lease-eilanden kweken. Op andere eilanden werden de bomen gekapt.'}];
-function icon(L,b,big){var s=big?18:14;return L.divIcon({className:'',iconSize:[s,s],html:'<span style="display:block;width:'+s+'px;height:'+s+'px;box-sizing:border-box;background:'+BW[b][1]+';border:2px solid #111"></span>'})}
+function icon(L,b,big){var m=innerWidth<600,s=big?(m?14:18):(m?10:14);return L.divIcon({className:'',iconSize:[s,s],html:'<span style="display:block;width:'+s+'px;height:'+s+'px;box-sizing:border-box;background:'+BW[b][1]+';border:2px solid #111"></span>'})}
 mzKaart({id:'forten',path:'/kaarten/forten',live:false,
  kicker:'Kaart · Forten en specerijen',title:'Forten en specerijen',serif:'de geschiedenis op de kaart',
  lead:'Eeuwenlang kwamen handelaars naar de Molukken voor kruidnagel en nootmuskaat. Portugezen, Spanjaarden en de VOC bouwden er forten om die handel in handen te krijgen. Op deze kaart zie je waar de forten staan en waar de specerijen vandaan kwamen.',
