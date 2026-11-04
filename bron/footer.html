@@ -1541,3 +1541,94 @@ html.moza-dark .mz-verzend{color:#ECECF1}
   var n=0,iv=setInterval(function(){zet();if(++n>20){clearInterval(iv);setInterval(zet,60000);}},500);
 })();
 </script>
+
+<style id="mz-rec-css">
+#mz-rec{max-width:1240px;margin:48px auto 24px;padding:0 16px;font-family:'Hanken Grotesk',system-ui,sans-serif;color:#111;box-sizing:border-box}
+#mz-rec *{box-sizing:border-box}
+#mz-rec .rk{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:12px;border-top:6px solid #111;padding-top:14px;margin-bottom:18px}
+#mz-rec h2{margin:0;font-size:clamp(26px,3vw,36px);font-weight:900;letter-spacing:-.02em}
+#mz-rec .gem{font-weight:800;font-size:16px}
+#mz-rec .st{color:#1F3BD1;letter-spacing:2px;font-size:18px}
+#mz-rec .lijst{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:20px}
+#mz-rec .r{border:3px solid #111;box-shadow:6px 6px 0 #E9F25A;background:#fff;padding:16px}
+#mz-rec .r b{display:block;font-weight:900}
+#mz-rec .r small{color:#555;font-size:13px}
+#mz-rec .r p{margin:8px 0 0;font-size:16px;line-height:1.5}
+#mz-rec .leeg{margin:0 0 18px;font-size:16px}
+#mz-rec button.open,#mz-rec button.verstuur{background:#111;color:#fff;border:3px solid #111;font:900 16px 'Hanken Grotesk',sans-serif;padding:12px 20px;cursor:pointer;min-height:48px}
+#mz-rec button.open:hover,#mz-rec button.verstuur:hover{background:#1F3BD1;border-color:#1F3BD1}
+#mz-rec form{display:none;border:3px solid #111;box-shadow:8px 8px 0 #1F3BD1;background:#F4F2EC;padding:20px;margin-top:16px;max-width:640px}
+#mz-rec form.aan{display:block}
+#mz-rec label{display:block;font-weight:800;margin:0 0 6px}
+#mz-rec input[type=text],#mz-rec input[type=email],#mz-rec textarea{width:100%;border:2px solid #111;padding:10px;font:16px 'Hanken Grotesk',sans-serif;margin-bottom:14px;background:#fff;color:#111}
+#mz-rec textarea{min-height:120px;resize:vertical}
+#mz-rec .sterren{display:flex;gap:4px;margin-bottom:14px}
+#mz-rec .sterren button{background:none;border:0;font-size:32px;line-height:1;cursor:pointer;color:#bbb;padding:0 2px}
+#mz-rec .sterren button.aan{color:#1F3BD1}
+#mz-rec .klein{font-size:13px;color:#555;margin:-8px 0 14px}
+#mz-rec .hp{position:absolute;left:-9999px}
+#mz-rec .melding{font-weight:800;margin-top:12px}
+html.moza-dark #mz-rec{color:#ECECF1}
+html.moza-dark #mz-rec .rk{border-color:#ECECF1}
+html.moza-dark #mz-rec .r{background:#1E2029;border-color:#ECECF1;box-shadow:6px 6px 0 #1F3BD1}
+html.moza-dark #mz-rec .r small,html.moza-dark #mz-rec .klein{color:#A8AAB6}
+html.moza-dark #mz-rec .st,html.moza-dark #mz-rec .sterren button.aan{color:#E9F25A}
+html.moza-dark #mz-rec form{background:#1E2029;border-color:#ECECF1}
+html.moza-dark #mz-rec button.open,html.moza-dark #mz-rec button.verstuur{background:#E9F25A;color:#111;border-color:#E9F25A}
+</style>
+<script id="mz-rec-js">
+/* Recensies in de Toko Buku. Insturen via een Google Formulier; tonen alleen wat in de Sheet op "Ja" staat (tabblad met alleen boek, naam, sterren, tekst, datum). */
+(function(){
+  var CFG={form:'https://docs.google.com/forms/d/e/1FAIpQLSdn50Boqnq_SAJL17WyumRmJqNhhN9sB9IbG9IbL5pqo7uJQA/formResponse',velden:{boek:'entry.75094983',naam:'entry.493752397',sterren:'entry.1596120347',tekst:'entry.1699090494',email:'entry.1025330682'},csv:''};
+  /* csv: de 'Publiceren op internet'-link van tabblad Blad1 (CSV). Leeg = de recensies staan uit. */
+  var m=location.pathname.match(/^\/store\/p\/([^\/]+)\/?$/);if(!m||!CFG.form||!CFG.csv)return;
+  var slug=decodeURIComponent(m[1]);
+  function esc(s){return String(s||'').replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  function sterren(n){n=Math.round(n);return '\u2605\u2605\u2605\u2605\u2605'.slice(0,n)+'<span style="opacity:.25">'+'\u2605\u2605\u2605\u2605\u2605'.slice(0,5-n)+'</span>';}
+  function csv(t){var rows=[],r=[],v='',q=false;for(var i=0;i<t.length;i++){var c=t[i];if(q){if(c==='"'){if(t[i+1]==='"'){v+='"';i++;}else q=false;}else v+=c;}else if(c==='"')q=true;else if(c===','){r.push(v);v='';}else if(c==='\n'){r.push(v);rows.push(r);r=[];v='';}else if(c!=='\r')v+=c;}if(v||r.length){r.push(v);rows.push(r);}return rows;}
+  function datum(s){var d=s.match(/(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})/);if(!d)return '';var mnd=['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];return (+d[1])+' '+mnd[(+d[2])-1]+' '+d[3];}
+  function bouw(){
+    if(document.getElementById('mz-rec'))return true;
+    var pd=document.querySelector('.product-detail');if(!pd)return false;
+    var na=document.querySelector('.moza-pextra');
+    var s=document.createElement('section');s.id='mz-rec';s.setAttribute('aria-label','Recensies');
+    s.innerHTML='<div class="rk"><h2>Recensies</h2><span class="gem"></span></div><div class="lijst"></div><p class="leeg">Nog geen recensies. Heb je dit boek gelezen? Vertel anderen wat je ervan vond.</p>'+
+      '<button type="button" class="open">Schrijf een recensie</button>'+
+      '<form novalidate><label for="mzr-naam">Je naam</label><input id="mzr-naam" type="text" maxlength="60" required autocomplete="name">'+
+      '<label id="mzr-sl">Hoeveel sterren geef je?</label><div class="sterren" role="radiogroup" aria-labelledby="mzr-sl">'+[1,2,3,4,5].map(function(n){return '<button type="button" role="radio" aria-checked="false" aria-label="'+n+' ster'+(n>1?'ren':'')+'" data-n="'+n+'">\u2605</button>';}).join('')+'</div>'+
+      '<label for="mzr-tekst">Je recensie</label><textarea id="mzr-tekst" maxlength="2000" required></textarea>'+
+      '<label for="mzr-mail">Je e-mailadres (mag leeg blijven)</label><input id="mzr-mail" type="email" maxlength="120" autocomplete="email"><p class="klein">Alleen voor MOZA, als we een vraag hebben. Je e-mailadres komt niet op de site.</p>'+
+      '<input class="hp" type="text" tabindex="-1" autocomplete="off" aria-hidden="true">'+
+      '<button type="submit" class="verstuur">Verstuur</button><p class="klein" style="margin-top:12px">We lezen elke recensie eerst. Daarna komt hij op de site.</p><p class="melding" role="status"></p></form>';
+    if(na)na.parentNode.insertBefore(s,na);else pd.parentNode.insertBefore(s,pd.nextSibling);
+    var f=s.querySelector('form'),keuze=0;
+    s.querySelector('.open').onclick=function(){f.classList.toggle('aan');if(f.classList.contains('aan'))f.querySelector('input').focus();};
+    [].forEach.call(s.querySelectorAll('.sterren button'),function(b){b.onclick=function(){keuze=+b.dataset.n;[].forEach.call(s.querySelectorAll('.sterren button'),function(x){var aan=+x.dataset.n<=keuze;x.classList.toggle('aan',aan);x.setAttribute('aria-checked',+x.dataset.n===keuze?'true':'false');});};});
+    f.onsubmit=function(e){e.preventDefault();var mel=f.querySelector('.melding');
+      var naam=f.querySelector('#mzr-naam').value.trim(),tekst=f.querySelector('#mzr-tekst').value.trim(),mail=f.querySelector('#mzr-mail').value.trim();
+      if(f.querySelector('.hp').value)return;
+      if(!naam||!keuze||tekst.length<10){mel.textContent='Vul je naam in, kies het aantal sterren en schrijf een recensie van minstens een paar woorden.';return;}
+      var fd=new FormData();fd.append(CFG.velden.boek,slug);fd.append(CFG.velden.naam,naam);fd.append(CFG.velden.sterren,String(keuze));fd.append(CFG.velden.tekst,tekst);if(mail)fd.append(CFG.velden.email,mail);
+      f.querySelector('.verstuur').disabled=true;mel.textContent='Versturen\u2026';
+      fetch(CFG.form,{method:'POST',mode:'no-cors',body:fd}).then(function(){f.innerHTML='<p class="melding">Dank je. We lezen je recensie eerst, daarna komt hij op de site.</p>';try{if(window.goatcounter)goatcounter.count({path:'recensie-verstuurd/'+slug,event:true});}catch(x){}})
+        .catch(function(){f.querySelector('.verstuur').disabled=false;mel.textContent='Versturen lukte niet. Probeer het later nog eens.';});
+    };
+    fetch(CFG.csv).then(function(r){return r.text();}).then(function(t){
+      var rows=csv(t).slice(1).filter(function(r){return r[0]===slug&&r[1]&&r[3];});
+      if(!rows.length)return;
+      var som=0;rows.forEach(function(r){som+=Math.min(5,Math.max(1,parseInt(r[2],10)||0));});var gem=som/rows.length;
+      s.querySelector('.leeg').style.display='none';
+      s.querySelector('.gem').innerHTML='<span class="st" aria-hidden="true">'+sterren(gem)+'</span> '+gem.toFixed(1).replace('.',',')+' van 5 &middot; '+rows.length+' recensie'+(rows.length>1?'s':'');
+      s.querySelector('.lijst').innerHTML=rows.slice().reverse().map(function(r){var n=Math.min(5,Math.max(1,parseInt(r[2],10)||0));return '<article class="r"><span class="st" aria-label="'+n+' van 5 sterren">'+sterren(n)+'</span><b>'+esc(r[1])+'</b><small>'+esc(datum(r[4]||''))+'</small><p>'+esc(r[3]).replace(/\n/g,'<br>')+'</p></article>';}).join('');
+      var pogingen=0;(function zetLd(){var ld=document.getElementById('mz-ld-product');
+      if(!ld){if(++pogingen<20)setTimeout(zetLd,500);return;}
+      if(ld){try{var o=JSON.parse(ld.textContent);o.aggregateRating={'@type':'AggregateRating',ratingValue:gem.toFixed(1),reviewCount:rows.length,bestRating:5,worstRating:1};
+        o.review=rows.slice(-5).map(function(r){return {'@type':'Review',author:{'@type':'Person',name:r[1]},reviewRating:{'@type':'Rating',ratingValue:Math.min(5,Math.max(1,parseInt(r[2],10)||1)),bestRating:5},reviewBody:r[3]};});
+        ld.textContent=JSON.stringify(o);}catch(x){}}
+      })();
+    }).catch(function(){});
+    return true;
+  }
+  var n=0;(function k(){if(bouw()||++n>40)return;setTimeout(k,300);})();
+})();
+</script>
