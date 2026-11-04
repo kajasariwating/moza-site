@@ -1601,6 +1601,7 @@ html.moza-dark #mz-rec button.open,html.moza-dark #mz-rec button.verstuur{backgr
       '<input class="hp" type="text" tabindex="-1" autocomplete="off" aria-hidden="true">'+
       '<button type="submit" class="verstuur">Verstuur</button><p class="klein" style="margin-top:12px">We lezen elke recensie eerst. Daarna komt hij op de site.</p><p class="melding" role="status"></p></form>';
     if(na)na.parentNode.insertBefore(s,na);else pd.parentNode.insertBefore(s,pd.nextSibling);
+    if(!na){var nn=0;(function zet(){var x=document.querySelector('.moza-pextra');if(x){x.parentNode.insertBefore(s,x);return;}if(++nn<30)setTimeout(zet,400);})();}
     var f=s.querySelector('form'),keuze=0;
     s.querySelector('.open').onclick=function(){f.classList.toggle('aan');if(f.classList.contains('aan'))f.querySelector('input').focus();};
     [].forEach.call(s.querySelectorAll('.sterren button'),function(b){b.onclick=function(){keuze=+b.dataset.n;[].forEach.call(s.querySelectorAll('.sterren button'),function(x){var aan=+x.dataset.n<=keuze;x.classList.toggle('aan',aan);x.setAttribute('aria-checked',+x.dataset.n===keuze?'true':'false');});};});
