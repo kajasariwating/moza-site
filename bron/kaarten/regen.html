@@ -6,7 +6,7 @@ var G=[];for(var a=-9;a<=3.01;a+=0.75)for(var b=124.5;b<=135.51;b+=0.75)G.push([
 var DATA=null;
 /* dagen in de reeks: 0..6 = afgelopen 7 dagen, 7 = vandaag, 8..10 = komende 3 dagen */
 var SEL={w7:[0,7],g:[6,7],v:[8,11]},LBL={w7:'afgelopen 7 dagen',g:'gisteren',v:'komende 3 dagen'};
-function col(d){return d<1?'#EDDCB8':d<5?'#BFD4FF':d<15?'#7FA3FF':d<30?'#1F3BD1':'#111'}
+function col(d){return d<1?'#EDDCB8':d<5?'#BFD4FF':d<15?'#7FA3FF':d<30?'#1F3BD1':'#FF7AB6'}
 function haal(){if(DATA)return Promise.resolve(DATA);var all=G.concat(PL.map(function(p){return [p[1],p[2]]}));
  return fetch('https://api.open-meteo.com/v1/forecast?latitude='+all.map(function(p){return p[0]}).join(',')+'&longitude='+all.map(function(p){return p[1]}).join(',')+'&daily=precipitation_sum&past_days=7&forecast_days=4&timezone=Asia%2FJayapura').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(j){DATA=[].concat(j);setTimeout(function(){DATA=null},60*6e4);return DATA})}
 function som(o,s){var v=o&&o.daily&&o.daily.precipitation_sum;if(!v)return null;var t=0,n=0;for(var i=s[0];i<s[1];i++){if(v[i]!=null){t+=v[i];n++}}return n?{t:t,d:t/n}:null}
@@ -27,7 +27,7 @@ mzKaart({id:'regen',path:'/kaarten/regen',
  lead:'Regen bepaalt veel op de Molukken: de oogst, het drinkwater en of er bosbranden kunnen ontstaan. Deze kaart laat zien hoeveel regen er de afgelopen week viel en hoeveel er de komende dagen verwacht wordt.',
  tabs:[['w7','Afgelopen 7 dagen'],['g','Gisteren'],['v','Komende 3 dagen']],tabLabel:'Kies een periode',
  stats:['Regen','Natste plaats','Droogste plaats','Droog'],
- legend:'<span style="font-size:12px;opacity:.8">Gemiddeld per dag:</span><span><i style="background:#EDDCB8"></i>Droog (minder dan 1 mm)</span><span><i style="background:#BFD4FF"></i>1 tot 5 mm</span><span><i style="background:#7FA3FF"></i>5 tot 15 mm</span><span><i style="background:#1F3BD1"></i>15 tot 30 mm</span><span><i style="background:#111"></i>30 mm of meer</span>',
+ legend:'<span style="font-size:12px;opacity:.8">Gemiddeld per dag:</span><span><i style="background:#EDDCB8"></i>Droog (minder dan 1 mm)</span><span><i style="background:#BFD4FF"></i>1 tot 5 mm</span><span><i style="background:#7FA3FF"></i>5 tot 15 mm</span><span><i style="background:#1F3BD1"></i>15 tot 30 mm</span><span><i style="background:#FF7AB6"></i>30 mm of meer</span>',
  sideTitle:'Regen per plaats',sideNote:'Totaal aan regen in de gekozen periode. 1 millimeter is 1 liter water op een vierkante meter.',
  bounds:[[-9,124.5],[2.5,135.5]],attr:'Regen: Open-Meteo',refresh:60,
  mapLabel:'Kaart van de Molukken met de hoeveelheid regen',
