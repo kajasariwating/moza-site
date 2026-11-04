@@ -62,16 +62,16 @@ var F=[
 ];
 var NU={g:'Gerestaureerd en te bezoeken',i:'Grotendeels bewaard gebleven',l:'Ligt op een terrein van het Indonesische leger',r:'Ruïne of resten zichtbaar',w:'Weinig of niets meer van te zien',o:'Huidige staat onbekend'};
 var BW={v:['VOC','#1F3BD1'],s:['Spanje','#E9F25A'],p:['Portugal','#FF7AB6']};
-var SP=[{n:'Nootmuskaat',c:[-4.54,129.89],r:26000,k:'#C9A86A',t:'Nootmuskaat groeide alleen op de Banda-eilanden.'},
- {n:'Kruidnagel, oorspronkelijk',c:[0.55,127.42],r:65000,k:'#FF4D2E',t:'Kruidnagel kwam oorspronkelijk van de eilanden in het noorden: Ternate, Tidore, Moti, Makian en Bacan.'},
- {n:'Kruidnagel in de VOC-tijd',c:[-3.6,128.45],r:42000,k:'#FF4D2E',t:'Om de prijs hoog te houden liet de VOC kruidnagel alleen nog op Ambon en de Lease-eilanden kweken. Op andere eilanden werden de bomen gekapt.'}];
+var SP=[{n:'Nootmuskaat en foelie',c:[-4.54,129.89],r:26000,k:'#C9A86A',t:'Nootmuskaat en foelie komen van dezelfde boom. De noot is het zaad, foelie is het felrode vlies eromheen. In de 17e eeuw kwamen ze alleen van de Banda-eilanden.'},
+ {n:'Kruidnagel, oorspronkelijk',c:[0.55,127.42],r:65000,k:'#FF4D2E',t:'Kruidnagel is de gedroogde bloemknop van de kruidnagelboom. Die groeide oorspronkelijk alleen op de Molukken, vooral op de eilanden in het noorden, zoals Ternate, Tidore, Moti en Makian.'},
+ {n:'Kruidnagel in de VOC-tijd',c:[-3.6,128.45],r:42000,k:'#FF4D2E',t:'Na de oorlog van 1650-1651 mocht kruidnagel alleen nog groeien op Ambon en een paar eilanden ernaast, zoals de Lease-eilanden. Elders liet de VOC de bomen kappen.'}];
 function icon(L,b,big){var m=innerWidth<600,s=big?(m?14:18):(m?10:14);return L.divIcon({className:'',iconSize:[s,s],html:'<span style="display:block;width:'+s+'px;height:'+s+'px;box-sizing:border-box;background:'+BW[b][1]+';border:2px solid #111"></span>'})}
 mzKaart({id:'forten',path:'/kaarten/forten',live:false,
  kicker:'Kaart · Forten en specerijen',title:'Forten en specerijen',serif:'de geschiedenis op de kaart',
- lead:'Eeuwenlang kwamen handelaars naar de Molukken voor kruidnagel en nootmuskaat. Portugezen, Spanjaarden en de VOC bouwden er forten om die handel in handen te krijgen. Op deze kaart zie je waar de forten staan en waar de specerijen vandaan kwamen.',
+ lead:'Eeuwenlang kwamen handelaars naar de Molukken voor kruidnagel, nootmuskaat en foelie. Portugezen, Spanjaarden en de VOC bouwden er forten om die handel in handen te krijgen. Op deze kaart zie je waar de forten staan en waar de specerijen vandaan kwamen.',
  tabs:[['alles','Alles'],['forten','Forten'],['specerijen','Specerijen']],tabLabel:'Kies wat je ziet',
  stats:['Forten','Oudste fort','Gebouwd door','Specerijen'],
- legend:'<span><i style="background:#FF7AB6;border-radius:0"></i>Portugal</span><span><i style="background:#E9F25A;border-radius:0"></i>Spanje</span><span><i style="background:#1F3BD1;border-radius:0"></i>VOC</span><span><i style="background:#FF4D2E"></i>Kruidnagel (gebied)</span><span><i style="background:#C9A86A"></i>Nootmuskaat (gebied)</span>',
+ legend:'<span><i style="background:#FF7AB6;border-radius:0"></i>Portugal</span><span><i style="background:#E9F25A;border-radius:0"></i>Spanje</span><span><i style="background:#1F3BD1;border-radius:0"></i>VOC</span><span><i style="background:#FF4D2E"></i>Kruidnagel (gebied)</span><span><i style="background:#C9A86A"></i>Nootmuskaat en foelie (gebied)</span>',
  sideTitle:'Forten op volgorde van tijd',sideNote:'Klik op een fort om in te zoomen. Het jaartal is het jaar waarin met de bouw werd begonnen, volgens de Atlas of Mutual Heritage. Een vraagteken betekent dat het jaar niet bekend is.',
  bounds:[[-6.2,125.4],[1.6,134.6]],attr:'Forten: Atlas of Mutual Heritage · Fort Kastela: Wikipedia',
  updLabel:'Gegevens van november 2026 · bekeken ',
@@ -84,15 +84,15 @@ mzKaart({id:'forten',path:'/kaarten/forten',live:false,
   X.stat(0,String(F.length),'van Ternate tot de Aru-eilanden');
   X.stat(1,'Kastela 1522','Fort Kastela op Ternate');
   X.stat(2,'VOC '+n.v,'Spanje '+n.s+' · Portugal '+n.p);
-  X.stat(3,'2','nootmuskaat en kruidnagel');
+  X.stat(3,'3','kruidnagel, nootmuskaat en foelie');
   var rows=t==='specerijen'?SP.map(function(s){return '<button type="button" class="row" data-la="'+s.c[0]+'" data-lo="'+s.c[1]+'" data-z="8"><span class="nm">'+esc(s.n)+'<small>'+esc(s.t)+'</small></span></button>'}):
    F.slice().sort(function(a,b){return (a[5]==null?9999:a[5])-(b[5]==null?9999:b[5])}).map(function(f){return '<button type="button" class="row" data-la="'+f[3]+'" data-lo="'+f[4]+'" data-z="13"><span class="nm">'+esc(f[1])+'<small>'+esc(f[2])+' · '+esc(BW[f[7]][0])+'</small></span><span class="n">'+esc(f[6])+'</span></button>'});
   X.side(rows.join(''));X.load(null);return Promise.resolve()},
- info:[['Wat zie je hier?',['Elk vierkantje is een fort. De kleur laat zien wie het bouwde: Portugal, Spanje of de VOC. Klik op een fort voor het bouwjaar en een korte uitleg.','De gekleurde cirkels laten zien waar kruidnagel en nootmuskaat vandaan kwamen. Het zijn grove gebieden, geen precieze grenzen.']],
-  ['Waarom hier?',['Nootmuskaat groeide alleen op de Banda-eilanden. Kruidnagel kwam van eilanden in het noorden, zoals Ternate, Tidore, Moti, Makian en Bacan. Europese landen wilden die handel in handen krijgen en bouwden daarom forten.','Om de prijs hoog te houden, liet de VOC kruidnagel later alleen nog op Ambon en de Lease-eilanden kweken. Op andere eilanden liet de VOC de bomen kappen, met zogenaamde hongitochten.']],
+ info:[['Wat zie je hier?',['Elk vierkantje is een fort. De kleur laat zien wie het bouwde: Portugal, Spanje of de VOC. Klik op een fort voor het bouwjaar en een korte uitleg.','De gekleurde cirkels laten zien waar kruidnagel, nootmuskaat en foelie vandaan kwamen. Het zijn grove gebieden, geen precieze grenzen.']],
+  ['Waarom hier?',['Nootmuskaat en foelie komen van dezelfde boom: de noot is het zaad, foelie het felrode vlies eromheen. In de 17e eeuw kwamen ze alleen van de Banda-eilanden. Kruidnagel groeide oorspronkelijk alleen op de Molukken, vooral op Ternate, Tidore, Moti en Makian. Europese landen wilden die handel in handen krijgen en bouwden daarom forten.','Om de prijs hoog te houden, mocht kruidnagel na de oorlog van 1650-1651 alleen nog groeien op Ambon en een paar eilanden ernaast, zoals de Lease-eilanden. Elders liet de VOC de bomen kappen, ook op Makian. Vorsten kregen geld als ze hun eigen bomen lieten kappen.']],
   ['Handel en geweld',['De forten gaan over handel, maar ook over geweld. In 1621 veroverde de VOC de Banda-eilanden. Duizenden Bandanezen werden gedood, gevangen genomen of verdreven. Op de nootmuskaatplantages moesten daarna tot slaaf gemaakte mensen werken.','Van de meeste forten zijn nu alleen ruïnes of resten over. Een paar zijn gerestaureerd en te bezoeken, zoals Fort Belgica en Fort Nassau op Banda, Fort Duurstede op Saparua, Fort Amsterdam bij Hila en Fort Oranje op Ternate. Van andere is bijna niets meer te zien. Fort Victoria in Ambon ligt op een terrein van het Indonesische leger. Bij elk fort staat wat er nu nog is, voor zover bekend.']],
   ['Waar komen de gegevens vandaan?',['Uit de <a href="https://www.atlasofmutualheritage.nl" target="_blank" rel="noopener">Atlas of Mutual Heritage</a> van onder meer het Nationaal Archief en het Rijksmuseum. MOZA heeft de plekken en bouwjaren overgenomen en de uitleg in eigen woorden geschreven. Fort Kastela staat niet in de atlas; dat komt van Wikipedia.','Bronnen spreken elkaar soms tegen. Wij volgen dan de atlas. Weet je meer over een fort? Laat het ons weten.']]],
- reads:{title:'Lees meer',re:/fort|benteng|voc|banda|pattimura|kruidnagel|nootmuskaat|specerij|sejarah/i},
+ reads:{title:'Lees meer',re:/fort|benteng|voc|banda|pattimura|kruidnagel|nootmuskaat|foelie|specerij|sejarah/i},
  cta:['<b>Woont jouw familie bij een van deze forten?</b> Deel je verhaal of foto’s met MOZA.','Stuur het in →','/uploaden']});
 })();
 </script>
