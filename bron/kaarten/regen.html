@@ -18,7 +18,7 @@ function teken(X){var L=X.L,esc=X.esc,tab=X.state.tab,s=SEL[tab];return haal().t
  pl.forEach(function(p){L.circleMarker([p.la,p.lo],{radius:7,color:'#111',weight:2,fillColor:'#fff',fillOpacity:1}).bindPopup('<b>'+esc(p.nm)+'</b><br>'+X.num(p.t,0)+' mm regen ('+LBL[tab]+')').addTo(X.layer)});
  var srt=pl.slice().sort(function(a,b){return b.t-a.t}),av=vals.reduce(function(a,r){return a+r.t},0)/vals.length,dr=vals.filter(function(r){return r.d<1}).length;
  X.stat(0,X.num(av,0)+' mm','gemiddeld in het hele gebied, '+LBL[tab]);
- X.stat(1,X.num(srt[0].t,0)+' mm','het natst: '+srt[0].nm);X.stat(2,X.num(srt[srt.length-1].t,0)+' mm','het droogst: '+srt[srt.length-1].nm);
+ var kort=function(n){return n.replace(/ \(.*\)$/,'')};X.stat(1,kort(srt[0].nm),X.num(srt[0].t,0)+' mm, '+srt[0].nm);X.stat(2,kort(srt[srt.length-1].nm),X.num(srt[srt.length-1].t,0)+' mm, '+srt[srt.length-1].nm);
  X.stat(3,Math.round(dr/vals.length*100)+'%','van het gebied (bijna) droog');
  X.side(srt.map(function(p){return '<button type="button" class="row" data-la="'+p.la+'" data-lo="'+p.lo+'" data-z="9"><span class="nm">'+esc(p.nm)+'<small>gemiddeld '+X.num(p.d,1)+' mm per dag</small></span><span class="n">'+X.num(p.t,0)+' mm</span></button>'}).join(''));
  X.load(null)})}

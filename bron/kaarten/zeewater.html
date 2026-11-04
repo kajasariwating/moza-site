@@ -16,7 +16,7 @@ function teken(X){var L=X.L,esc=X.esc,tab=X.state.tab;return haal().then(functio
  if(!zee.length&&!pts.length)throw 0;
  pts.forEach(function(p){L.circleMarker([p.la,p.lo],{radius:7,color:'#111',weight:2,fillColor:'#fff',fillOpacity:1}).bindPopup('<b>Zee bij '+esc(p.nm)+'</b><br>'+X.num(p.t)+' °C ('+LBL[tab]+')').addTo(X.layer)});
  var av=zee.reduce(function(a,t){return a+t},0)/zee.length,s=pts.slice().sort(function(a,b){return b.t-a.t}),w=zee.filter(function(t){return t>=30}).length;
- X.stat(0,X.num(av)+' °C','gemiddeld in de hele zee, '+LBL[tab]);X.stat(1,s.length?X.num(s[0].t)+' °C':'–',s.length?'zee bij '+s[0].nm:'');X.stat(2,s.length?X.num(s[s.length-1].t)+' °C':'–',s.length?'zee bij '+s[s.length-1].nm:'');
+ X.stat(0,X.num(av)+' °C','gemiddeld in de hele zee, '+LBL[tab]);var kort=function(n){return n.replace(/ \(.*\)$/,'')};X.stat(1,s.length?kort(s[0].nm)+' '+X.num(s[0].t)+'°':'–',s.length?'zee bij '+s[0].nm:'');X.stat(2,s.length?kort(s[s.length-1].nm)+' '+X.num(s[s.length-1].t)+'°':'–',s.length?'zee bij '+s[s.length-1].nm:'');
  X.stat(3,Math.round(w/zee.length*100)+'%','van de zee is 30 graden of warmer');
  X.side(s.map(function(p){return '<button type="button" class="row" data-la="'+p.la+'" data-lo="'+p.lo+'" data-z="8"><span class="nm">Zee bij '+esc(p.nm)+'</span><span class="n">'+X.num(p.t)+'°</span></button>'}).join(''));
  X.load(null)})}

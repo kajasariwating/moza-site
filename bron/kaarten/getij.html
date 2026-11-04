@@ -21,8 +21,8 @@ function teken(X){var L=X.L,esc=X.esc,dag=dagStr(DAG[X.state.tab]||0),nu=nuWIT()
  var hw=toek.filter(function(e){return e.s==='hoog'})[0],lw=toek.filter(function(e){return e.s==='laag'})[0];
  var vd=A.k.filter(function(e){return e.t.slice(0,10)===dag}),hs=vd.filter(function(e){return e.s==='hoog'}).map(function(e){return e.h}),ls=vd.filter(function(e){return e.s==='laag'}).map(function(e){return e.h});
  X.stat(0,s.op?'Stijgt':'Zakt','water bij '+A.nm+' nu');
- X.stat(1,hw?uur(hw.t):'–',hw?'volgend hoog water bij '+A.nm+(hw.t.slice(0,10)!==nu.slice(0,10)?' (morgen)':''):'');
- X.stat(2,lw?uur(lw.t):'–',lw?'volgend laag water bij '+A.nm+(lw.t.slice(0,10)!==nu.slice(0,10)?' (morgen)':''):'');
+ X.stat(1,hw?(hw.t.slice(0,10)!==nu.slice(0,10)?'morgen ':'')+uur(hw.t):'–',hw?'volgend hoog water bij '+A.nm+(hw.t.slice(0,10)!==nu.slice(0,10)?' (morgen)':''):'');
+ X.stat(2,lw?(lw.t.slice(0,10)!==nu.slice(0,10)?'morgen ':'')+uur(lw.t):'–',lw?'volgend laag water bij '+A.nm+(lw.t.slice(0,10)!==nu.slice(0,10)?' (morgen)':''):'');
  X.stat(3,hs.length&&ls.length?X.num((Math.max.apply(null,hs)-Math.min.apply(null,ls))*100,0)+' cm':'–','verschil hoog en laag bij '+A.nm+', '+(DAG[X.state.tab]?(X.state.tab==='d1'?'morgen':'overmorgen'):'vandaag'));
  X.side(D.map(function(p){var e=p.k.filter(function(x){return x.t.slice(0,10)===dag});
   return '<button type="button" class="row" data-la="'+p.la+'" data-lo="'+p.lo+'" data-z="9"><span class="nm">'+esc(p.nm)+'<small>'+e.map(function(x){return (x.s==='hoog'?'▲ ':'▼ ')+uur(x.t)}).join(' · ')+'</small></span></button>'}).join(''));
@@ -31,14 +31,14 @@ mzKaart({id:'getij',path:'/kaarten/getij',
  kicker:'Live · Eb en vloed',title:'Eb en vloed op de Molukken',serif:'wanneer is het hoog water',
  lead:'Twee keer per dag komt het water op en gaat het weer terug. Voor vissers, voor wie gaat varen of zwemmen en voor wie een boot moet halen, is het handig om te weten wanneer. Deze kaart laat zien wanneer het hoog en laag water is bij 14 plaatsen.',
  tabs:[['d0','Vandaag'],['d1','Morgen'],['d2','Overmorgen']],tabLabel:'Kies een dag',
- stats:['Nu','Hoog water','Laag water','Getijverschil'],
+ stats:['Ambon nu','Hoog water Ambon','Laag water Ambon','Verschil Ambon'],
  legend:'<span><i style="background:#FF7AB6"></i>Water stijgt nu (vloed)</span><span><i style="background:#1F3BD1"></i>Water zakt nu (eb)</span><span style="font-size:12px;opacity:.8">▲ hoog water · ▼ laag water</span>',
  sideTitle:'Hoog en laag water',sideNote:'Tijden in Maluku-tijd (WIT), afgerond op een kwartier. Het zijn berekeningen voor de zee vlak bij elke plaats. In een baai of haven kan het tijdstip een kwartier tot een half uur anders zijn.',
  bounds:[[-8.6,125.5],[2.2,134.8]],attr:'Getij: Open-Meteo',refresh:30,
  mapLabel:'Kaart van de Molukken met eb en vloed per plaats',
  onTab:function(X){teken(X).catch(function(){X.load('De gegevens zijn nu niet bereikbaar. Probeer het later opnieuw.')})},
  update:function(X){return teken(X)},
- info:[['Wat zie je hier?',['Een roze stip betekent dat het water daar nu stijgt (vloed). Een blauwe stip betekent dat het water zakt (eb). In de lijst zie je per plaats wanneer het hoog water (▲) en laag water (▼) is.','Rond de Molukken is het meestal twee keer per dag hoog water. Op sommige plekken, zoals bij Ternate, is het verschil tussen hoog en laag water klein.']],
+ info:[['Wat zie je hier?',['Een roze stip betekent dat het water daar nu stijgt (vloed). Een blauwe stip betekent dat het water zakt (eb). In de lijst zie je per plaats wanneer het hoog water (▲) en laag water (▼) is.','Rond de Molukken is het meestal twee keer per dag hoog water. Hoe groot het verschil tussen hoog en laag water is, verschilt per plek en per dag. Rond nieuwe maan en volle maan is het verschil het grootst.']],
   ['Wat zie je niet?',['Dit is geen getijtafel voor de scheepvaart. Ga je varen, kijk dan ook bij de havenmeester of bij de Indonesische dienst <a href="https://maritim.bmkg.go.id" target="_blank" rel="noopener">BMKG Maritim</a>.','Wind en storm kunnen het water hoger of lager maken dan op deze kaart staat.']],
   ['Waar komen de cijfers vandaan?',['Van <a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo</a>. Die berekent de hoogte van de zee per kwartier, met het getij erin. Het zijn berekeningen, geen metingen in de haven zelf.']]],
  reads:{title:'Lees meer',re:/zee|visser|boot|haven|kapal|vissen/i},

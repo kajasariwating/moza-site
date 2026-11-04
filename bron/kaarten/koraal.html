@@ -10,7 +10,7 @@ function maak(L,k){var c=K[k][1],cql=encodeURIComponent(K[k][0]);
  var T=L.GridLayer.extend({createTile:function(o,done){var t=document.createElement('canvas');t.width=t.height=256;var n=Math.pow(2,o.z),M=20037508.34,s=2*M/n;
   var bb=[-M+o.x*s,M-(o.y+1)*s,-M+(o.x+1)*s,M-o.y*s].join(',');
   fetch(URL+bb+'&CQL_FILTER='+cql).then(function(r){if(!r.ok)throw 0;return r.blob()}).then(function(b){return createImageBitmap(b)}).then(function(bm){var x=t.getContext('2d');x.drawImage(bm,0,0);var d=x.getImageData(0,0,256,256),p=d.data;
-   for(var i=0;i<p.length;i+=4){if(p[i+3]>0){p[i]=c[0];p[i+1]=c[1];p[i+2]=c[2];p[i+3]=235}}x.putImageData(d,0,0);done(null,t)}).catch(function(){done(null,t)});return t}});
+   for(var i=0;i<p.length;i+=4){if(p[i+3]>0){p[i]=c[0];p[i+1]=c[1];p[i+2]=c[2];p[i+3]=235}}x.putImageData(d,0,0);if(o.z<13){var k=o.z<11?2:1;[[k,0],[-k,0],[0,k],[0,-k]].forEach(function(v){x.drawImage(t,v[0],v[1])})}done(null,t)}).catch(function(){done(null,t)});return t}});
  return new T({minZoom:9,maxZoom:16,zIndex:5,updateWhenIdle:true,keepBuffer:1})}
 function lagen(X){var L=X.L;X.layer.clearLayers();var bezig=0;
  TAB[X.state.tab].forEach(function(k){var l=maak(L,k);l.on('loading',function(){bezig++;if(X.map.getZoom()>=9)X.load('Riffen laden… dit kan even duren')});l.on('load',function(){bezig=Math.max(0,bezig-1);if(!bezig)X.load(null)});l.addTo(X.layer)});
