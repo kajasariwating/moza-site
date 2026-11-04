@@ -98,6 +98,13 @@
   function wacht(fn,ms){var t0=Date.now();return new Promise(function(res,rej){(function k(){var v;try{v=fn();}catch(e){}if(v)return res(v);if(Date.now()-t0>ms)return rej(new Error('time-out'));setTimeout(k,300);})();});}
   function editorOpen(t){var k=t.slice(0,25);return leaf(/^Edit /).some(function(e){return e.textContent.trim().slice(5).indexOf(k)===0;});}
   function product(id){return fetch('/api/commerce/products/'+id).then(function(r){return r.json();});}
+  async function sluitAlles(){
+    for(var i=0;i<3&&leaf(/^Edit /).length;i++){
+      sluitEditor(); await sleep(1200);
+      var l=[].filter.call(document.querySelectorAll('button,[role=button]'),function(x){return x.textContent.trim()==='Leave'&&zichtbaar(x);})[0];
+      if(l){l.click(); await sleep(1200);}
+    }
+  }
   function sluitEditor(){var c=[].filter.call(document.querySelectorAll('button,[role=button],a,div,span'),function(e){return e.textContent.trim().toUpperCase()==='CANCEL'&&zichtbaar(e)&&e.children.length<=1;}).pop();if(c)c.click();}
 
   async function voegToe(b,el,files){
@@ -106,7 +113,7 @@
     try{
       var voor=await product(b.id); var n0=(voor.images||[]).length;
       if(location.pathname!==LIJST){stap('Naar de productlijst…');history.pushState({},'',LIJST);dispatchEvent(new PopStateEvent('popstate'));await sleep(2000);}
-      if(leaf(/^Edit /).length){sluitEditor();await sleep(1200);}
+      if(leaf(/^Edit /).length){await sluitAlles();}
       stap('Boek zoeken…');
       var zoek=await wacht(function(){return document.querySelector('input[placeholder^="Search by products"]');},10000);
       Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(zoek,b.titel.slice(0,40));
@@ -128,17 +135,18 @@
       var optie=[].filter.call(document.querySelectorAll('body *'),function(e){return e.textContent.trim()===keus&&zichtbaar(e)&&!e.closest('#mzc');}).pop();
       if(optie)optie.click();
       stap('Controleren…');
-      var na=await wacht(function(){return product(b.id).then(function(x){return (x.images||[]).length>=n0+files.length?x:null;});},30000).catch(function(){return null;});
-      if(!na){var x=await product(b.id);if((x.images||[]).length>n0)na=x;}
-      await sleep(800); if(leaf(/^Edit /).length){sluitEditor();await sleep(1000);}
+      var na=null;
+      for(var i=0;i<30&&!na;i++){await sleep(1000);var x=await product(b.id);if((x.images||[]).length>=n0+files.length)na=x;}
+      if(!na){var y=await product(b.id);if((y.images||[]).length>n0)na=y;}
+      await sleep(800); if(leaf(/^Edit /).length){await sluitAlles();}
       if(!na)throw new Error('foto niet gevonden na opslaan');
       b.fotos=na.images.length; b.klaar=true; el.className='mzc-boek klaar';
-      el.querySelector('.mzc-boek div div:last-child'); drop.textContent='Toegevoegd ✓ ('+b.fotos+" foto's)";
+      drop.textContent='Toegevoegd ✓ ('+b.fotos+" foto's)";
       status(b.titel+': '+files.length+' foto'+(files.length>1?"'s":'')+' toegevoegd.');
     }catch(e){
       el.className='mzc-boek fout'; drop.textContent='Niet gelukt. Probeer opnieuw of doe het met de hand.';
       status(b.titel+': niet gelukt ('+(e&&e.message||e)+').');
-      try{if(leaf(/^Edit /).length)sluitEditor();await sleep(800);var l=[].filter.call(document.querySelectorAll('button,[role=button]'),function(x){return x.textContent.trim()==='Leave'&&zichtbaar(x);})[0];if(l)l.click();}catch(_){}
+      try{await sluitAlles();}catch(_){}
     }
   }
 })();
