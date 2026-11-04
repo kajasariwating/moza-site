@@ -34,12 +34,12 @@ mzKaart({id:'vulkanen',path:'/kaarten/vulkanen',live:false,
  stats:['Vulkanen','Hoogste','Laatste uitbarsting','Actief sinds 2000'],
  legend:'<span><i style="background:#FF4D2E"></i>Uitbarsting in 2000 of later</span><span><i style="background:#FF7AB6"></i>Tussen 1900 en 2000</span><span><i style="background:#E9F25A"></i>Voor 1900 of onbekend</span>',
  sideTitle:'Alle vulkanen',sideNote:'Klik op een vulkaan om in te zoomen. Jaartallen volgens het Global Volcanism Program, stand november 2026.',
- bounds:[[-7.6,126.6],[2.3,131]],attr:'Vulkanen: Smithsonian Global Volcanism Program',
+ bounds:[[-8.4,126.4],[2.5,131.2]],attr:'Vulkanen: Smithsonian Global Volcanism Program',
  updLabel:'Gegevens van november 2026 · bekeken ',
  mapLabel:'Kaart van de Molukken met vulkanen',
  update:function(X){var L=X.L,esc=X.esc,t=X.state.tab;X.layer.clearLayers();
   var f=V.filter(function(v){return t==='alle'||v[3]===t}).map(function(v){return {n:v[0],nm:v[1],ei:v[2],pr:PROV[v[3]],la:v[4],lo:v[5],h:v[6],y:v[7]}});
-  f.forEach(function(v){L.circleMarker([v.la,v.lo],{radius:9,color:'#111',weight:2,fillColor:col(v.y),fillOpacity:.95}).bindPopup('<b>'+esc(v.nm)+'</b> · '+esc(v.ei)+'<br>'+esc(v.pr)+'<br>Hoogte: '+X.num(v.h,0)+' meter<br>Laatste uitbarsting: '+esc(jaar(v.y))+'<br><a href="https://volcano.si.edu/volcano.cfm?vn='+v.n+'" target="_blank" rel="noopener">Meer bij het Global Volcanism Program →</a>').addTo(X.layer)});
+  f.forEach(function(v){L.circleMarker([v.la,v.lo],{radius:innerWidth<600?6:9,color:'#111',weight:innerWidth<600?1.5:2,fillColor:col(v.y),fillOpacity:.95}).bindPopup('<b>'+esc(v.nm)+'</b> · '+esc(v.ei)+'<br>'+esc(v.pr)+'<br>Hoogte: '+X.num(v.h,0)+' meter<br>Laatste uitbarsting: '+esc(jaar(v.y))+'<br><a href="https://volcano.si.edu/volcano.cfm?vn='+v.n+'" target="_blank" rel="noopener">Meer bij het Global Volcanism Program →</a>').addTo(X.layer)});
   X.stat(0,String(f.length),t==='alle'?'op de hele Molukken':'in '+PROV[t]);
   var hi=f.slice().sort(function(a,b){return b.h-a.h})[0];X.stat(1,hi?X.num(hi.h,0)+' m':'–',hi?hi.nm+' ('+hi.ei+')':'');
   var ys=f.filter(function(v){return v.y!=null}),mx=Math.max.apply(null,ys.map(function(v){return v.y}));
