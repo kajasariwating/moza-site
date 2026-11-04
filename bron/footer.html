@@ -206,7 +206,7 @@
       var mzTitle = ((document.querySelector('h1') || {}).textContent || '').toLowerCase();
       glossary = glossary.slice().sort(function (a, b) { return b.term.length - a.term.length; });
       glossary.forEach(function (g) {
-        if (mzTitle.indexOf(String(g.term).toLowerCase()) !== -1) return;
+        if (/^\/kennisbank\//.test(location.pathname) && mzTitle.indexOf(String(g.term).toLowerCase()) !== -1) return; /* alleen in de kennisbank: begrip uit de titel niet onderstrepen */
         var re = new RegExp('(^|[^\\p{L}\\p{N}])(' + esc(g.term) + ')(?![\\p{L}\\p{N}])', 'iu');
         linkFirst(root, re, function (w) {
           var btn = document.createElement('button'); btn.type = 'button'; btn.className = 'moza-term';
