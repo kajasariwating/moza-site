@@ -1525,9 +1525,19 @@ return intro('Agenda','Molukse evenementen','Concerten, exposities, herdenkingen
     '/podium':function(){return Promise.resolve(intro('Podium','Jouw verhaal op MOZA','Op Podium delen Molukkers hun eigen verhaal. Lees de bijdragen van anderen of stuur zelf een verhaal in bij MOZA.','/podium','Naar Podium')+
         '<div class="mg-two"><div class="mg-cta"><b>Schrijf voor Podium</b><p>Heb je een verhaal, een herinnering of een mening die je wilt delen? Stuur een voorstel in bij de redactie van MOZA.</p><a class="mg-all" href="/podium-insturen">Stuur een voorstel</a></div>'+
         '<div><span class="mg-l">Goed om te weten</span><ol class="mg-top"><li><a href="/podium"><span>Lees eerst de huisregels van Podium</span></a></li><li><a href="/podium"><span>Zo schrijf je voor Podium</span></a></li></ol></div></div>');},
-    '/boekenplank':function(){return Promise.all([j('/lezen'+Q),books()]).then(function(r){var art=(r[0].items||[]).filter(function(x){return (x.categories||[]).indexOf('boeken')>-1;})[0];var sl=[];if(art){var re=/\/store\/p\/([a-z0-9\-]+)/g,m;while((m=re.exec(art.body||''))){if(sl.indexOf(m[1])<0)sl.push(m[1]);}}sl=sl.slice(0,4);
-return Promise.all(sl.map(function(s){var f=r[1].filter(function(x){return x.urlId===s;})[0];return f?f:j('/store/p/'+s+Q).then(function(d){return d.item||null;});})).then(function(bk){bk=bk.filter(Boolean);if(!bk.length)bk=r[1].slice(0,3);var n=bk.length+(art?1:0);
-return intro('Boekenplank','Boekentips','Boeken over Molukkers en de Molukken op een rij, met elke maand nieuwe leestips van MOZA.','/boekenplank','Naar de Boekenplank')+
+    '/boekenplank':function(){
+/* Voorvertoning volgt de Boekenplank zelf: boeken met tag boekenplank:JJJJ-MM van de nieuwste maand (niet later dan nu). Artikel van die maand erbij als het bestaat. */
+var MND=['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
+var allStore=function(){var out=[],url='/store'+Q;return (function next(n){return j(url).then(function(d){out=out.concat(d.items||[]);var pg=d.pagination;if(pg&&pg.nextPage&&pg.nextPageUrl&&n<20){url=pg.nextPageUrl+'&format=json';return next(n+1);}return out;});})(0).catch(function(){return out;});};
+var mk=function(p){return (p.tags||[]).map(function(t){var m=/^boekenplank:(\d{4}-\d{2})$/i.exec(String(t).trim());return m&&m[1];}).filter(Boolean);};
+var nu=new Date(),nuk=nu.getFullYear()+'-'+('0'+(nu.getMonth()+1)).slice(-2);
+return allStore().then(function(ps){ps=ps.filter(function(p){return !/doneer/i.test(p.title||'')&&!/doneer/.test(p.urlId||'');});
+var ks=[];ps.forEach(function(p){mk(p).forEach(function(k){if(k<=nuk&&ks.indexOf(k)<0)ks.push(k);});});ks.sort();var k=ks[ks.length-1];
+var bk=k?ps.filter(function(p){return mk(p).indexOf(k)>-1;}):ps.slice(0,3);
+var slug=k?'/lezen/boekenplank-'+MND[+k.split('-')[1]-1]+'-'+k.split('-')[0]:null;
+return (slug?j(slug+Q).then(function(d){return d&&d.item?d.item:null;}).catch(function(){return null;}):Promise.resolve(null)).then(function(art){
+var n=bk.length+(art?1:0);var lab=k?'Boekenplank van '+MND[+k.split('-')[1]-1]:'Boekenplank';
+return intro(lab,'Boekentips','Boeken over Molukkers en de Molukken op een rij, met elke maand nieuwe leestips van MOZA.','/boekenplank','Naar de Boekenplank')+
 '<div class="mg-grid"'+(n>4?' style="grid-template-columns:repeat('+n+',minmax(0,1fr))"':'')+'>'+(art?card(art,'Deze maand'):'')+bk.map(prod).join('')+'</div>';});});},
 '/beeldbank':function(){return j('/beeldbank'+Q).then(function(d){var seen={},ph=[];(d.items||[]).forEach(function(p){var base=(p.title||'').replace(/\s+[\u2013-]\s+levenslang rechtenvrij$/i,'');if(seen[base]||!p.assetUrl||/\/$/.test(p.assetUrl))return;seen[base]=1;ph.push({fullUrl:p.fullUrl,title:base,assetUrl:p.assetUrl});});
       var skip=/^(niet beschikbaar|speciaal|premium|basis)$/i;var cats=((d.nestedCategories||{}).categories||[]).filter(function(c){return !skip.test(c.displayName);});
