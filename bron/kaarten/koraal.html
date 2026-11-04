@@ -2,16 +2,16 @@
 (function(){
 /* Koraalriffen rond de Molukken. Kaartbeeld: Allen Coral Atlas (WMS, CC BY 4.0), per bodemsoort ingekleurd in de browser. */
 var URL='https://allencoralatlas.org/geoserver/ows?service=WMS&version=1.1.1&request=GetMap&layers=coral-atlas:benthic_data_verbose&styles=&srs=EPSG:3857&width=256&height=256&format=image/png&transparent=true&bbox=';
-var K={koraal:["class_name='Coral/Algae'",[255,77,46]],zeegras:["class_name='Seagrass'",[30,158,90]],rest:["class_name IN ('Sand','Rubble','Rock','Microalgal Mats')",[200,184,150]]};
-var TAB={alles:['rest','zeegras','koraal'],koraal:['koraal'],zeegras:['zeegras']};
+var K={koraal:["class_name='Coral/Algae'",[255,77,46]],zeegras:["class_name='Seagrass'",[30,158,90]]};
+var TAB={alles:['zeegras','koraal'],koraal:['koraal'],zeegras:['zeegras']};
 var R=[['Ambon en Lease',-3.62,128.4,10],['Teluk Ambon',-3.67,128.14,12],['Saparua',-3.58,128.65,11],['Nusa Laut',-3.67,128.79,12],['Banda',-4.54,129.89,12],['Seram Utara (Sawai)',-2.95,129.2,11],['Buru (Namlea)',-3.25,127.1,11],['Kei Kecil',-5.75,132.7,10],['Dobo (Aru)',-5.76,134.2,11],['Saumlaki (Tanimbar)',-7.98,131.3,11],['Kisar',-8.06,127.18,12],['Ternate en Tidore',0.73,127.38,11]];
 var laag=[];
 function maak(L,k){var c=K[k][1],cql=encodeURIComponent(K[k][0]);
  var T=L.GridLayer.extend({createTile:function(o,done){var t=document.createElement('canvas');t.width=t.height=256;var n=Math.pow(2,o.z),M=20037508.34,s=2*M/n;
   var bb=[-M+o.x*s,M-(o.y+1)*s,-M+(o.x+1)*s,M-o.y*s].join(',');
-  fetch(URL+bb+'&CQL_FILTER='+cql).then(function(r){if(!r.ok)throw 0;return r.blob()}).then(function(b){return createImageBitmap(b)}).then(function(bm){var x=t.getContext('2d');x.drawImage(bm,0,0);var d=x.getImageData(0,0,256,256),p=d.data;
+  var ac=window.AbortController?new AbortController():null;t._ac=ac;fetch(URL+bb+'&CQL_FILTER='+cql,ac?{signal:ac.signal}:{}).then(function(r){if(!r.ok)throw 0;return r.blob()}).then(function(b){return createImageBitmap(b)}).then(function(bm){var x=t.getContext('2d');x.drawImage(bm,0,0);var d=x.getImageData(0,0,256,256),p=d.data;
    for(var i=0;i<p.length;i+=4){if(p[i+3]>0){p[i]=c[0];p[i+1]=c[1];p[i+2]=c[2];p[i+3]=235}}x.putImageData(d,0,0);if(o.z<13){var k=o.z<11?2:1;[[k,0],[-k,0],[0,k],[0,-k]].forEach(function(v){x.drawImage(t,v[0],v[1])})}done(null,t)}).catch(function(){done(null,t)});return t}});
- return new T({minZoom:9,maxZoom:16,zIndex:5,updateWhenIdle:true,keepBuffer:1})}
+ var l=new T({minZoom:9,maxZoom:16,zIndex:5,updateWhenIdle:true,keepBuffer:1});l.on('tileunload',function(e){try{e.tile._ac&&e.tile._ac.abort()}catch(x){}});return l}
 function lagen(X){var L=X.L;X.layer.clearLayers();var bezig=0;
  TAB[X.state.tab].forEach(function(k){var l=maak(L,k);l.on('loading',function(){bezig++;if(X.map.getZoom()>=9)X.load('Riffen laden… dit kan even duren')});l.on('load',function(){bezig=Math.max(0,bezig-1);if(!bezig)X.load(null)});l.addTo(X.layer)});
  klein(X)}
@@ -20,8 +20,8 @@ var klaar=false;
 mzKaart({id:'koraal',path:'/kaarten/koraal',live:false,
  kicker:'Kaart · Koraalriffen',title:'Koraalriffen rond de Molukken',serif:'de tuinen onder water',
  lead:'Rond de Molukken liggen enkele van de rijkste koraalriffen ter wereld. Ze geven vis, beschermen de kust tegen golven en zijn prachtig om te zien. Deze kaart laat zien waar koraal en zeegras groeien in de ondiepe zee.',
- tabs:[['alles','Alles op de bodem'],['koraal','Alleen koraal'],['zeegras','Alleen zeegras']],tabLabel:'Kies wat je ziet',
- legend:'<span><i style="background:#FF4D2E"></i>Koraal en algen</span><span><i style="background:#1E9E5A"></i>Zeegras</span><span><i style="background:#C8B896"></i>Zand, puin en rots</span>',
+ tabs:[['alles','Koraal en zeegras'],['koraal','Alleen koraal'],['zeegras','Alleen zeegras']],tabLabel:'Kies wat je ziet',
+ legend:'<span><i style="background:#FF4D2E"></i>Koraal en algen</span><span><i style="background:#1E9E5A"></i>Zeegras</span>',
  sideTitle:'Ga naar',sideNote:'De riffen zie je pas als je inzoomt. Klik op een plek om erheen te gaan. Het laden kan een paar seconden duren.',
  bounds:[[-3.9,127.95],[-3.4,128.85]],attr:'Riffen: © Allen Coral Atlas Partnership en Arizona State University, CC BY 4.0',
  updLabel:'Kaart van de Allen Coral Atlas · bekeken ',
@@ -30,7 +30,7 @@ mzKaart({id:'koraal',path:'/kaarten/koraal',live:false,
  update:function(X){if(!klaar){klaar=true;X.map.on('zoomend',function(){klein(X)})}
   X.side(R.map(function(r){return '<button type="button" class="row" data-la="'+r[1]+'" data-lo="'+r[2]+'" data-z="'+r[3]+'"><span class="nm">'+X.esc(r[0])+'</span></button>'}).join(''));
   lagen(X);return Promise.resolve()},
- info:[['Wat zie je hier?',['De kleuren laten zien wat er op de bodem van de ondiepe zee ligt, tot ongeveer 10 meter diep. Rood is koraal, groen is zeegras en beige is zand, puin of rots.','Vanuit de ruimte kun je levend koraal en algen niet goed uit elkaar houden. Daarom staan ze samen in één kleur. Rood betekent dus niet altijd gezond koraal.']],
+ info:[['Wat zie je hier?',['De kleuren laten zien wat er op de bodem van de ondiepe zee ligt, tot ongeveer 10 meter diep. Rood is koraal, groen is zeegras. Zand, puin en rots laten we weg.','Vanuit de ruimte kun je levend koraal en algen niet goed uit elkaar houden. Daarom staan ze samen in één kleur. Rood betekent dus niet altijd gezond koraal.']],
   ['Wat zie je niet?',['Diepere riffen en riffen in troebel water staan niet op de kaart. De kaart laat ook niet zien of het koraal gezond is. Of de zee nu te warm is voor koraal, zie je op de kaart <a href="/kaarten/zeewater">Zeewater</a>.','De atlas is gemaakt met satellietbeelden en kan op sommige plekken fouten bevatten.']],
   ['Waar komen de gegevens vandaan?',['Van de <a href="https://allencoralatlas.org" target="_blank" rel="noopener">Allen Coral Atlas</a>, een wereldkaart van ondiepe koraalriffen. Die is gemaakt door onder meer Arizona State University met satellietbeelden van Planet. De gegevens zijn vrij te gebruiken met bronvermelding (CC BY 4.0). MOZA geeft alleen de kleuren aan.']]],
  reads:{title:'Lees meer',re:/koraal|rif|zee|duik|snorkel|vis/i},
