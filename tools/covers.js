@@ -95,7 +95,10 @@
     }).catch(function(){status('Die afbeelding mag ik niet ophalen vanaf die site. Sla hem eerst op en sleep dan het bestand.');});
   }
   var rij=Promise.resolve();
-  function wachtrij(b,el,files){
+  function maat(f){return new Promise(function(res){var u=URL.createObjectURL(f),i=new Image();i.onload=function(){res([i.naturalWidth,i.naturalHeight]);URL.revokeObjectURL(u);};i.onerror=function(){res([0,0]);};i.src=u;});}
+  async function wachtrij(b,el,files){
+    for(var k=0;k<files.length;k++){var m=await maat(files[k]);
+      if(m[0]&&m[0]<800&&!confirm(files[k].name+' is klein: '+m[0]+' × '+m[1]+' pixels. Op de website wordt hij dan wazig. Een foto van minstens 1000 pixels breed is beter.\n\nToch toevoegen?')){status(b.titel+': niet toegevoegd, foto te klein.');return;}}
     el.className='mzc-boek bezig'; el.querySelector('.mzc-drop').textContent='Wacht op beurt…';
     rij=rij.then(function(){return voegToe(b,el,files);}).catch(function(){});
   }
