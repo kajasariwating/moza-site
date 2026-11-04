@@ -1589,6 +1589,8 @@ html.moza-dark #mz-rec button.open,html.moza-dark #mz-rec button.verstuur{backgr
   function datum(s){var d=s.match(/(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})/);if(!d)return '';var mnd=['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];return (+d[1])+' '+mnd[(+d[2])-1]+' '+d[3];}
   function bouw(){
     if(document.getElementById('mz-rec'))return true;
+    var ld0=document.getElementById('mz-ld-product');if(!ld0)return false;
+    if(!/"isbn"/.test(ld0.textContent))return true; /* alleen bij boeken */
     var pd=document.querySelector('.product-detail');if(!pd)return false;
     var na=document.querySelector('.moza-pextra');
     var s=document.createElement('section');s.id='mz-rec';s.setAttribute('aria-label','Recensies');
