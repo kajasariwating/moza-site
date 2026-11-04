@@ -1553,6 +1553,11 @@ html.moza-dark .mz-verzend{color:#ECECF1}
 .mz-rec-top:hover span.n{text-decoration:underline}
 html.moza-dark .mz-rec-top{color:#ECECF1}
 html.moza-dark .mz-rec-top .st{color:#E9F25A}
+.mz-rec-top .st.leeg{color:#111;opacity:.35}
+.mz-rec-top .st.leeg span{opacity:1!important}
+html.moza-dark .mz-rec-top .st.leeg{color:#ECECF1}
+.mz-rec-top:has(.leeg){font-weight:600;color:#555}
+html.moza-dark .mz-rec-top:has(.leeg){color:#A8AAB6}
 #mz-rec .st{color:#1F3BD1;letter-spacing:2px;font-size:18px}
 #mz-rec .lijst{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:20px}
 #mz-rec .r{border:3px solid #111;box-shadow:6px 6px 0 #E9F25A;background:#fff;padding:16px}
@@ -1621,14 +1626,15 @@ html.moza-dark #mz-rec button.open,html.moza-dark #mz-rec button.verstuur{backgr
       fetch(CFG.form,{method:'POST',mode:'no-cors',body:fd}).then(function(){f.innerHTML='<p class="melding">Dank je. We lezen je recensie eerst, daarna komt hij op de site.</p>';try{if(window.goatcounter)goatcounter.count({path:'recensie-verstuurd/'+slug,event:true});}catch(x){}})
         .catch(function(){f.querySelector('.verstuur').disabled=false;mel.textContent='Versturen lukte niet. Probeer het later nog eens.';});
     };
+    function top(html){var meta=document.querySelector('.product-detail .product-meta')||pd,ank=meta.querySelector('.moza-tagline')||meta.querySelector('.product-title');
+      if(!ank||document.querySelector('.mz-rec-top'))return;var a=document.createElement('a');a.className='mz-rec-top';a.href='#mz-rec';a.innerHTML=html;a.onclick=function(e){e.preventDefault();s.scrollIntoView({behavior:'smooth',block:'start'});};ank.parentNode.insertBefore(a,ank.nextSibling);}
     fetch(CFG.csv).then(function(r){return r.text();}).then(function(t){
       var rows=csv(t).slice(1).filter(function(r){return r[0]===slug&&r[1]&&r[3];});
-      if(!rows.length)return;
+      if(!rows.length){top('<span class="st leeg" aria-hidden="true">'+sterren(0)+'</span><span class="n">Nog geen recensies</span>');return;}
       var som=0;rows.forEach(function(r){som+=Math.min(5,Math.max(1,parseInt(r[2],10)||0));});var gem=som/rows.length;
       s.querySelector('.leeg').style.display='none';
       s.querySelector('.gem').innerHTML='<span class="st" aria-hidden="true">'+sterren(gem)+'</span> '+gem.toFixed(1).replace('.',',')+' van 5 &middot; '+rows.length+' recensie'+(rows.length>1?'s':'');
-      var meta=document.querySelector('.product-detail .product-meta')||pd,ank=meta.querySelector('.moza-tagline')||meta.querySelector('.product-title');
-      if(ank&&!document.querySelector('.mz-rec-top')){var a=document.createElement('a');a.className='mz-rec-top';a.href='#mz-rec';a.innerHTML='<span class="st" aria-hidden="true">'+sterren(gem)+'</span><span class="n">'+gem.toFixed(1).replace('.',',')+' van 5 &middot; '+rows.length+' recensie'+(rows.length>1?'s':'')+'</span>';a.onclick=function(e){e.preventDefault();s.scrollIntoView({behavior:'smooth',block:'start'});};ank.parentNode.insertBefore(a,ank.nextSibling);}
+      top('<span class="st" aria-hidden="true">'+sterren(gem)+'</span><span class="n">'+gem.toFixed(1).replace('.',',')+' van 5 &middot; '+rows.length+' recensie'+(rows.length>1?'s':'')+'</span>');
       s.querySelector('.lijst').innerHTML=rows.slice().reverse().map(function(r){var n=Math.min(5,Math.max(1,parseInt(r[2],10)||0));return '<article class="r"><span class="st" aria-label="'+n+' van 5 sterren">'+sterren(n)+'</span><b>'+esc(r[1])+'</b><small>'+esc(datum(r[4]||''))+'</small><p>'+esc(r[3]).replace(/\n/g,'<br>')+'</p></article>';}).join('');
       var pogingen=0;(function zetLd(){var ld=document.getElementById('mz-ld-product');
       if(!ld){if(++pogingen<20)setTimeout(zetLd,500);return;}
