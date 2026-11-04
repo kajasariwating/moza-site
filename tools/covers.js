@@ -28,6 +28,8 @@
     '#mzc .mzc-drop.over{background:#E9F25A}#mzc .mzc-boek.bezig .mzc-drop{background:#1F3BD1;color:#fff;border-style:solid}'+
     '#mzc .mzc-boek.klaar{box-shadow:4px 4px 0 #1F3BD1}#mzc .mzc-boek.klaar .mzc-drop{background:#111;color:#E9F25A;border-style:solid}'+
     '#mzc .mzc-boek.fout .mzc-drop{background:#FF4D2E;color:#111;border-style:solid}'+
+    '#mzc .mzc-kies{grid-column:1/-1;display:block;text-align:center;font-weight:900;font-size:13px;padding:8px;background:#1F3BD1;color:#fff;cursor:pointer;border:2px solid #111}'+
+    '#mzc .mzc-kies:hover{background:#111;color:#E9F25A}'+
     '#mzc .mzc-status{padding:8px 14px;border-top:2px solid #111;font-size:12px;min-height:18px}';
   document.head.appendChild(css);
   var p=document.createElement('div'); p.id='mzc';
@@ -37,6 +39,9 @@
     '<div class="mzc-lijst">Laden…</div><div class="mzc-status"></div>';
   document.body.appendChild(p);
   var lijstEl=p.querySelector('.mzc-lijst'), statusEl=p.querySelector('.mzc-status');
+  /* Squarespace luistert zelf ook naar slepen; binnen het paneel gaat ons paneel voor. */
+  p.addEventListener('dragover',function(e){e.preventDefault();},true);
+  p.addEventListener('drop',function(e){if(!e.target.closest('.mzc-boek')){e.preventDefault();e.stopPropagation();status('Laat de foto los boven een boek.');}},true);
   function status(t){statusEl.textContent=t;}
   p.querySelector('[data-a=sluit]').onclick=function(){p.style.display='none';};
   p.querySelector('[data-a=min]').onclick=function(){var m=p.style.bottom==='auto';p.style.bottom=m?'12px':'auto';lijstEl.style.display=m?'':'none';};
@@ -53,12 +58,15 @@
     zicht.forEach(function(b){
       var el=document.createElement('div'); el.className='mzc-boek'+(b.klaar?' klaar':'');
       el.innerHTML='<img src="'+esc(b.thumb)+'" alt=""><div><div class="mzc-t">'+esc(b.titel)+'</div><div class="mzc-isbn" title="Kopieer ISBN">'+esc(b.isbn)+'</div><div>'+b.fotos+' foto'+(b.fotos===1?'':"'s")+'</div></div>'+
-        '<div class="mzc-drop">'+(b.klaar?'Toegevoegd ✓ — sleep hier nog meer':'Sleep hier de achterkant')+'</div>';
+        '<div class="mzc-drop">'+(b.klaar?'Toegevoegd ✓ — sleep hier nog meer':'Sleep hier de achterkant')+'</div>'+
+        '<label class="mzc-kies">Of kies een foto op je computer<input type="file" accept="image/jpeg,image/png,image/webp" multiple hidden></label>';
       el.querySelector('.mzc-isbn').onclick=function(){try{navigator.clipboard.writeText(b.isbn);status('ISBN '+b.isbn+' gekopieerd.');}catch(e){}};
       var dz=el.querySelector('.mzc-drop');
       el.addEventListener('dragover',function(e){e.preventDefault();dz.classList.add('over');});
       el.addEventListener('dragleave',function(){dz.classList.remove('over');});
-      el.addEventListener('drop',function(e){e.preventDefault();dz.classList.remove('over');neem(e.dataTransfer,b,el);});
+      el.addEventListener('drop',function(e){e.preventDefault();e.stopPropagation();dz.classList.remove('over');neem(e.dataTransfer,b,el);});
+      var kies=el.querySelector('.mzc-kies input');
+      kies.addEventListener('change',function(){var f=[].slice.call(kies.files||[]);kies.value='';if(f.length)wachtrij(b,el,f);});
       b.el=el; lijstEl.appendChild(el);
     });
   }
