@@ -1731,6 +1731,9 @@ html.moza-dark #mz-rec button.open,html.moza-dark #mz-rec button.verstuur{backgr
 .mz-direct[disabled]{opacity:.7;cursor:wait}
 html.moza-dark .mz-direct{border-color:#E9F25A}
 html.mz-boek .product-detail .product-quantity-input-wrapper{display:none!important}
+/* uitverkocht: één melding (bij de voorraad), geen grijze knop en geen koopbalk */
+html.mz-boek .product-detail .product-status{display:none!important}
+html.mz-uit .product-detail .product-add-to-cart,html.mz-uit .moza-sticky{display:none!important}
 html.mz-boek .product-detail .mz-koop{display:grid!important;grid-template-columns:1fr;gap:10px;align-items:stretch;width:100%}
 html.mz-boek .product-detail .mz-koop>*{width:auto!important;margin:0!important;max-width:none!important}
 html.mz-boek .product-detail .mz-koop .sqs-add-to-cart-button,html.mz-boek .product-detail .mz-koop .mz-direct{margin:0!important;box-shadow:none!important;display:flex!important;align-items:center;justify-content:center;line-height:1.15!important}
@@ -1793,7 +1796,7 @@ html.mz-boek .product-detail .mz-koop .sqs-add-to-cart-button-wrapper{min-width:
       if(!nat||!wrap){if(++n<40)setTimeout(zet,250);return;}
       var uit=nat.disabled||nat.classList.contains('sold-out')||/uitverkocht|sold out/i.test(nat.textContent);
       /* koopbalk: knop wordt Bestel en gaat direct naar afrekenen */
-      if(!uit)window.__mzSnel=true;
+      if(!uit)window.__mzSnel=true;else document.documentElement.classList.add('mz-uit');
     })();
   }).catch(function(){});
   /* koopbalk boven het menu onderin, en zichtbaar zodra de gewone knop niet in beeld is */
