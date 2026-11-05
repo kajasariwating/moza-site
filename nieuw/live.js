@@ -14,7 +14,8 @@
     var rij=hero.querySelector('.moza-chiprow .blog-item-meta-wrapper')||hero.querySelector('.moza-chiprow');
     if(naam&&rij){var c=document.createElement('span');c.className='mzrk-tag'+(/^dit weekend/i.test(naam)?' roze':'');c.textContent=naam;rij.insertBefore(c,rij.firstChild)}
     var img=hero.querySelector('img');
-    if(img&&VASTE.test(img.getAttribute('src')||img.src||'')){
+    /* Tag "foto in tekst": de foto blijft in de tekst staan en de kop houdt de vaste cover */
+    if(img&&VASTE.test(img.getAttribute('src')||img.src||'')&&!document.querySelector('article.tag-foto-in-tekst')){
       var fig=document.querySelector('.blog-item-content .sqs-html-content figure img');
       if(fig){var f=fig.closest('figure'),cap=f&&f.nextElementSibling,cr=hero.querySelector('.moza-credit');
         img.removeAttribute('srcset');img.src=(fig.getAttribute('src')||fig.src).split('?')[0]+'?format=1500w';
