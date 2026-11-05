@@ -1733,7 +1733,10 @@ html.moza-dark .mz-direct{border-color:#E9F25A}
 html.mz-boek .product-detail .product-quantity-input-wrapper{display:none!important}
 html.mz-boek .product-detail .mz-koop{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:stretch;width:100%}
 html.mz-boek .product-detail .mz-koop>*{width:auto!important;margin:0!important;max-width:none!important}
-html.mz-boek .product-detail .sqs-add-to-cart-button{width:100%!important;min-height:54px}
+html.mz-boek .product-detail .mz-koop .sqs-add-to-cart-button{width:100%!important;min-width:0!important;max-width:100%!important;min-height:54px;padding-left:8px!important;padding-right:8px!important;white-space:normal!important;box-sizing:border-box!important}
+html.mz-boek .product-detail .mz-koop .sqs-add-to-cart-button-wrapper{min-width:0!important;width:100%!important}
+.mz-direct{min-width:0;box-sizing:border-box}
+@media (max-width:420px){html.mz-boek .product-detail .mz-koop .sqs-add-to-cart-button,.mz-direct{font-size:15px!important}}
 @media (max-width:767px){
   html.mz-boek .product-detail .product-gallery{padding:42px 16px 12px!important}
   html.mz-boek .product-detail .product-gallery-slides{aspect-ratio:auto!important;height:230px!important}
