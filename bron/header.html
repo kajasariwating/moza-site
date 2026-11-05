@@ -3736,7 +3736,7 @@ html.moza-dark #mzag{--bg:#12151F;--ink:#F1F1EC;--mu:#C9CBD3;--ln:#F1F1EC;--bl:#
 #mzag .how ol{margin:0;padding-left:22px;font-size:17px;line-height:1.6}
 #mzag .how .r{display:flex;flex-direction:column;gap:14px;justify-content:center}
 #mzag .how .r p{margin:0;font-size:17px;line-height:1.55}
-#mzag .mzag-n{margin:0 0 18px;font-size:16px;font-weight:800}
+#mzag .mzag-n{margin:0 0 22px;padding:12px 16px;background:var(--ye);color:#111;border:3px solid #111;box-shadow:4px 4px 0 var(--pk);font-size:17px;font-weight:900}
 @media (max-width:860px){#mzag .ev{grid-template-columns:78px minmax(0,1fr)}#mzag .ph{display:none}#mzag .dt b{font-size:32px}#mzag .how{grid-template-columns:1fr}#mzag .how .l{border-right:0;border-bottom:2px solid var(--ln)}}
 @media (max-width:560px){#mzag{margin-top:60px}#mzag .hero{padding-block:40px 44px}#mzag h1{text-shadow:3px 3px 0 var(--pk),6px 6px 0 var(--rd)}#mzag .lead{font-size:17px}#mzag .bar{position:static}#mzag .bd{padding:14px 14px}#mzag .ev h3{font-size:18px!important}#mzag .ev{grid-template-columns:1fr;margin-bottom:22px}#mzag .dt{flex-direction:row;justify-content:flex-start;align-items:baseline;gap:8px;padding:10px 18px;border-right:0;border-bottom:2px solid var(--ln);text-align:left}#mzag .dt b{font-size:30px}#mzag .dt span{margin-top:0}#mzag .bd{padding:16px 18px 18px;gap:8px}#mzag .month{margin:34px 0 14px}#mzag .bar .in{gap:12px;padding-block:16px}#mzag .grp{gap:8px}#mzag .chip{padding:6px 12px}}
 </style>
@@ -3802,7 +3802,8 @@ function load(){fetch(SRC,{cache:'no-store'}).then(function(r){return r.json()})
 function build(){var sw=document.getElementById('siteWrapper'),pg=document.getElementById('page');if(!sw||!pg)return false;if(document.getElementById('mzag'))return true;W=document.createElement('div');W.id='mzag';sw.insertBefore(W,pg);render();load();
  return true}
 function kies(f,v){F[f]=v;var top=W.querySelector('#mzag-lijst'),bi=W.querySelector('.bar>.in:not(#mzfb)');if(bi)bi.innerHTML=bar();top.innerHTML=telling()+listHtml()+pastHtml();
- var y=top.getBoundingClientRect().top+window.pageYOffset-(parseInt(getComputedStyle(document.documentElement).getPropertyValue('--moza-hb'))||0)-90;if(window.pageYOffset>y+40)window.scrollTo(0,Math.max(0,y))}
+ var br=W.querySelector('.bar')||top,hd=0;[].forEach.call(document.querySelectorAll('#header,.header,#mztabs'),function(e){var r=e.getBoundingClientRect(),p=getComputedStyle(e).position;if((p==='fixed'||p==='sticky')&&r.top<=1&&r.bottom>hd)hd=r.bottom});
+ var y=br.getBoundingClientRect().top+window.pageYOffset-hd-8;window.scrollTo({top:Math.max(0,y),behavior:'smooth'})}
 function telling(){if(!LOADED||!ALL.length||(F.when==='alles'&&!F.reg&&!F.cat))return '';var n=filt().length;return '<p class="mzag-n" role="status">'+(n===1?'1 evenement':n+' evenementen')+' gevonden</p>'}
 document.addEventListener('click',function(e){var b=e.target&&e.target.closest&&e.target.closest('#mzag .chip');if(!b||!W)return;kies(b.getAttribute('data-f'),b.getAttribute('data-v'))});
 if(!build()){var n=0,iv=setInterval(function(){if(build()||++n>60)clearInterval(iv)},100)}document.addEventListener('DOMContentLoaded',build);
