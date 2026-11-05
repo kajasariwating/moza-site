@@ -1723,3 +1723,64 @@ html.moza-dark #mz-rec button.open,html.moza-dark #mz-rec button.verstuur{backgr
 })();
 </script>
 
+
+<style id="mz-snel-css">
+/* Sneller bestellen op de telefoon */
+.mz-direct{display:flex;align-items:center;justify-content:center;width:100%;min-height:54px;border:3px solid #111;background:#E9F25A;color:#111;font:900 16px/1.2 'Hanken Grotesk',system-ui,sans-serif;cursor:pointer;box-shadow:4px 4px 0 #1F3BD1;padding:0 12px}
+.mz-direct:hover{background:#fff}
+.mz-direct[disabled]{opacity:.7;cursor:wait}
+html.moza-dark .mz-direct{border-color:#E9F25A}
+html.mz-boek .product-detail .product-quantity-input-wrapper{display:none!important}
+html.mz-boek .product-detail .product-purchase-controls-wrapper{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:stretch;width:100%}
+html.mz-boek .product-detail .product-purchase-controls-wrapper>*{width:auto!important;margin:0!important;max-width:none!important}
+html.mz-boek .product-detail .sqs-add-to-cart-button{width:100%!important;min-height:54px}
+@media (max-width:767px){
+  html.mz-boek .product-detail .product-gallery{padding:42px 16px 12px!important}
+  html.mz-boek .product-detail .product-gallery-slides{aspect-ratio:auto!important;height:230px!important}
+  html.mz-boek .product-detail .product-gallery-thumbnails{margin-top:10px!important}
+}
+@media (max-width:380px){html.mz-boek .product-detail .product-purchase-controls-wrapper{grid-template-columns:1fr}}
+</style>
+<script id="mz-snel-js">
+/* Boekpagina: knop "Direct bestellen" (in je mandje en meteen naar afrekenen), geen aantal-veld, koopbalk boven het menu onderin. */
+(function(){
+  if(!/^\/store\/p\/[^\/]+\/?$/.test(location.pathname))return;
+  function q(s){return document.querySelector(s);}
+  function aantal(c){return (c.entries||[]).reduce(function(s,e){return s+(e.quantity||0);},0);}
+  function mand(){return fetch('/api/commerce/shopping-cart',{credentials:'same-origin',cache:'no-store'}).then(function(r){return r.json();});}
+  var bezig=false;
+  function direct(knop){
+    if(bezig)return;var nat=q('.product-detail .sqs-add-to-cart-button');if(!nat)return;bezig=true;
+    var oud=knop.innerHTML;knop.disabled=true;knop.textContent='Even geduld…';
+    function klaar(){bezig=false;knop.disabled=false;knop.innerHTML=oud;}
+    mand().then(function(c0){var voor=aantal(c0),t=0;nat.click();
+      (function kijk(){setTimeout(function(){mand().then(function(c){
+        if(aantal(c)>voor&&c.cartToken){location.href='/checkout?cartToken='+encodeURIComponent(c.cartToken);return;}
+        if(++t<20)kijk();else{klaar();location.href='/cart';}
+      }).catch(function(){if(++t<20)kijk();else klaar();});},400);})();
+    }).catch(function(){klaar();location.href='/cart';});
+  }
+  fetch(location.pathname.replace(/\/$/,'')+'?format=json').then(function(r){return r.json();}).then(function(j){
+    var it=j.item||{};if(!/97[89][\d\s-]{10,14}/.test(String(it.excerpt||'')))return; /* alleen boeken */
+    document.documentElement.classList.add('mz-boek');
+    var n=0;(function zet(){
+      var nat=q('.product-detail .sqs-add-to-cart-button');var wrap=q('.product-detail .product-purchase-controls-wrapper');
+      if(!nat||!wrap){if(++n<40)setTimeout(zet,250);return;}
+      var uit=nat.disabled||nat.classList.contains('sold-out')||/uitverkocht|sold out/i.test(nat.textContent);
+      if(!uit&&!q('.mz-direct')){var b=document.createElement('button');b.type='button';b.className='mz-direct';b.textContent='Direct bestellen →';b.onclick=function(){direct(b);};wrap.appendChild(b);}
+      /* koopbalk: knop wordt Bestel en gaat direct naar afrekenen */
+      var sb=q('.moza-sticky button');if(sb&&!uit&&!sb.dataset.mz){sb.dataset.mz=1;sb.textContent='Bestel →';sb.addEventListener('click',function(e){e.preventDefault();e.stopImmediatePropagation();direct(sb);},true);}
+    })();
+  }).catch(function(){});
+  /* koopbalk boven het menu onderin, en zichtbaar zodra de gewone knop niet in beeld is */
+  function balk(){
+    var s=q('.moza-sticky');if(!s)return;var o=document.getElementById('mz-onder');
+    var h=o&&getComputedStyle(o).display!=='none'?Math.round(o.getBoundingClientRect().height):0;
+    var want=h+'px';if(s.style.bottom!==want)s.style.bottom=want;
+    if(window.innerWidth<768){var c=q('.product-detail .product-add-to-cart');if(c){var r=c.getBoundingClientRect();var inBeeld=r.bottom>60&&r.top<window.innerHeight-h-60;s.classList.toggle('is-on',!inBeeld);}}
+  }
+  window.addEventListener('scroll',function(){requestAnimationFrame(balk);},{passive:true});
+  window.addEventListener('resize',balk);
+  var k=0,iv=setInterval(function(){balk();if(++k>30)clearInterval(iv);},400);
+})();
+</script>
