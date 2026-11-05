@@ -1733,6 +1733,8 @@ html.moza-dark .mz-direct{border-color:#E9F25A}
 html.mz-boek .product-detail .product-quantity-input-wrapper{display:none!important}
 html.mz-boek .product-detail .mz-koop{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:stretch;width:100%}
 html.mz-boek .product-detail .mz-koop>*{width:auto!important;margin:0!important;max-width:none!important}
+html.mz-boek .product-detail .mz-koop .sqs-add-to-cart-button,html.mz-boek .product-detail .mz-koop .mz-direct{height:56px!important;min-height:56px!important;margin:0!important;box-shadow:none!important;display:flex!important;align-items:center;justify-content:center;line-height:1.15!important}
+html.mz-boek .product-detail .mz-koop .sqs-add-to-cart-button-wrapper{display:flex!important;padding:0!important}
 html.mz-boek .product-detail .mz-koop .sqs-add-to-cart-button{width:100%!important;min-width:0!important;max-width:100%!important;min-height:54px;padding-left:8px!important;padding-right:8px!important;white-space:normal!important;box-sizing:border-box!important}
 html.mz-boek .product-detail .mz-koop .sqs-add-to-cart-button-wrapper{min-width:0!important;width:100%!important}
 .mz-direct{min-width:0;box-sizing:border-box}
@@ -1743,6 +1745,14 @@ html.mz-boek .product-detail .mz-koop .sqs-add-to-cart-button-wrapper{min-width:
   html.mz-boek .product-detail .product-gallery-thumbnails{margin-top:10px!important}
 }
 @media (max-width:380px){html.mz-boek .product-detail .mz-koop{grid-template-columns:1fr}}
+/* winkelwagen-venster na toevoegen: boven het menu onderin, niet tegen de randen */
+@media (max-width:767px){
+  .commerce-mini-cart-root{z-index:10001!important}
+  .commerce-mini-cart-dialog.open{box-sizing:border-box!important;padding:0 22px 22px 14px!important;width:100%!important}
+  .commerce-mini-cart-dialog.open>.commerce-mini-cart-dialog{width:100%!important;max-width:100%!important;box-sizing:border-box!important}
+  /* winkelwagenpagina: het gele totaalblok niet over de boeken heen */
+  .system-page :has(>.cart-summary){position:static!important}
+}
 </style>
 <script id="mz-snel-js">
 /* Boekpagina: knop "Direct bestellen" (in je mandje en meteen naar afrekenen), geen aantal-veld, koopbalk boven het menu onderin. */
