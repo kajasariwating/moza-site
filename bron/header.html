@@ -2917,6 +2917,9 @@ function html(withForm){
 }
 function hash(el){if(location.hash==='#mzf-nb'){setTimeout(function(){var t=el.querySelector('#mzf-nb');if(t)t.scrollIntoView({block:'center'});var i=el.querySelector('input[type=email],input');if(i)try{i.focus({preventScroll:true})}catch(e){}},400)}}
 function build(){
+ /* In de Squarespace-editor (iframe op *.squarespace.com) de eigen footer niet bouwen:
+    dan blijven de blokken, zoals het nieuwsbriefblok, gewoon aanklikbaar. */
+ try{if(window.self!==window.top&&/\.squarespace\.com$/.test(location.hostname))return true}catch(e){return true}
  var home=location.pathname==='/'||location.pathname==='';
  if(home){var hfs=document.getElementById('footer-sections');if(hfs)[].forEach.call(hfs.children,function(c){c.style.display='none'});var ft=document.querySelector('#mzmob footer.ft');if(!ft)return false;if(ft.getAttribute('data-mzf'))return true;ft.setAttribute('data-mzf','1');ft.classList.add('mzf');ft.innerHTML=html(false);hash(ft);return true}
  if(document.querySelector('footer.mzf'))return true;
