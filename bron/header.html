@@ -3821,7 +3821,7 @@ function build(){var sw=document.getElementById('siteWrapper'),pg=document.getEl
 function kies(f,v){F[f]=v;var top=W.querySelector('#mzag-lijst'),bi=W.querySelector('.bar>.in:not(#mzfb)');if(bi)bi.innerHTML=bar();top.innerHTML=telling()+listHtml()+pastHtml();
  var br=W.querySelector('.bar')||top,hd=0;[].forEach.call(document.querySelectorAll('#header,.header,#mztabs'),function(e){var r=e.getBoundingClientRect(),p=getComputedStyle(e).position;if((p==='fixed'||p==='sticky')&&r.top<=1&&r.bottom>hd)hd=r.bottom});
  var y=br.getBoundingClientRect().top+window.pageYOffset-hd-8;window.scrollTo({top:Math.max(0,y),behavior:'smooth'})}
-function telling(){if(!LOADED||!ALL.length||(F.when==='alles'&&!F.reg&&!F.cat))return '';var S=splits(filt()),n=S.nieuw.length,l=S.lopend.length;return '<p class="mzag-n" role="status">'+(n===1?'1 evenement':n+' evenementen')+' gevonden'+(l?'<small> + '+l+' dat al loopt (onderaan)</small>':'')+'</p>'}
+function telling(){if(!LOADED||!ALL.length||(F.when==='alles'&&!F.reg&&!F.cat))return '';var S=splits(filt()),n=S.nieuw.length,l=S.lopend.length;return '<p class="mzag-n" role="status">'+(n===1?'1 evenement':n+' evenementen')+' gevonden'+(l?'<small> + '+(l===1?'1 dat al loopt':l+' die al lopen')+' (onderaan)</small>':'')+'</p>'}
 document.addEventListener('click',function(e){var b=e.target&&e.target.closest&&e.target.closest('#mzag .chip');if(!b||!W)return;kies(b.getAttribute('data-f'),b.getAttribute('data-v'))});
 if(!build()){var n=0,iv=setInterval(function(){if(build()||++n>60)clearInterval(iv)},100)}document.addEventListener('DOMContentLoaded',build);
 })();
