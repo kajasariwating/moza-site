@@ -35,7 +35,7 @@
     n.id='mz-onder';n.setAttribute('aria-label','Hoofdmenu');
     function item(k,href,lbl,inner){return '<a href="'+href+'"'+(a===k?' aria-current="page"':'')+'>'+inner+lbl+'</a>'}
     n.innerHTML=item('home','/','Voorpagina',ic('home'))+
-      item('agenda','/events','Agenda','<span class="ag">'+ic('agenda')+'</span>')+
+      item('agenda','/evenementen','Agenda','<span class="ag">'+ic('agenda')+'</span>')+
       item('toko','/store','Toko Buku',ic('toko'))+
       item('kaart','/kaarten','Kaarten',ic('kaart')+'<span class="live" aria-hidden="true"></span>')+
       '<button type="button" aria-label="Meer: menu en zoeken">'+ic('meer')+'Meer</button>';
@@ -182,7 +182,7 @@
       var nu=Date.now(),U=(j.upcoming||[]).filter(function(e){return e.startDate>=nu-6*3600e3}).sort(function(a,b){return a.startDate-b.startDate});
       var W=U.filter(function(e){return e.startDate<nu+7*864e5});if(W.length<3)W=U;W=W.slice(0,3);
       if(!W.length){vak.week.remove();return}
-      vak.week.innerHTML=kop('Deze week te doen','/events','Agenda')+'<ul>'+W.map(function(e){var d=dagnr(e.startDate),l=e.location||{},st=((l.addressLine2||'').split(',')[0]||'').trim();
+      vak.week.innerHTML=kop('Deze week te doen','/evenementen','Agenda')+'<ul>'+W.map(function(e){var d=dagnr(e.startDate),l=e.location||{},st=((l.addressLine2||'').split(',')[0]||'').trim();
         return '<li><a href="'+esc(e.fullUrl)+'"><span class="mzh-dt"><i>'+d.d+'</i><b>'+d.n+'</b><i>'+d.m+'</i></span><span class="mzh-ev"><b>'+esc(dec(e.title))+'</b><small>'+d.u+(l.addressTitle?' · '+esc(dec(l.addressTitle)):'')+(st&&st!==l.addressTitle?', '+esc(dec(st)):'')+'</small></span></a></li>'}).join('')+'</ul>';
     }).catch(function(){vak.week.remove()});
     /* Nieuw in de Kennisbank */

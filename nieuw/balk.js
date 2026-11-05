@@ -71,7 +71,7 @@
     n.id='mz-onder';n.setAttribute('aria-label','Hoofdmenu');
     function item(k,href,lbl,inner){return '<a href="'+href+'"'+(a===k?' aria-current="page"':'')+'>'+inner+lbl+'</a>'}
     n.innerHTML=item('home','/','Voorpagina',ic('home'))+
-      item('agenda','/events','Agenda','<span class="ag">'+ic('agenda')+'</span>')+
+      item('agenda','/evenementen','Agenda','<span class="ag">'+ic('agenda')+'</span>')+
       (art?'<button type="button" class="deel" data-deel aria-label="Deel dit artikel"><span class="dl">'+ic('deel')+'</span>Deel</button>':item('toko','/store','Toko Buku',ic('toko')))+
       item('kaart','/kaarten','Kaarten',ic('kaart')+'<span class="live" aria-hidden="true"></span>')+
       '<button type="button" data-meer aria-label="Meer: menu en zoeken">'+ic('meer')+'Meer</button>';
