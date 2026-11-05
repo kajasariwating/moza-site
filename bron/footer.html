@@ -1775,6 +1775,7 @@ html.mz-boek .product-detail .sqs-add-to-cart-button{width:100%!important;min-he
   /* koopbalk boven het menu onderin, en zichtbaar zodra de gewone knop niet in beeld is */
   function balk(){
     var s=q('.moza-sticky');if(!s)return;var o=document.getElementById('mz-onder');
+    var nb=q('.product-detail .sqs-add-to-cart-button-inner')||q('.product-detail .sqs-add-to-cart-button');if(nb&&window.__mzSnel&&/^\s*Toevoegen aan winkelwagentje\s*$/i.test(nb.textContent))nb.textContent='In winkelwagen';
     var sb=s.querySelector('button');if(sb&&window.__mzSnel&&!sb.dataset.mz){sb.dataset.mz=1;sb.addEventListener('click',function(e){e.preventDefault();e.stopImmediatePropagation();direct(sb);},true);}
     if(sb&&window.__mzSnel&&!bezig&&sb.textContent!=='Bestel →')sb.textContent='Bestel →';
     var h=o&&getComputedStyle(o).display!=='none'?Math.round(o.getBoundingClientRect().height):0;
