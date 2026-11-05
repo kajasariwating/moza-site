@@ -1482,6 +1482,10 @@ window.__mzoMain();
   function card(it,cat){return '<a class="mg-card" href="'+esc(it.fullUrl)+'"><span class="mg-img" style="background-image:url(\''+esc(img(it.assetUrl))+'\')"></span>'+(cat?'<span class="mg-cat">'+esc(cat)+'</span>':'')+'<span class="mg-t">'+esc(it.title)+'</span><span class="mg-d">'+dt(it.publishOn)+'</span></a>';}
   function prod(p){var v=(p.variants||[])[0]||{};var au=(p.assetUrl&&!/\/$/.test(p.assetUrl))?p.assetUrl:((p.items||[])[0]||{}).assetUrl;var pr=v.priceMoney&&v.priceMoney.value,sp=v.salePriceMoney&&v.salePriceMoney.value,sale=v.onSale&&sp&&Number(sp)>0;
     return '<a class="mg-card book" href="'+esc(p.fullUrl)+'"><span class="mg-img" style="background-image:url(\''+esc(img(au))+'\')"></span>'+(sale?'<span class="mg-badge">Afgeprijsd</span>':'')+'<span class="mg-t">'+esc(p.title)+'</span>'+(pr?'<span class="mg-price">'+(sale?'<s>'+eur(pr)+'</s>'+eur(sp):eur(pr))+'</span>':'')+'</a>';}
+  /* Alle producten (alle pagina's) en de maand van de Boekenplank (nieuwste tag boekenplank:JJJJ-MM, niet later dan nu). */
+  function allStore(){var out=[],url='/store'+Q;return (function next(n){return j(url).then(function(d){out=out.concat(d.items||[]);var pg=d.pagination;if(pg&&pg.nextPage&&pg.nextPageUrl&&n<20){url=pg.nextPageUrl+'&format=json';return next(n+1);}return out;});})(0).catch(function(){return out;});}
+  function bpMonths(p){return (p.tags||[]).map(function(t){var m=/^boekenplank:(\d{4}-\d{2})$/i.exec(String(t).trim());return m&&m[1];}).filter(Boolean);}
+  function bpKey(ps){var nu=new Date(),nuk=nu.getFullYear()+'-'+('0'+(nu.getMonth()+1)).slice(-2),ks=[];ps.forEach(function(p){bpMonths(p).forEach(function(k){if(k<=nuk&&ks.indexOf(k)<0)ks.push(k);});});ks.sort();return ks[ks.length-1]||null;}
   function books(){return j('/store'+Q).then(function(d){return (d.items||[]).filter(function(p){return !/doneer/i.test(p.title||'')&&!/doneer/.test(p.urlId||'');});});}
   function ymd(off){var d=new Date(Date.now()-off*864e5);return d.toISOString().slice(0,10);}
   function kbTop(){
@@ -1528,12 +1532,9 @@ return intro('Agenda','Molukse evenementen','Concerten, exposities, herdenkingen
     '/boekenplank':function(){
 /* Voorvertoning volgt de Boekenplank zelf: boeken met tag boekenplank:JJJJ-MM van de nieuwste maand (niet later dan nu). Artikel van die maand erbij als het bestaat. */
 var MND=['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
-var allStore=function(){var out=[],url='/store'+Q;return (function next(n){return j(url).then(function(d){out=out.concat(d.items||[]);var pg=d.pagination;if(pg&&pg.nextPage&&pg.nextPageUrl&&n<20){url=pg.nextPageUrl+'&format=json';return next(n+1);}return out;});})(0).catch(function(){return out;});};
-var mk=function(p){return (p.tags||[]).map(function(t){var m=/^boekenplank:(\d{4}-\d{2})$/i.exec(String(t).trim());return m&&m[1];}).filter(Boolean);};
-var nu=new Date(),nuk=nu.getFullYear()+'-'+('0'+(nu.getMonth()+1)).slice(-2);
 return allStore().then(function(ps){ps=ps.filter(function(p){return !/doneer/i.test(p.title||'')&&!/doneer/.test(p.urlId||'');});
-var ks=[];ps.forEach(function(p){mk(p).forEach(function(k){if(k<=nuk&&ks.indexOf(k)<0)ks.push(k);});});ks.sort();var k=ks[ks.length-1];
-var bk=k?ps.filter(function(p){return mk(p).indexOf(k)>-1;}):ps.slice(0,3);
+var k=bpKey(ps);
+var bk=k?ps.filter(function(p){return bpMonths(p).indexOf(k)>-1;}):ps.slice(0,3);
 var slug=k?'/lezen/boekenplank-'+MND[+k.split('-')[1]-1]+'-'+k.split('-')[0]:null;
 return (slug?j(slug+Q).then(function(d){return d&&d.item?d.item:null;}).catch(function(){return null;}):Promise.resolve(null)).then(function(art){
 var n=bk.length+(art?1:0);var lab=k?'Boekenplank van '+MND[+k.split('-')[1]-1]:'Boekenplank';
@@ -1544,7 +1545,8 @@ return intro(lab,'Boekentips','Boeken over Molukkers en de Molukken op een rij, 
       var chips='<div class="mg-chips">'+cats.map(function(c){return '<a href="'+esc(c.fullUrl)+'">'+esc(c.displayName)+'</a>';}).join('')+'</div>';
       return intro('Beeldbank','Foto’s van Molukkers','Bekijk en bestel foto’s van de Molukken van nu en van Molukkers in Nederland.','/beeldbank','Naar de Beeldbank')+
         '<div style="display:flex;flex-direction:column;gap:18px;min-width:0"><div class="mg-grid">'+ph.slice(0,4).map(function(p){return '<a class="mg-card photo" href="'+esc(p.fullUrl)+'"><span class="mg-img" style="background-image:url(\''+esc(img(p.assetUrl))+'\')"></span><span class="mg-t">'+esc(p.title)+'</span></a>';}).join('')+'</div><div><span class="mg-l" style="display:block;margin-bottom:8px">Kies een onderwerp</span>'+chips+'</div></div>';});},
-    '/store':function(){return books().then(function(ps){var tm=ps.filter(function(p){return p.urlId==='tanda-mata';});var four=tm.concat(ps.filter(function(p){return p.urlId!=='tanda-mata';})).slice(0,4);
+    /* Toko Buku: andere boeken dan op de Boekenplank van deze maand, Tanda Mata voorop */
+    '/store':function(){return allStore().then(function(ps){ps=ps.filter(function(p){return !/doneer/i.test(p.title||'')&&!/doneer/.test(p.urlId||'');});var k=bpKey(ps);if(k)ps=ps.filter(function(p){return bpMonths(p).indexOf(k)<0;});var tm=ps.filter(function(p){return p.urlId==='tanda-mata';});var four=tm.concat(ps.filter(function(p){return p.urlId!=='tanda-mata';})).slice(0,4);
       return intro('Toko Buku','De boekenwinkel van MOZA','Boeken over Molukkers en de Molukken, voor jong en oud. Bestel ze direct bij MOZA.','/store','Naar de Toko Buku')+'<div class="mg-grid">'+four.map(prod).join('')+'</div>';});}
 ,
     '/doneer':function(){var A=[['eigen','Eigen bedrag','Een steuntje in de rug'],['25','€ 25','Een reportage op de Molukken'],['100','€ 100+','Met een prent of gesigneerd boek naar keuze']];
