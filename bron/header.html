@@ -46,7 +46,7 @@ if(location.pathname==='/'){var L=['/lezen?format=json','/evenementen?format=jso
 </script>
 <style id="mz-logo-kleur">html body .moza-logo,html body #siteWrapper #header .moza-logo,html body #siteWrapper .moza-logo{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2250%22%20r%3D%2250%22%20fill%3D%22%231F3BD1%22%2F%3E%3Cpath%20transform%3D%22translate(13.532%2058.672)%20scale(0.02488)%22%20fill%3D%22%23FFFFFF%22%20d%3D%22M59%200V-697H288L448%20-221H420L580%20-697H809V0H652V-513L667%20-510L510%20-63H358L201%20-510L216%20-513V0Z%20M1221.0%2018Q1120.0%2018%201043.0%20-27.8Q966.0%20-73.7%20923.0%20-156.3Q880.0%20-239%20880.0%20-347.9Q880.0%20-458%20923.0%20-540.6Q966.0%20-623.2%201043.0%20-669.1Q1120.0%20-715%201221.0%20-715Q1323.0%20-715%201400.0%20-669.5Q1477.0%20-624%201520.0%20-541.5Q1563.0%20-459.0%201563.0%20-347.9Q1563.0%20-238%201519.5%20-155.5Q1476.0%20-73%201399.0%20-27.5Q1322.0%2018%201221.0%2018ZM1220.6%20-132.0Q1278.0%20-132%201318.9%20-158.6Q1359.8%20-185.2%201382.4%20-233.7Q1405.0%20-282.2%201405.0%20-348Q1405.0%20-414.5%201382.3%20-463.1Q1359.6%20-511.7%201318.6%20-538.3Q1277.5%20-565.0%201220.5%20-565.0Q1165.0%20-565%201123.3%20-538.8Q1081.7%20-512.7%201059.3%20-464.3Q1037.0%20-416%201037.0%20-348.1Q1037.0%20-281%201059.3%20-232.6Q1081.7%20-184.2%201123.3%20-158.1Q1164.9%20-132.0%201220.6%20-132.0Z%20M1600.0%200V-127L1997.0%20-607L2021.0%20-557H1623.0V-697H2156.0V-569L1773.0%20-108L1751.0%20-140H2170.0V0Z%20M2178.0%200%202468.0%20-697H2583.0L2872.0%200H2701.0L2526.0%20-463L2349.0%200ZM2386.0%20-118%202435.0%20-258H2616.0L2667.0%20-118Z%22%2F%3E%3C%2Fsvg%3E")!important;background-color:transparent!important}html.moza-dark body .moza-logo,html.moza-dark body #siteWrapper #header .moza-logo,html.moza-dark body #siteWrapper .moza-logo{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2250%22%20r%3D%2250%22%20fill%3D%22%23FF7AB6%22%2F%3E%3Cpath%20transform%3D%22translate(13.532%2058.672)%20scale(0.02488)%22%20fill%3D%22%23111111%22%20d%3D%22M59%200V-697H288L448%20-221H420L580%20-697H809V0H652V-513L667%20-510L510%20-63H358L201%20-510L216%20-513V0Z%20M1221.0%2018Q1120.0%2018%201043.0%20-27.8Q966.0%20-73.7%20923.0%20-156.3Q880.0%20-239%20880.0%20-347.9Q880.0%20-458%20923.0%20-540.6Q966.0%20-623.2%201043.0%20-669.1Q1120.0%20-715%201221.0%20-715Q1323.0%20-715%201400.0%20-669.5Q1477.0%20-624%201520.0%20-541.5Q1563.0%20-459.0%201563.0%20-347.9Q1563.0%20-238%201519.5%20-155.5Q1476.0%20-73%201399.0%20-27.5Q1322.0%2018%201221.0%2018ZM1220.6%20-132.0Q1278.0%20-132%201318.9%20-158.6Q1359.8%20-185.2%201382.4%20-233.7Q1405.0%20-282.2%201405.0%20-348Q1405.0%20-414.5%201382.3%20-463.1Q1359.6%20-511.7%201318.6%20-538.3Q1277.5%20-565.0%201220.5%20-565.0Q1165.0%20-565%201123.3%20-538.8Q1081.7%20-512.7%201059.3%20-464.3Q1037.0%20-416%201037.0%20-348.1Q1037.0%20-281%201059.3%20-232.6Q1081.7%20-184.2%201123.3%20-158.1Q1164.9%20-132.0%201220.6%20-132.0Z%20M1600.0%200V-127L1997.0%20-607L2021.0%20-557H1623.0V-697H2156.0V-569L1773.0%20-108L1751.0%20-140H2170.0V0Z%20M2178.0%200%202468.0%20-697H2583.0L2872.0%200H2701.0L2526.0%20-463L2349.0%200ZM2386.0%20-118%202435.0%20-258H2616.0L2667.0%20-118Z%22%2F%3E%3C%2Fsvg%3E")!important}</style>
 <style id="mz-hicons-tight">body #header .header-actions--right .mz-lbtn,body #header .header-actions--right .moza-theme,body #header .header-actions--right > .moza-theme{margin-left:-12px!important}</style>
-<script id="mz-evt-redir">if(/^\/evenementen\/?$/i.test(location.pathname))location.replace("/events")</script>
+
 <script id="mz-embed">
 (function(){
 /* Kaart insluiten in een artikel: <iframe data-mzkaart src="/kaarten/NAAM?embed=1"> */
@@ -99,7 +99,7 @@ window.addEventListener('message',function(e){if(e.origin!==location.origin)retu
     ['Lezen','/lezen'],
     ['Kennis','/weten'],
     ['Podium','/podium'],
-    ['Agenda','/events'],
+    ['Agenda','/evenementen'],
     ['Beeldbank','/beeldbank'],
     ['Boekenplank','/boekenplank'],
     ['Store','/store'],
@@ -1447,7 +1447,7 @@ window.__mzoMain();
       '<nav class="mm-main" aria-label="Menu">'+
         '<a href="/lezen"><b>Lezen</b><span>Nieuws en verhalen</span></a>'+
         '<a href="/weten"><b>Kennisbank</b><span>Uitleg van MOZA</span></a>'+'<a href="/onderzoek"><b>Onderzoek</b><span>Studies van anderen</span></a>'+'<a href="/kaarten"><b>Kaarten</b><span>Live data</span></a>'+'<a href="/organisaties"><b>Organisaties</b><span>Zoek een organisatie</span></a>'+
-        '<a href="/podium"><b>Podium</b><span>Deel jouw verhaal</span></a>'+'<a href="/events"><b>Agenda</b><span>Molukse evenementen</span></a>'+
+        '<a href="/podium"><b>Podium</b><span>Deel jouw verhaal</span></a>'+'<a href="/evenementen"><b>Agenda</b><span>Molukse evenementen</span></a>'+
 '<a href="/uploaden"><b>Insturen</b><span>Tip de redactie</span></a>'+
         '<a href="/boekenplank"><b>Boekenplank</b><span>Boekentips</span></a>'+
         '<a href="/store"><b>Toko Buku</b><span>Boeken en prints</span></a>'+
@@ -1508,7 +1508,7 @@ return intro('Lezen','Nieuws, agenda en verhalen','Wat er speelt onder Molukkers
 '<div class="mg-kwrap"><div class="mg-three mg-four">'+
 '<div class="mg-ks"><a class="mg-kh" href="/lezen"><span class="mg-kt y">Al het nieuws</span><b>Actueel</b></a><span class="mg-l">Net binnen</span><ol class="mg-top">'+it.map(function(x){return '<li><a href="'+esc(x.fullUrl)+'"><span>'+esc(x.title)+'</span></a></li>';}).join('')+'</ol></div>'+
 '<div class="mg-ks"><a class="mg-kh" href="/nieuws/maluku"><span class="mg-kt b">Van de eilanden</span><b>Nieuws uit Maluku</b></a><ul class="mg-klist mg-lst">'+mk.map(function(x){return '<li><a href="'+esc(x.fullUrl)+'"><small>'+dt(x.publishOn)+'</small>'+esc(x.title)+'</a></li>';}).join('')+'</ul><a class="mg-kgo" href="/nieuws/maluku">Alle berichten →</a></div>'+
-'<div class="mg-ks"><a class="mg-kh" href="/events"><span class="mg-kt lr">Wat er te doen is</span><b>Agenda</b></a><ul class="mg-klist mg-lst">'+ev.map(function(e){return '<li><a href="'+esc(e.fullUrl)+'"><small>'+esc(fd(e))+'</small>'+esc(dec(e.title))+'</a></li>';}).join('')+'</ul><a class="mg-kgo" href="/events">Hele agenda →</a></div>'+
+'<div class="mg-ks"><a class="mg-kh" href="/evenementen"><span class="mg-kt lr">Wat er te doen is</span><b>Agenda</b></a><ul class="mg-klist mg-lst">'+ev.map(function(e){return '<li><a href="'+esc(e.fullUrl)+'"><small>'+esc(fd(e))+'</small>'+esc(dec(e.title))+'</a></li>';}).join('')+'</ul><a class="mg-kgo" href="/evenementen">Hele agenda →</a></div>'+
 '<div class="mg-ks"><a class="mg-kh" href="/oral-history-scholenproject"><span class="mg-kt lp">Oral history</span><b>Verhalen</b></a><span class="mg-l">Spraakmakend Verleden</span><p class="mg-kd">Leerlingen uit Tiel interviewden Molukse ouderen over hun leven. Lees hun portretten, betogen en verslagen.</p><a class="mg-kgo" href="/oral-history-scholenproject">Lees de verhalen →</a></div>'+
 '</div><div class="mg-kfoot"><span class="mg-l">Vaste rubrieken</span><div class="mg-chips" style="margin:12px 0 18px">'+[['Kaart van de week','#FF4D2E'],['Achter de foto','#EDDCB8'],['Leeswijzer','#FF7AB6'],['Woord van de week','#E9F25A'],['Dit weekend','#1F3BD1'],['Deze week toen','#111'],['Jullie zeiden','#fff'],['MOZA deze maand','#fff']].map(function(r){return '<a href="/lezen/tag/'+r[0].replace(/ /g,'+')+'"><i aria-hidden="true" style="display:inline-block;width:10px;height:10px;background:'+r[1]+';border:1px solid #111;margin-right:7px;vertical-align:-1px"></i>'+r[0]+'</a>';}).join('')+'<a href="/lezen/tag/rubriek">Alle rubrieken →</a></div><span class="mg-l">Actueel: kies een onderwerp</span><div class="mg-chips" style="margin-top:12px">'+CH.map(function(c){return '<a href="/lezen#categorie-'+c[0]+'">'+c[1]+'</a>';}).join('')+'</div><div class="mg-more"><a href="/uploaden">Nieuws insturen →</a><a href="/podium">Podium →</a></div></div></div>';});},
     '/weten':function(){return kbTop().then(function(top){var wk=top!==KBPOOL;
@@ -1520,12 +1520,12 @@ return intro('Lezen','Nieuws, agenda en verhalen','Wat er speelt onder Molukkers
 '<div class="mg-ks"><a class="mg-kh" href="/onderzoek"><span class="mg-kt b">Studies van anderen</span><b>Onderzoek</b></a><p class="mg-kd">Scripties en proefschriften over Molukkers in Nederland en de Molukken. MOZA vat ze samen en linkt naar de bron.</p><a class="mg-kgo" href="/onderzoek">Alle studies →</a></div>'+
 '<div class="mg-ks"><a class="mg-kh" href="/kaarten"><span class="mg-kt r"><i class="mg-live"></i>Live data</span><b>Kaarten</b></a><p class="mg-kd">Kaarten met open data die zichzelf bijwerken.</p><ul class="mg-klist">'+KA.map(function(k){return '<li><a href="'+esc(k.u)+'">'+(k.live?'<i class="mg-live"></i>':'')+esc(k.t)+'</a></li>';}).join('')+'</ul><a class="mg-kgo" href="/kaarten">Alle kaarten →</a></div>'+
 '</div><div class="mg-kfoot"><span class="mg-l">Kennisbank: kies een thema</span>'+chips+'<div class="mg-more"><a href="/begrippen">Begrippenlijst →</a><a href="/sejarah-maluku">Sejarah Maluku →</a></div></div></div>';});},
-    '/events':function(){return j('/evenementen'+Q).then(function(r){var now=Date.now();var L=(r.upcoming||[]).filter(function(e){return (e.endDate||e.startDate)>=now}).sort(function(a,b){var ra=a.startDate<now?1:0,rb=b.startDate<now?1:0;return ra-rb||a.startDate-b.startDate}).slice(0,3);
+    '/evenementen':function(){return j('/evenementen'+Q).then(function(r){var now=Date.now();var L=(r.upcoming||[]).filter(function(e){return (e.endDate||e.startDate)>=now}).sort(function(a,b){var ra=a.startDate<now?1:0,rb=b.startDate<now?1:0;return ra-rb||a.startDate-b.startDate}).slice(0,3);
 var F=function(o,ms){return new Intl.DateTimeFormat('nl-NL',Object.assign({timeZone:'Europe/Amsterdam'},o)).format(new Date(ms)).replace(/\./g,'')};
 var dec=function(s){var x=document.createElement('textarea');x.innerHTML=s||'';return x.value};
 var ec=function(e){var run=e.startDate<now;var d=run?'t/m':F({day:'numeric'},e.startDate);var m=run?F({day:'numeric',month:'short'},e.endDate):F({month:'short'},e.startDate);var tm=F({hour:'2-digit',minute:'2-digit',hour12:false},e.startDate);var city=((e.location||{}).addressLine2||'').split(',')[0].trim();var when=run?'Nu te zien':F({weekday:'long'},e.startDate)+(tm!=='00:00'?' · '+tm+' uur':'');var u=img(e.assetUrl);return '<a class="mg-card" href="'+esc(e.fullUrl)+'"><span class="mg-img" style="position:relative;'+(u?"background-image:url('"+esc(u)+"')":'background:#EDDCB8 radial-gradient(circle,#FF7AB6 0 5px,transparent 6px) 0 0/22px 22px')+'"><span style="position:absolute;left:0;bottom:0;background:#E9F25A;color:#111;padding:7px 11px;line-height:1;text-align:center;border-top:2px solid #111;border-right:2px solid #111"><b style="display:block;font-size:'+(run?'15px':'28px')+';font-weight:900">'+d+'</b><small style="font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase">'+esc(m)+'</small></span></span>'+((e.categories||[])[0]?'<span class="mg-cat">'+esc(e.categories[0])+'</span>':'')+'<span class="mg-t">'+esc(dec(e.title))+'</span><span class="mg-d">'+esc(when+(city?' · '+city:''))+'</span></a>'};
 var tile='<div class="mg-mal"><span class="mg-ml">Doe mee</span><a class="mg-mt" href="/uploaden">Zet jouw evenement in de agenda</a><p style="margin:8px 0 12px;font-size:14px;line-height:1.45">Gratis voor iedereen die iets organiseert voor of met Molukkers.</p><a class="mg-mgo" href="/uploaden">Evenement aanmelden →</a></div>';
-return intro('Agenda','Molukse evenementen','Concerten, exposities, herdenkingen, festivals en lezingen in heel Nederland. De agenda wordt elke dag bijgewerkt.','/events','Hele agenda')+'<div class="mg-grid lz">'+(L.length?L.map(ec).join(''):'<p class="mg-p">Er staan nu geen evenementen in de agenda.</p>')+tile+'</div>';});},
+return intro('Agenda','Molukse evenementen','Concerten, exposities, herdenkingen, festivals en lezingen in heel Nederland. De agenda wordt elke dag bijgewerkt.','/evenementen','Hele agenda')+'<div class="mg-grid lz">'+(L.length?L.map(ec).join(''):'<p class="mg-p">Er staan nu geen evenementen in de agenda.</p>')+tile+'</div>';});},
     '/podium':function(){return Promise.resolve(intro('Podium','Jouw verhaal op MOZA','Op Podium delen Molukkers hun eigen verhaal. Lees de bijdragen van anderen of stuur zelf een verhaal in bij MOZA.','/podium','Naar Podium')+
         '<div class="mg-two"><div class="mg-cta"><b>Schrijf voor Podium</b><p>Heb je een verhaal, een herinnering of een mening die je wilt delen? Stuur een voorstel in bij de redactie van MOZA.</p><a class="mg-all" href="/podium-insturen">Stuur een voorstel</a></div>'+
         '<div><span class="mg-l">Goed om te weten</span><ol class="mg-top"><li><a href="/podium"><span>Lees eerst de huisregels van Podium</span></a></li><li><a href="/podium"><span>Zo schrijf je voor Podium</span></a></li></ol></div></div>');},
@@ -1886,7 +1886,7 @@ html.moza-dark body .mz-vv .vv-list .vv-lab{color:#E9F25A!important;-webkit-text
   function card(c){var kb=c.kind==='kennisbank';return '<a class="nx-card'+(kb?' nx-noimg':'')+'" href="'+esc(c.u)+'" data-nx="eind">'+(kb?'':'<span class="nx-img" style="background-image:url(\''+esc(img(c.img))+'\')"></span>')+'<span class="nx-txt"><span class="nx-lab">'+esc(c.kind==='kennisbank'?'Kennisbank':(c.cats[0]||'Lezen'))+'</span><span class="nx-t">'+esc(c.t)+'</span><span class="nx-d">'+(c.kind==='kennisbank'?'Antwoord op je vraag':dt(c.pub))+'</span></span></a>';}
   function vvChips(){var v=document.querySelector('.mzvt'),L=[];
     if(v)[].forEach.call(v.querySelectorAll('a[href]'),function(a){var h=a.getAttribute('href')||'';if(/^\/kaarten\/weer/.test(h))return;var b=a.querySelector('b'),s=a.querySelector('small');var t=((b?b.textContent:a.textContent)||'').replace(/\s+/g,' ').replace(/^LIVE\s+/,'').trim();var x=s?s.textContent.replace(/\s+/g,' ').trim():'';if(t)L.push({u:h,t:t+(x?' · '+x:''),live:!!a.querySelector('.bd')});});
-    if(!L.length)L=[{u:'/events',t:'Agenda'},{u:'/weten',t:'Kennisbank'},{u:'/kaarten',t:'Live kaarten',live:true},{u:'/store',t:'Toko Buku'},{u:'/peilingen',t:'Jouw mening'}];
+    if(!L.length)L=[{u:'/evenementen',t:'Agenda'},{u:'/weten',t:'Kennisbank'},{u:'/kaarten',t:'Live kaarten',live:true},{u:'/store',t:'Toko Buku'},{u:'/peilingen',t:'Jouw mening'}];
     return L;}
   function vv(three,kb){var f=three[0],rest=[];if(three[1])rest.push(three[1]);if(kb)rest.push(kb);else if(three[2])rest.push(three[2]);
     function lab(c){return c.kind==='kennisbank'?'Kennisbank':(c.cats[0]||'Lezen');}
@@ -2056,7 +2056,7 @@ function img(){if(!/^\/beeldbank\/p\//.test(p))return true;var t=document.queryS
 var n=0,a=0,b=0,c=0;(function loop(){if(!a)a=h1();if(!b)b=terms();if(!c)c=img();if((a&&b&&c)||++n>40)return;setTimeout(loop,250)})();
 })();</script>
 <script id="mz-oldlinks">(function(){var p=location.pathname.replace(/\/$/,'');if(p==='/kennis'){location.replace('/weten');return}
-var R={'/kennis':'/weten','/agenda':'/events','/voorpagina':'/','/nieuws':'/lezen'};function fix(){[].forEach.call(document.querySelectorAll('a[href]'),function(a){var u=a.getAttribute('href').replace(/^https?:\/\/(www\.)?moza\.nu/,'').replace(/\/$/,'');if(R[u]!=null)a.setAttribute('href',R[u])})}
+var R={'/kennis':'/weten','/agenda':'/evenementen','/voorpagina':'/','/nieuws':'/lezen'};function fix(){[].forEach.call(document.querySelectorAll('a[href]'),function(a){var u=a.getAttribute('href').replace(/^https?:\/\/(www\.)?moza\.nu/,'').replace(/\/$/,'');if(R[u]!=null)a.setAttribute('href',R[u])})}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',fix);else fix();})();</script>
 
 
@@ -2237,7 +2237,7 @@ var BLOG='/lezen',PAGE=24,p=location.pathname.replace(/\/+$/,'')||'/';
 var T=[
  {u:'/lezen',c:'y',k:'Al het nieuws',t:'Actueel',d:'Al het nieuws en de achtergrond, van nu en uit het archief.'},
  {u:'/nieuws/maluku',c:'b',k:'Van de eilanden',t:'Nieuws uit Maluku',d:'Nieuws, foto\u2019s en verhalen van Ambon en de andere eilanden.'},
- {u:'/events',c:'r',k:'Wat er te doen is',t:'Agenda',d:'Concerten, exposities, herdenkingen en festivals.'},
+ {u:'/evenementen',c:'r',k:'Wat er te doen is',t:'Agenda',d:'Concerten, exposities, herdenkingen en festivals.'},
  {u:'/oral-history-scholenproject',c:'p',k:'Oral history',t:'Verhalen',d:'Leerlingen interviewden Molukse ouderen over hun leven.'}
 ];
 var G=[
@@ -2764,13 +2764,14 @@ var G=[['Lezen','/lezen','#1F3BD1','#1F3BD1','krant',[['Net binnen','/lezen'],['
 ['Rubrieken','/lezen/tag/rubriek','#111','#E9F25A','kal',[['Alle rubrieken','/lezen/tag/rubriek'],['Kaart van de week','/lezen/tag/Kaart+van+de+week'],['Achter de foto','/lezen/tag/Achter+de+foto'],['Leeswijzer','/lezen/tag/Leeswijzer'],['Woord van de week','/lezen/tag/Woord+van+de+week'],['Dit weekend','/lezen/tag/Dit+weekend'],['Deze week toen','/lezen/tag/Deze+week+toen'],['Jullie zeiden','/lezen/tag/Jullie+zeiden'],['MOZA deze maand','/lezen/tag/MOZA+deze+maand']]],
 ['Kennis','/weten','#D9468A','#FF7AB6','boek',[['Kennisbank','/weten'],['Begrippenlijst','/begrippen'],['Sejarah Maluku','/sejarah-maluku'],['Onderzoek','/onderzoek'],['Organisaties','/organisaties']]],
 ['Kaarten','/kaarten','#D7381A','#FF4D2E','kaart',[['Bosbranden','/kaarten/bosbranden'],['Weer en zee','/kaarten/weer-en-zee'],['Aardbevingen','/kaarten/aardbevingen'],['Luchtkwaliteit','/kaarten/luchtkwaliteit'],['Bos en ontbossing','/kaarten/bos-en-ontbossing'],['Rampen','/kaarten/rampen'],['Zeewater','/kaarten/zeewater'],['Satellietbeeld','/kaarten/satelliet'],['Vulkanen','/kaarten/vulkanen'],['Regen','/kaarten/regen'],['Eb en vloed','/kaarten/getij'],['Koraalriffen','/kaarten/koraal'],['Forten en specerijen','/kaarten/forten'],['Overtochten 1951','/kaarten/overtochten-1951'],['Vluchten','/kaarten/vluchten'],['Molukse wijken','/kaarten/molukse-wijken'],['Grafstatus','/kaarten/grafstatus']]],
-['Doe mee','/podium','#111','#E9F25A','kal',[['Agenda','/events'],['Podium','/podium'],['Insturen','/uploaden'],['Beeldbank','/beeldbank']]],
+['Agenda','/evenementen','#D7381A','#FF4D2E','kal',[['Alle evenementen','/evenementen'],['Evenement aanmelden','/uploaden']]],
+['Doe mee','/podium','#111','#E9F25A','kal',[['Agenda','/evenementen'],['Podium','/podium'],['Insturen','/uploaden'],['Beeldbank','/beeldbank']]],
 ['Winkel en steun','/store','#111','#111','tas',[['Toko Buku','/store'],['Boekenplank','/boekenplank'],['Doneer','/doneer'],['Maandelijks doneren','/maandelijks-doneren']]],
 ['Over MOZA','/over-moza','#111','#EDDCB8','info',[['Over MOZA','/over-moza'],['Team','/team'],['Verantwoording','/verantwoording']]]];
 function cur(h){return (h==='/'&&HOME)||(h==='/lezen'&&p==='/lezen')||(h==='/nieuws/maluku'&&p==='/nieuws/maluku')?' aria-current="page"':''}
 function tiles(){return '<div class="tl" aria-label="Snel naar">'+
  '<a class="w" href="/kaarten/weer-en-zee">'+sv('wolk')+'<b>Ambon <span data-wt></span></b><small data-wc>weer</small></a>'+
- '<a class="ag" href="/events">'+sv('kal')+'<b>Agenda</b><small data-agw></small></a>'+'<a href="/kaarten"><span class="bd">LIVE</span>'+sv('kaart')+'<b>Live kaarten</b></a>'+
+ '<a class="ag" href="/evenementen">'+sv('kal')+'<b>Agenda</b><small data-agw></small></a>'+'<a href="/kaarten"><span class="bd">LIVE</span>'+sv('kaart')+'<b>Live kaarten</b></a>'+
  
  '<a href="/begrippen">'+sv('aa')+'<b>Begrippen</b></a>'+
  '<a href="/organisaties"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 4.5a3 3 0 0 1 0 6"/><path d="M21 20a6 6 0 0 0-3.5-5.4"/></svg><b>Organisaties</b></a>'+'<a class="pl" href="/peilingen">'+sv('poll')+'<b>Jouw mening</b><small>2 peilingen</small></a></div>'}
@@ -2880,9 +2881,9 @@ if(!build()){var n=0,iv=setInterval(function(){if(build()||++n>80)clearInterval(
 <script id="mzf-js">
 (function(){
 var WA='https://whatsapp.com/channel/0029VaA4StPIt5rs5FadnH1d';
-var NAV=[['Lezen','/lezen'],['Kennisbank','/weten'],['Agenda','/events'],['Podium','/podium'],['Boekenplank','/boekenplank'],['Toko Buku','/store'],['Over MOZA','/over-moza']];
+var NAV=[['Lezen','/lezen'],['Kennisbank','/weten'],['Agenda','/evenementen'],['Podium','/podium'],['Boekenplank','/boekenplank'],['Toko Buku','/store'],['Over MOZA','/over-moza']];
 var COLS=[
- ['Lees &amp; leer',[['Lezen','/lezen'],['Nieuws uit Maluku','/nieuws/maluku'],['Kennisbank','/weten'],['Begrippenlijst','/begrippen'],['Sejarah Maluku','/sejarah-maluku'],['Molukse organisaties','/organisaties'],['Boekenplank','/boekenplank'],['Podium','/podium'],['Agenda','/events']]],
+ ['Lees &amp; leer',[['Lezen','/lezen'],['Nieuws uit Maluku','/nieuws/maluku'],['Kennisbank','/weten'],['Begrippenlijst','/begrippen'],['Sejarah Maluku','/sejarah-maluku'],['Molukse organisaties','/organisaties'],['Boekenplank','/boekenplank'],['Podium','/podium'],['Agenda','/evenementen']]],
  ['Over ons',[['Over MOZA','/over-moza'],['Team','/team'],['Verantwoording','/verantwoording'],['Contact','/contact'],['Stuur iets in','/uploaden'],['Organisatie aanmelden','/organisatie-aanmelden'],['Inloggen','/account']]],
  ['Ook interessant',[['Tanda Mata','/tanda-mata'],['Tahuri Festival','/tahuri-festival'],['Expositie MENA','/mena'],['Oral history scholenproject','/oral-history-scholenproject'],['Beeldbank','/beeldbank'],['Toko Buku','/store']]]
 ];
@@ -3143,7 +3144,7 @@ var SV=function(p){return '<svg viewBox="0 0 24 24" aria-hidden="true">'+p+'</sv
 var IC={wolk:'<path d="M7 15a4 4 0 1 1 1.2-7.8A5 5 0 0 1 18 9a3 3 0 0 1 0 6z"/>',kal:'<rect x="4" y="5" width="16" height="15" rx="1"/><path d="M4 10h16M9 3v4M15 3v4"/>',boek:'<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20"/>',kaart:'<path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/>',tas:'<path d="M6 8h12l-1 12H7z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/>',poll:'<path d="M5 20V12M12 20V5M19 20v-9"/><path d="M3 20h18"/>'};
 function tegels(){return '<section class="mzvt" aria-label="Verder op MOZA"><div class="mzvt-h" role="heading" aria-level="3">Verder op MOZA</div><div class="mzvt-g">'+
 '<a class="w" href="/kaarten/weer-en-zee">'+SV(IC.wolk)+'<b>Ambon <span data-mzw></span></b><small data-mzc>weer</small></a>'+
-'<a class="ag" href="/events">'+SV(IC.kal)+'<b style="color:#E9F25A!important">Agenda</b><small data-agw></small></a>'+
+'<a class="ag" href="/evenementen">'+SV(IC.kal)+'<b style="color:#E9F25A!important">Agenda</b><small data-agw></small></a>'+
 '<a href="/weten">'+SV(IC.boek)+'<b>Kennisbank</b></a>'+
 '<a href="/kaarten"><span class="bd">LIVE</span>'+SV(IC.kaart)+'<b>Live kaarten</b></a>'+
 '<a href="/store">'+SV(IC.tas)+'<b>Toko Buku</b><small data-tk></small></a>'+
@@ -3157,7 +3158,7 @@ function build(r){
  if(!document.querySelector('.mzvt')){var vt=document.createElement('div');vt.innerHTML=tegels();vt=vt.firstChild;var cc=document.querySelector('.blog-item-content'),ly=cc&&cc.querySelector(':scope > .sqs-layout');if(ly)ly.parentNode.insertBefore(vt,ly.nextSibling);else r.insertBefore(vt,r.firstChild);weer(vt)}
  if(r.querySelector('.mzag'))return;
  ev().then(function(j){var L=komend(j);if(!L.length||r.querySelector('.mzag'))return;var a=document.createElement('section');a.className='mzag';a.setAttribute('aria-label','Komende evenementen');
- a.innerHTML='<h3 class="mr-h">Komende evenementen</h3><div class="mzag-l">'+L.slice(0,3).map(kaart).join('')+'</div><a class="mzag-all" href="/events">Alle '+(j.upcoming||[]).length+' evenementen →</a><a class="mzag-meld" href="/uploaden">Meld je evenement aan</a>';
+ a.innerHTML='<h3 class="mr-h">Komende evenementen</h3><div class="mzag-l">'+L.slice(0,3).map(kaart).join('')+'</div><a class="mzag-all" href="/evenementen">Alle '+(j.upcoming||[]).length+' evenementen →</a><a class="mzag-meld" href="/uploaden">Meld je evenement aan</a>';
  var v2=r.querySelector('.mzvt');r.insertBefore(a,v2?v2.nextSibling:r.firstChild)})}
 /* de zijkolom wordt soms opnieuw opgebouwd: 12 seconden lang controleren */
 function vul(j){[].forEach.call(document.querySelectorAll('[data-agw]'),function(s){if(!s.textContent)s.textContent=agw(j)})}
@@ -3251,7 +3252,7 @@ html.mzkop-on :is(#moza-lz .lz-hero,#mzmal>.hero,#mzag>.hero,#mzoh>.hero,#moza-k
 </style>
 <script id="mzkop-js">
 (function(){
-var L=["Lezen bij MOZA",["/lezen","Actueel","Al het nieuws en de achtergrond, van nu en uit het archief.","e9f25a"],["/nieuws/maluku","Nieuws uit Maluku","Nieuws, foto's en verhalen van Ambon en de andere eilanden.","1f3bd1"],["/events","Agenda","Concerten, exposities, herdenkingen en festivals.","ff4d2e"],["/oral-history-scholenproject","Verhalen","Leerlingen interviewden Molukse ouderen over hun leven.","ff7ab6"],["/lezen/tag/rubriek","Rubrieken","Elke dag een vaste rubriek: kaart, foto, boeken, woord, weekend.","111"]],
+var L=["Lezen bij MOZA",["/lezen","Actueel","Al het nieuws en de achtergrond, van nu en uit het archief.","e9f25a"],["/nieuws/maluku","Nieuws uit Maluku","Nieuws, foto's en verhalen van Ambon en de andere eilanden.","1f3bd1"],["/evenementen","Agenda","Concerten, exposities, herdenkingen en festivals.","ff4d2e"],["/oral-history-scholenproject","Verhalen","Leerlingen interviewden Molukse ouderen over hun leven.","ff7ab6"],["/lezen/tag/rubriek","Rubrieken","Elke dag een vaste rubriek: kaart, foto, boeken, woord, weekend.","111"]],
 W=["Kennis bij MOZA",["/weten","Kennisbank","Antwoorden op je vragen, in gewone taal.","e9f25a"],["/onderzoek","Onderzoek","Scripties en proefschriften, samengevat met link naar de bron.","1f3bd1"],["/kaarten","Kaarten","Kaarten met open data die zichzelf bijwerken.","ff4d2e",1],["/organisaties","Organisaties","Molukse organisaties op naam, plaats, thema en niveau.","ff7ab6"]],
 P={"/lezen":[L,"#moza-lz .lz-hero"],"/nieuws/maluku":[L,"#mzmal>.hero"],"/events":[L,"#mzag>.hero"],"/oral-history-scholenproject":[L,"#mzoh>.hero"],"/weten":[W,"#moza-kb .kb-hero"],"/onderzoek":[W,"#mzo>.hero"],"/kaarten":[W,"#mzk>.k-hero"],"/organisaties":[W,"#mzorg>.hero"]};
 var D=document.documentElement;
