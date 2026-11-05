@@ -1731,7 +1731,7 @@ html.moza-dark #mz-rec button.open,html.moza-dark #mz-rec button.verstuur{backgr
 .mz-direct[disabled]{opacity:.7;cursor:wait}
 html.moza-dark .mz-direct{border-color:#E9F25A}
 html.mz-boek .product-detail .product-quantity-input-wrapper{display:none!important}
-html.mz-boek .product-detail .mz-koop{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:stretch;width:100%}
+html.mz-boek .product-detail .mz-koop{display:grid!important;grid-template-columns:1fr;gap:10px;align-items:stretch;width:100%}
 html.mz-boek .product-detail .mz-koop>*{width:auto!important;margin:0!important;max-width:none!important}
 html.mz-boek .product-detail .mz-koop .sqs-add-to-cart-button,html.mz-boek .product-detail .mz-koop .mz-direct{margin:0!important;box-shadow:none!important;display:flex!important;align-items:center;justify-content:center;line-height:1.15!important}
 html.mz-boek .product-detail .mz-koop .sqs-add-to-cart-button-wrapper{display:flex!important;padding:0!important}
@@ -1788,7 +1788,6 @@ html.mz-boek .product-detail .mz-koop .sqs-add-to-cart-button-wrapper{min-width:
       var nat=q('.product-detail .sqs-add-to-cart-button');var wrap=q('.product-detail .product-purchase-controls-wrapper')||(nat&&nat.closest('.product-add-to-cart-layout-wrapper'));if(wrap)wrap.classList.add('mz-koop');
       if(!nat||!wrap){if(++n<40)setTimeout(zet,250);return;}
       var uit=nat.disabled||nat.classList.contains('sold-out')||/uitverkocht|sold out/i.test(nat.textContent);
-      if(!uit&&!q('.mz-direct')){var b=document.createElement('button');b.type='button';b.className='mz-direct';b.textContent='Direct bestellen →';b.onclick=function(){direct(b);};wrap.appendChild(b);}
       /* koopbalk: knop wordt Bestel en gaat direct naar afrekenen */
       if(!uit)window.__mzSnel=true;
     })();
@@ -1796,9 +1795,9 @@ html.mz-boek .product-detail .mz-koop .sqs-add-to-cart-button-wrapper{min-width:
   /* koopbalk boven het menu onderin, en zichtbaar zodra de gewone knop niet in beeld is */
   function balk(){
     var s=q('.moza-sticky');if(!s)return;var o=document.getElementById('mz-onder');
-    var nb=q('.product-detail .sqs-add-to-cart-button .add-to-cart-text');if(nb&&window.__mzSnel&&/^\s*(Toevoegen aan winkelwagentje|Bestel|Bestellen|Pre-?order)\s*$/i.test(nb.textContent))nb.textContent='In winkelwagen';
+    var nb=q('.product-detail .sqs-add-to-cart-button .add-to-cart-text');if(nb&&window.__mzSnel&&/^\s*(Toevoegen aan winkelwagentje|Bestel|Bestellen|Pre-?order)\s*$/i.test(nb.textContent))nb.textContent='Direct bestellen';
     var dk=q('.mz-direct'),nk=q('.product-detail .mz-koop .sqs-add-to-cart-button');if(dk&&nk){var hh=Math.round(nk.getBoundingClientRect().height);if(hh>30&&dk.style.height!==hh+'px'){dk.style.height=hh+'px';dk.style.minHeight=hh+'px';}}
-    var sb=s.querySelector('button');if(sb&&window.__mzSnel&&!sb.dataset.mz){sb.dataset.mz=1;sb.addEventListener('click',function(e){e.preventDefault();e.stopImmediatePropagation();direct(sb);},true);}
+    var sb=s.querySelector('button');if(sb&&window.__mzSnel&&!sb.dataset.mz){sb.dataset.mz=1;}
     if(sb&&window.__mzSnel&&!bezig&&sb.textContent!=='Bestel →')sb.textContent='Bestel →';
     var h=o&&getComputedStyle(o).display!=='none'?Math.round(o.getBoundingClientRect().height):0;
     var want=h+'px';if(s.style.bottom!==want)s.style.bottom=want;
