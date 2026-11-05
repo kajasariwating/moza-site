@@ -1744,6 +1744,10 @@ html.mz-boek .product-detail .mz-koop .sqs-add-to-cart-button-wrapper{min-width:
   html.mz-boek .product-detail .product-gallery-slides{aspect-ratio:auto!important;height:230px!important}
   html.mz-boek .product-detail .product-gallery-thumbnails{margin-top:10px!important}
   html.mz-boek .product-detail .product-meta{gap:6px!important}
+  html.mz-boek .product-detail>div:has(>.moza-crumb){padding-top:0!important}
+  html.mz-boek .product-detail .moza-crumb{margin-bottom:10px!important}
+  html.mz-boek .product-detail .product-gallery-thumbnails-item{width:44px!important;height:60px!important}
+  html.mz-boek .product-detail .product-gallery-thumbnails{height:auto!important}
   html.mz-boek .product-detail .product-meta>.mz-rec-top{margin:0 0 2px!important}
   html.mz-boek .product-detail .product-meta>.product-price{margin:8px 0 0!important}
   html.mz-boek .product-detail .product-meta>.moza-buyline{margin:2px 0 0!important;row-gap:6px!important}
@@ -1805,6 +1809,14 @@ html.mz-boek .product-detail .mz-koop .sqs-add-to-cart-button-wrapper{min-width:
   }
   window.addEventListener('scroll',function(){requestAnimationFrame(balk);},{passive:true});
   window.addEventListener('resize',balk);
+  /* minder lege ruimte tussen de kop van de site en het kruimelpad (telefoon) */
+  function boven(){
+    if(window.innerWidth>=768||!document.documentElement.classList.contains('mz-boek'))return;
+    var sec=q('.product-detail')&&q('.product-detail').closest('section');var kop=document.getElementById('header');if(!sec||!kop)return;
+    var kb=kop.getBoundingClientRect().bottom,st=sec.getBoundingClientRect().top+window.pageYOffset;
+    if(window.pageYOffset>5)return;var pad=Math.max(0,Math.round(kb-st+14));if(pad>0&&pad<200&&sec.style.paddingTop!==pad+'px')sec.style.setProperty('padding-top',pad+'px','important');
+  }
+  var kb2=0,ivb=setInterval(function(){boven();if(++kb2>12)clearInterval(ivb);},250);
   var k=0,iv=setInterval(function(){balk();if(++k>30)clearInterval(iv);},400);
 })();
 </script>
