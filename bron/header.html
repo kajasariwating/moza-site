@@ -3170,7 +3170,8 @@ var k=0,iv=setInterval(function(){var r=document.querySelector('.moza-right');if
 #mzag .bar.mzfb-on>.in:not(#mzfb),#mzorg .mzfb-on .grp,#mzo .mzfb-on .row[role]{display:none!important}
 #mzo #mzfb{padding:12px 0 4px}
 #mzo .mzfb-on input[type=search],#mzo .mzfb-on select{min-height:62px;border:3px solid var(--ink);border-radius:0}
-#mzfb{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding-block:14px}
+#mzfb{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding-block:14px;position:relative;z-index:40}
+#mzfb button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 #mzorg #mzfb{flex:999 1 560px;padding:0}
 #mzorg .bar .q{flex:1 0 300px;max-width:100%;min-height:62px;border:3px solid var(--ink);border-radius:0;padding:0 16px;font-size:16px}
 #mzfb .fb-l{font-size:13px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
@@ -3214,14 +3215,21 @@ h+='<div class="fb-c"><button type="button" class="fb-b'+(j?" on":"")+(x?" open"
 if(x){h+='<div class="fb-p" role="listbox" aria-label="'+g[0]+'">';c.forEach(function(e,i){h+='<button type="button" role="option" aria-selected="'+(i==j)+'" data-n="'+n+'" data-j="'+i+'"><i></i>'+tx(e)+'</button>'});h+="</div>"}h+="</div>"});
 w.querySelector(".fb-k").innerHTML=h;w.classList.toggle("act",!!a);if(f){var t=w.querySelector(f);t&&t.focus()}}
 function kies(n,i){var c=it(n)[i];c&&!sel(c)&&c.click()}
+/* Telefoons (vooral iPhone): een tik op een keuze direct afhandelen bij touchend, niet wachten op de click */
+var tS=null;function fk(t){return t.className+"|"+t.getAttribute("data-n")+"|"+t.getAttribute("data-j")}
+document.addEventListener("touchstart",function(e){var t=e.target&&e.target.closest&&e.target.closest("#mzfb .fb-p button,#mzfb .fb-b,#mzfb .fb-wis");tS=t?{k:fk(t),x:e.touches[0].clientX,y:e.touches[0].clientY}:null},{passive:true});
+document.addEventListener("touchend",function(e){if(!tS)return;var s=tS;tS=null;var c=e.changedTouches[0],t=document.elementFromPoint(c.clientX,c.clientY);t=t&&t.closest&&t.closest("#mzfb button");
+if(!t||fk(t)!==s.k||Math.abs(c.clientX-s.x)>10||Math.abs(c.clientY-s.y)>10)return;e.preventDefault();act(t)},{passive:false});
 document.addEventListener("click",function(e){var w=document.getElementById("mzfb");if(!w||!e.target.closest)return;var t=e.target.closest("#mzfb button");
 if(!t){if(o!==null&&!e.target.closest("#mzfb")){o=null;r()}return}
+if(t.classList.contains("mzig-mine"))return;act(t)});
+function act(t){
 var n=t.getAttribute("data-n");
 if(t.classList.contains("fb-wis")){cf.g.forEach(function(g,m){kies(m,0)});o=null}
 else if(n==null)return;
 else if(t.hasAttribute("data-j")){kies(+n,+t.getAttribute("data-j"));o=null}
 else o=o===+n?null:+n;
-r(o!==null?'.fb-p [aria-selected="true"]':n!=null?'.fb-b[data-n="'+n+'"]':0)});
+r(o!==null?'.fb-p [aria-selected="true"]':n!=null?'.fb-b[data-n="'+n+'"]':0)}
 document.addEventListener("keydown",function(e){if(o!==null&&e.key=="Escape"){var n=o;o=null;r('.fb-b[data-n="'+n+'"]')}});
 var mo=new MutationObserver(function(m){for(var i=0;i<m.length;i++){var t=m[i].target;if(!t.closest||!t.closest("#mzfb")){r();return}}});
 (window.mzWatch||setInterval)(function(){if(document.getElementById("mzfb"))return;for(var k in C){var b=document.querySelector(C[k].b);if(b&&b.querySelector(C[k].g[0][1])){cf=C[k];bar=b;o=null;var w=document.createElement("div");w.id="mzfb";
