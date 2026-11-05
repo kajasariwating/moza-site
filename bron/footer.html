@@ -1769,12 +1769,14 @@ html.mz-boek .product-detail .sqs-add-to-cart-button{width:100%!important;min-he
       var uit=nat.disabled||nat.classList.contains('sold-out')||/uitverkocht|sold out/i.test(nat.textContent);
       if(!uit&&!q('.mz-direct')){var b=document.createElement('button');b.type='button';b.className='mz-direct';b.textContent='Direct bestellen →';b.onclick=function(){direct(b);};wrap.appendChild(b);}
       /* koopbalk: knop wordt Bestel en gaat direct naar afrekenen */
-      var sb=q('.moza-sticky button');if(sb&&!uit&&!sb.dataset.mz){sb.dataset.mz=1;sb.textContent='Bestel →';sb.addEventListener('click',function(e){e.preventDefault();e.stopImmediatePropagation();direct(sb);},true);}
+      if(!uit)window.__mzSnel=true;
     })();
   }).catch(function(){});
   /* koopbalk boven het menu onderin, en zichtbaar zodra de gewone knop niet in beeld is */
   function balk(){
     var s=q('.moza-sticky');if(!s)return;var o=document.getElementById('mz-onder');
+    var sb=s.querySelector('button');if(sb&&window.__mzSnel&&!sb.dataset.mz){sb.dataset.mz=1;sb.addEventListener('click',function(e){e.preventDefault();e.stopImmediatePropagation();direct(sb);},true);}
+    if(sb&&window.__mzSnel&&!bezig&&sb.textContent!=='Bestel →')sb.textContent='Bestel →';
     var h=o&&getComputedStyle(o).display!=='none'?Math.round(o.getBoundingClientRect().height):0;
     var want=h+'px';if(s.style.bottom!==want)s.style.bottom=want;
     if(window.innerWidth<768){var c=q('.product-detail .product-add-to-cart');if(c){var r=c.getBoundingClientRect();var inBeeld=r.bottom>60&&r.top<window.innerHeight-h-60;s.classList.toggle('is-on',!inBeeld);}}
