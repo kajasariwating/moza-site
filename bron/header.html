@@ -705,7 +705,7 @@ html.moza-dark #moza-adv{--bg:#12151F;--fg:#F1F1EC;--mute:#C9CBD3;--line:#F1F1EC
 #moza-adv h1,#moza-adv h2,#moza-adv h3,#moza-adv p,#moza-adv ul,#moza-adv ol{margin:0;padding:0;font-family:inherit;letter-spacing:normal;text-transform:none}
 #moza-adv a{text-decoration:none}
 /* kop */
-#moza-adv .mza-hero{background:var(--b);color:#fff;border-bottom:3px solid var(--k);padding:44px 0 48px}
+#moza-adv .mza-hero{background:var(--b);color:#fff;border-bottom:3px solid var(--k);padding:56px 0 56px}
 #moza-adv .mza-hero .mza-in{display:flex;flex-direction:column;gap:14px;align-items:flex-start}
 #moza-adv .mza-lbl{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;line-height:1.2}
 #moza-adv .mza-hero .mza-lbl{background:var(--y);color:#111;padding:4px 8px}
@@ -827,12 +827,13 @@ html.moza-dark #moza-adv{--bg:#12151F;--fg:#F1F1EC;--mute:#C9CBD3;--line:#F1F1EC
     '</div></div>';
     host.insertBefore(sec,host.firstChild);
     H.classList.add('mz-adv-on');H.classList.remove('mz-adv-pre');
-    ruimte();addEventListener('resize',ruimte);addEventListener('load',ruimte);setTimeout(ruimte,800);
+    ruimte();addEventListener('resize',ruimte);addEventListener('load',ruimte);[300,800,1500,3000,5000].forEach(function(t){setTimeout(ruimte,t)});
+    var kop=document.getElementById('header');if(kop&&window.ResizeObserver)new ResizeObserver(ruimte).observe(kop);
     return true;
   }
   /* De kop van de site ligt over de pagina heen: schuif de pagina eronder */
   function ruimte(){
-    var sec=document.querySelector('.mza-host'),kop=document.getElementById('header');if(!sec||!kop)return;
+    var sec=document.querySelector('.mza-host'),kop=document.getElementById('header');if(!sec||!kop||scrollY>5)return;
     var oud=parseFloat(sec.style.paddingTop)||0,top=sec.getBoundingClientRect().top+scrollY+oud,kb=kop.getBoundingClientRect().bottom+scrollY;
     var pad=Math.max(0,Math.round(kb-top));if(pad<300&&pad!==oud)sec.style.paddingTop=pad+'px';
   }
