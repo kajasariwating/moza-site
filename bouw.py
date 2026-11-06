@@ -47,7 +47,7 @@ def js_string(s):
     return json.dumps(s, ensure_ascii=False).replace('</', '<\\/').replace('\u2028', '\\u2028').replace('\u2029', '\\u2029')
 
 blijft = []
-LIVE_SHA = '5b204d21a0cbe2c09e91e639ed814c31f481de75'  # commit met nieuw/balk.js en nieuw/live.js
+LIVE_SHA = '5091108fdc4b9e8050225f1486b00676703d249d'  # commit met nieuw/balk.js en nieuw/live.js
 LIVE_CSS = pathlib.Path('nieuw/balk.css').read_text() + '\n' + pathlib.Path('nieuw/live.css').read_text() + '''
 @keyframes mzzien{to{visibility:visible}}
 /* voorpagina: de kale Squarespace-pagina niet eerst tonen (de echte voorpagina wordt met script opgebouwd) */
