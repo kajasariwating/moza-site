@@ -12,3 +12,6 @@ Terugzetten: zet de oude hash hierboven terug in de injectie.
 
 ## 09:50 — tweede wijziging
 Hash 3e0aed6bcbc20a4edfc0d003db9cc91026cf4f29 vervangen door 6f037c9195a949e407e7a440e1fe1d05a6db441e (meer ruimte onder de kop van /advertorial).
+
+## 09:58 — derde wijziging
+Hash 6f037c9195a949e407e7a440e1fe1d05a6db441e vervangen door de commit hieronder (rekenfout ruimte onder de kop).
