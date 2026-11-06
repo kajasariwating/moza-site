@@ -824,7 +824,14 @@ html.moza-dark #moza-adv{--bg:#12151F;--fg:#F1F1EC;--mute:#C9CBD3;--line:#F1F1EC
     '</div></div>';
     host.insertBefore(sec,host.firstChild);
     H.classList.add('mz-adv-on');H.classList.remove('mz-adv-pre');
+    ruimte();addEventListener('resize',ruimte);addEventListener('load',ruimte);setTimeout(ruimte,800);
     return true;
+  }
+  /* De kop van de site ligt over de pagina heen: schuif de pagina eronder */
+  function ruimte(){
+    var sec=document.querySelector('.mza-host'),kop=document.getElementById('header');if(!sec||!kop)return;
+    var oud=parseFloat(sec.style.paddingTop)||0,top=sec.getBoundingClientRect().top+scrollY+oud,kb=kop.getBoundingClientRect().bottom+scrollY;
+    var pad=Math.max(0,Math.round(kb-top));if(pad<300&&pad!==oud)sec.style.paddingTop=pad+'px';
   }
   var n=0;(function t(){if(bouw()||++n>100)return;setTimeout(t,60)})();
 })();
