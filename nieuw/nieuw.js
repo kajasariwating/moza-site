@@ -260,7 +260,7 @@
   }
 
   /* ---------- Hero's van de overige pagina's: compact en in de kleur uit de mockup ---------- */
-  var KLEUR=[[/^\/(events|agenda|evenementen)$/,'lb'],[/^\/weten$/,'bl'],[/^\/podium$/,'rz'],[/^\/store$/,'rz'],[/^\/nieuws\/maluku$/,'bl'],[/^\/sejarah-maluku$/,'lb'],[/^\/begrippen$/,'lb'],[/^\/organisaties$/,'bl'],[/^\/beeldbank$/,'zw'],[/^\/onderzoek$/,'lb'],[/^\/(doneer|maandelijks-doneren)$/,'rz'],[/^\/over-moza$/,'rz']];
+  var KLEUR=[[/^\/(events|agenda|evenementen)$/,'lb'],[/^\/weten$/,'bl'],[/^\/podium$/,'rz'],[/^\/store$/,'rz'],[/^\/nieuws\/maluku$/,'bl'],[/^\/sejarah-maluku$/,'lb'],[/^\/begrippen$/,'lb'],[/^\/organisaties$/,'bl'],[/^\/beeldbank$/,'zw'],[/^\/onderzoek$/,'lb'],[/^\/(doneer|maandelijks-doneren)$/,'rz'],[/^\/over-moza$/,'rz'],[/^\/advertorial$/,'bl']];
   function paginaHero(){
     var kl=null;KLEUR.forEach(function(k){if(!kl&&k[0].test(P))kl=k[1]});if(!kl)return true;
     var h1=[].filter.call(document.querySelectorAll('#page h1, main h1, #siteWrapper h1'),function(h){return !h.closest('#header')&&h.getClientRects().length&&!/Marquee/.test(h.className)})[0];

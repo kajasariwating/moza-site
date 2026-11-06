@@ -694,6 +694,142 @@ window.addEventListener('message',function(e){if(e.origin!==location.origin)retu
 })();
 </script>
 <!-- ===== /moza-v3g ===== -->
+<!-- ===== mz-adv: pagina /advertorial in MOZA-huisstijl ===== -->
+<style id="mz-adv-css">
+html.mz-adv-pre #page :is(#sections,#page-regions .region)>section:not(.mza-host),
+html.mz-adv-on #page :is(#sections,#page-regions .region)>section:not(.mza-host){display:none!important}
+#moza-adv{--b:#1F3BD1;--y:#E9F25A;--p:#FF7AB6;--r:#FF4D2E;--k:#111;--bg:#F4F2EC;--fg:#111;--mute:#444;--line:#111;--card:#fff;--acc:#1F3BD1;background:var(--bg);color:var(--fg);font-family:"Hanken Grotesk",system-ui,sans-serif;font-weight:400;padding-bottom:56px}
+html.moza-dark #moza-adv{--bg:#12151F;--fg:#F1F1EC;--mute:#C9CBD3;--line:#F1F1EC;--card:#1A1E2B;--acc:#E9F25A}
+#moza-adv *{box-sizing:border-box}
+#moza-adv .mza-in{max-width:1120px;margin:0 auto;padding:0 24px}
+#moza-adv h1,#moza-adv h2,#moza-adv h3,#moza-adv p,#moza-adv ul,#moza-adv ol{margin:0;padding:0;font-family:inherit;letter-spacing:normal;text-transform:none}
+#moza-adv a{text-decoration:none}
+/* kop */
+#moza-adv .mza-hero{background:var(--b);color:#fff;border-bottom:3px solid var(--k);padding:44px 0 48px}
+#moza-adv .mza-hero .mza-in{display:flex;flex-direction:column;gap:14px;align-items:flex-start}
+#moza-adv .mza-lbl{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;line-height:1.2}
+#moza-adv .mza-hero .mza-lbl{background:var(--y);color:#111;padding:4px 8px}
+#moza-adv .mza-hero h1{font-size:clamp(34px,5.4vw,60px)!important;line-height:1.02!important;font-weight:900!important;letter-spacing:-.035em!important;color:var(--y)!important;text-shadow:3px 3px 0 var(--p);max-width:16ch}
+#moza-adv .mza-serif{font-family:"Fraunces",Georgia,serif;font-style:italic;font-weight:600;font-size:22px;line-height:1.2;color:#fff}
+#moza-adv .mza-hero p{font-size:19px;line-height:1.5;max-width:60ch;color:#fff}
+#moza-adv .mza-ctas{display:flex;flex-wrap:wrap;gap:12px;margin-top:6px}
+#moza-adv .mza-btn{display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:12px 18px;border:2px solid var(--k);background:var(--y);color:#111!important;font-size:16px;font-weight:900;line-height:1.1;box-shadow:4px 4px 0 var(--k);border-radius:0;transition:transform .1s,box-shadow .1s}
+#moza-adv .mza-btn:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--k)}
+#moza-adv .mza-btn.ghost{background:transparent;color:#fff!important;border-color:#fff;box-shadow:none}
+#moza-adv .mza-btn.ghost:hover{background:#fff;color:#111!important;transform:none}
+#moza-adv .mza-btn.dark{background:var(--k);color:var(--y)!important;box-shadow:4px 4px 0 var(--b)}
+/* secties */
+#moza-adv .mza-sec{padding-top:56px}
+#moza-adv .mza-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:8px 32px;margin-bottom:22px}
+#moza-adv .mza-head .mza-lbl{color:var(--acc);display:block;margin-bottom:6px}
+#moza-adv .mza-head h2{font-size:clamp(26px,3.4vw,36px);line-height:1.1;font-weight:900;letter-spacing:-.025em;color:var(--fg)}
+#moza-adv .mza-head p{max-width:46ch;font-size:16px;line-height:1.5;color:var(--mute)}
+#moza-adv .mza-tekst{font-size:18px;line-height:1.6;max-width:68ch}
+#moza-adv .mza-tekst+.mza-tekst{margin-top:14px}
+#moza-adv .mza-split{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:32px;align-items:start}
+#moza-adv .mza-box{border:2px solid var(--line);background:var(--card);padding:22px 24px;box-shadow:6px 6px 0 var(--p)}
+#moza-adv .mza-box h3{font-size:20px;line-height:1.2;font-weight:900;margin-bottom:8px}
+#moza-adv .mza-box p{font-size:16px;line-height:1.5}
+#moza-adv .mza-box.y{background:var(--y);color:#111;border-color:#111;box-shadow:6px 6px 0 var(--b)}
+#moza-adv .mza-box.y *{color:#111}
+/* voordelen */
+#moza-adv .mza-drie{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+#moza-adv .mza-drie .mza-box:nth-child(1){box-shadow:6px 6px 0 var(--b)}
+#moza-adv .mza-drie .mza-box:nth-child(2){box-shadow:6px 6px 0 var(--p)}
+#moza-adv .mza-drie .mza-box:nth-child(3){box-shadow:6px 6px 0 var(--y)}
+#moza-adv .mza-nr{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border:2px solid var(--line);font-weight:900;font-size:18px;margin-bottom:12px}
+/* vormen */
+#moza-adv .mza-vormen{list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+#moza-adv .mza-vorm{display:flex;gap:14px;align-items:flex-start;border:2px solid var(--line);background:var(--card);padding:16px 18px}
+#moza-adv .mza-km{flex:none;width:14px;height:14px;margin-top:5px;border:2px solid var(--line);background:var(--c)}
+#moza-adv .mza-vorm b{display:block;font-size:17px;font-weight:900;line-height:1.25;margin-bottom:4px}
+#moza-adv .mza-vorm span{display:block;font-size:15px;line-height:1.45;color:var(--mute)}
+/* prijs */
+#moza-adv .mza-twee{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+#moza-adv .mza-tag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:3px 7px;margin-bottom:10px;border:2px solid #111;color:#111}
+#moza-adv .mza-tag.y{background:var(--y)}
+#moza-adv .mza-tag.p{background:var(--p)}
+#moza-adv .mza-noot{margin-top:18px;font-size:16px;line-height:1.5;color:var(--mute);max-width:70ch}
+/* stappen en contact */
+#moza-adv .mza-cta{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;align-items:center;padding:28px}
+#moza-adv .mza-cta h2{font-size:clamp(26px,3.4vw,36px);line-height:1.1;font-weight:900;letter-spacing:-.025em;margin-bottom:10px}
+#moza-adv .mza-stappen{list-style:none;display:flex;flex-direction:column;gap:12px;counter-reset:st}
+#moza-adv .mza-stappen li{display:flex;gap:12px;align-items:flex-start;font-size:16px;line-height:1.45;counter-increment:st}
+#moza-adv .mza-stappen li:before{content:counter(st);flex:none;width:30px;height:30px;display:flex;align-items:center;justify-content:center;background:#111;color:var(--y);font-weight:900}
+#moza-adv .mza-cta .mza-ctas{margin-top:16px}
+#moza-adv .mza-mail{display:block;margin-top:12px;font-size:15px;font-weight:800;color:#111;text-decoration:underline!important;text-underline-offset:3px;overflow-wrap:anywhere}
+@media (max-width:860px){
+ #moza-adv .mza-split,#moza-adv .mza-drie,#moza-adv .mza-twee,#moza-adv .mza-cta{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:560px){
+ #moza-adv .mza-in{padding:0 16px}
+ #moza-adv .mza-hero{padding:28px 0 32px}
+ #moza-adv .mza-hero p{font-size:17px}
+ #moza-adv .mza-serif{font-size:19px}
+ #moza-adv .mza-sec{padding-top:40px}
+ #moza-adv .mza-tekst{font-size:17px}
+ #moza-adv .mza-box{padding:18px;box-shadow:4px 4px 0 var(--p)}
+ #moza-adv .mza-drie .mza-box{box-shadow:4px 4px 0 var(--b)}
+ #moza-adv .mza-cta{padding:20px}
+ #moza-adv .mza-btn{width:100%;justify-content:center}
+}
+</style>
+<script id="mz-adv-js">
+(function(){
+  if(!/^\/advertorial\/?$/.test(location.pathname))return;
+  var H=document.documentElement;H.classList.add('mz-adv-pre');
+  setTimeout(function(){H.classList.remove('mz-adv-pre')},3000);
+  var MAIL='mailto:info@moza.nu?subject='+encodeURIComponent('Advertorial op MOZA');
+  var VORM=[
+    ['#1F3BD1','Een informatief stuk','Uitleg over je organisatie, project of dienst.'],
+    ['#FF7AB6','Een opinieartikel','Een goed onderbouwde mening over een Moluks onderwerp.'],
+    ['#E9F25A','Een gastblog','Van een expert, of op basis van onderzoek of ervaring.'],
+    ['#FF4D2E','Een kort stukje in een artikel','Tijdelijk, en alleen als het past bij het artikel.'],
+    ['#C9D3FF','Extra aandacht voor je evenement','Een evenement in de agenda zetten is gratis. Wil je meer aandacht? Dan kan een advertorial.'],
+    ['#111','Een vacature','Voor een baan waarbij kennis van de Molukse gemeenschap een pluspunt is.'],
+    ['#EDDCB8','Beeld op de voorpagina','Een foto, video of infographic die iets vertelt.']
+  ];
+  function bouw(){
+    if(document.getElementById('moza-adv'))return true;
+    var host=document.querySelector('#sections')||document.querySelector('#page-regions .region')||document.querySelector('#page-regions');
+    if(!host||!document.body)return false;
+    var sec=document.createElement('section');sec.className='mza-host';
+    sec.innerHTML='<div id="moza-adv">'+
+    '<header class="mza-hero"><div class="mza-in"><span class="mza-lbl">Adverteren op MOZA</span>'+
+      '<h1>Breng je verhaal bij Molukkers</h1><span class="mza-serif">voor, door en met Molukkers</span>'+
+      '<p>Op MOZA lezen Molukkers over wat hen bezighoudt: nieuws, uitleg en opinie. Met een advertorial krijgt jouw bericht daar een plek. Rustig, inhoudelijk en tussen verhalen die passen.</p>'+
+      '<div class="mza-ctas"><a class="mza-btn" href="'+MAIL+'">Vraag een voorstel aan →</a><a class="mza-btn ghost" href="#mza-vormen">Wat kan er?</a></div>'+
+    '</div></header>'+
+    '<div class="mza-in">'+
+      '<section class="mza-sec" aria-labelledby="mza-h1"><div class="mza-head"><div><span class="mza-lbl">Uitleg</span><h2 id="mza-h1">Wat is een advertorial?</h2></div></div>'+
+        '<div class="mza-split"><div><p class="mza-tekst">Een advertorial is een betaald bericht in de vorm van een artikel. Je kent ze uit kranten, tijdschriften en van nieuwssites.</p>'+
+          '<p class="mza-tekst">Je vertelt over een product, evenement of dienst. Maar dan op een manier die past bij de website. Geen schreeuwende reclame, maar een stuk dat lezers echt willen lezen.</p></div>'+
+          '<aside class="mza-box y"><h3>De redactie kijkt mee</h3><p>Elke advertorial bespreken we eerst met de redactie van MOZA. Zo weten we zeker dat het past bij onze lezers en onze onderwerpen.</p></aside></div></section>'+
+      '<section class="mza-sec" aria-labelledby="mza-h2"><div class="mza-head"><div><span class="mza-lbl">Voordelen</span><h2 id="mza-h2">Waarom een advertorial?</h2></div><p>Goed voor jou, voor onze lezers en voor MOZA.</p></div>'+
+        '<div class="mza-drie">'+
+          '<div class="mza-box"><span class="mza-nr">1</span><h3>Rustig</h3><p>Geen banner of pop-up die je moet wegklikken. Lezers worden niet gestoord.</p></div>'+
+          '<div class="mza-box"><span class="mza-nr">2</span><h3>Inhoudelijk</h3><p>Een goed stuk voegt iets toe aan de onderwerpen op MOZA. Daar heeft iedereen wat aan.</p></div>'+
+          '<div class="mza-box"><span class="mza-nr">3</span><h3>Zeker van een plek</h3><p>We krijgen veel persberichten en tips. Meer dan we kunnen plaatsen. Met een advertorial krijgt jouw bericht wel een plek.</p></div>'+
+        '</div></section>'+
+      '<section class="mza-sec" id="mza-vormen" aria-labelledby="mza-h3"><div class="mza-head"><div><span class="mza-lbl">Mogelijkheden</span><h2 id="mza-h3">Wat kan er?</h2></div><p>Dit zijn voorbeelden. Heb je een ander idee? Vraag het ons.</p></div>'+
+        '<ul class="mza-vormen">'+VORM.map(function(v){return '<li class="mza-vorm"><i class="mza-km" style="--c:'+v[0]+'" aria-hidden="true"></i><div><b>'+v[1]+'</b><span>'+v[2]+'</span></div></li>';}).join('')+'</ul></section>'+
+      '<section class="mza-sec" aria-labelledby="mza-h4"><div class="mza-head"><div><span class="mza-lbl">Investering</span><h2 id="mza-h4">Wat kost het?</h2></div><p>Een advertorial is niet gratis. De prijs hangt af van twee dingen.</p></div>'+
+        '<div class="mza-twee">'+
+          '<div class="mza-box"><span class="mza-tag y">Bereik</span><h3>Hoeveel mensen MOZA lezen</h3><p>We kijken naar het aantal keer dat onze pagina’s de afgelopen maand zijn bekeken. Vraag ons gerust naar de cijfers.</p></div>'+
+          '<div class="mza-box"><span class="mza-tag p">Werk</span><h3>Wat je zelf aanlevert</h3><p>Lever je zelf tekst en beeld aan? Dan is het goedkoper. Schrijft MOZA het stuk, met foto’s erbij? Dan is het duurder.</p></div>'+
+        '</div></section>'+
+      '<section class="mza-sec" aria-labelledby="mza-h5"><div class="mza-box y mza-cta"><div><span class="mza-lbl">Interesse?</span><h2 id="mza-h5">Zo werkt het</h2><p>Mail ons je idee. We denken graag met je mee.</p>'+
+          '<div class="mza-ctas"><a class="mza-btn dark" href="'+MAIL+'">Mail MOZA →</a></div><a class="mza-mail" href="'+MAIL+'">info@moza.nu</a></div>'+
+        '<ol class="mza-stappen"><li>Stuur een mail met je idee en wanneer je het geplaatst wilt hebben.</li><li>De redactie kijkt of het past en je krijgt een voorstel met prijs.</li><li>Ga je akkoord? Dan gaan we samen aan de slag.</li></ol></div></section>'+
+    '</div></div>';
+    host.insertBefore(sec,host.firstChild);
+    H.classList.add('mz-adv-on');H.classList.remove('mz-adv-pre');
+    return true;
+  }
+  var n=0;(function t(){if(bouw()||++n>100)return;setTimeout(t,60)})();
+})();
+</script>
+<!-- ===== /mz-adv ===== -->
 <!-- ===== moza-v3j: donatie weg uit Boekenplank en winkeloverzicht, labels + artikel bij Uitgelicht + stuk van de redactie ===== -->
 
 <script id="moza-v3j-js">
