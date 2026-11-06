@@ -749,6 +749,9 @@ html.moza-dark #moza-adv{--bg:#12151F;--fg:#F1F1EC;--mute:#C9CBD3;--line:#F1F1EC
 #moza-adv .mza-tag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:3px 7px;margin-bottom:10px;border:2px solid #111;color:#111}
 #moza-adv .mza-tag.y{background:var(--y)}
 #moza-adv .mza-tag.p{background:var(--p)}
+#moza-adv .mza-cijfer{display:flex;flex-direction:column;gap:2px;margin:4px 0 12px}
+#moza-adv .mza-cijfer strong{font-size:40px;line-height:1;font-weight:900;letter-spacing:-.03em;color:var(--acc)}
+#moza-adv .mza-cijfer span{font-size:14px;font-weight:800;color:var(--mute)}
 #moza-adv .mza-noot{margin-top:18px;font-size:16px;line-height:1.5;color:var(--mute);max-width:70ch}
 /* stappen en contact */
 #moza-adv .mza-cta{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;align-items:center;padding:28px}
@@ -815,7 +818,7 @@ html.moza-dark #moza-adv{--bg:#12151F;--fg:#F1F1EC;--mute:#C9CBD3;--line:#F1F1EC
         '<ul class="mza-vormen">'+VORM.map(function(v){return '<li class="mza-vorm"><i class="mza-km" style="--c:'+v[0]+'" aria-hidden="true"></i><div><b>'+v[1]+'</b><span>'+v[2]+'</span></div></li>';}).join('')+'</ul></section>'+
       '<section class="mza-sec" aria-labelledby="mza-h4"><div class="mza-head"><div><span class="mza-lbl">Investering</span><h2 id="mza-h4">Wat kost het?</h2></div><p>Een advertorial is niet gratis. De prijs hangt af van twee dingen.</p></div>'+
         '<div class="mza-twee">'+
-          '<div class="mza-box"><span class="mza-tag y">Bereik</span><h3>Hoeveel mensen MOZA lezen</h3><p>We kijken naar het aantal keer dat onze pagina’s de afgelopen maand zijn bekeken. Vraag ons gerust naar de cijfers.</p></div>'+
+          '<div class="mza-box"><span class="mza-tag y">Bereik</span><h3>Hoeveel mensen MOZA lezen</h3><p class="mza-cijfer"><strong>bijna 4.000</strong><span>paginaweergaven in één week (begin november 2026)</span></p><p>We kijken naar het aantal keer dat onze pagina’s de afgelopen maand zijn bekeken. Vraag ons gerust naar de nieuwste cijfers.</p></div>'+
           '<div class="mza-box"><span class="mza-tag p">Werk</span><h3>Wat je zelf aanlevert</h3><p>Lever je zelf tekst en beeld aan? Dan is het goedkoper. Schrijft MOZA het stuk, met foto’s erbij? Dan is het duurder.</p></div>'+
         '</div></section>'+
       '<section class="mza-sec" aria-labelledby="mza-h5"><div class="mza-box y mza-cta"><div><span class="mza-lbl">Interesse?</span><h2 id="mza-h5">Zo werkt het</h2><p>Mail ons je idee. We denken graag met je mee.</p>'+
