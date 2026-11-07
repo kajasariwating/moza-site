@@ -189,7 +189,7 @@ button{font:inherit;color:inherit;cursor:pointer}
   </header>
 
   <section class="info" aria-live="polite">
-    <div class="modus"><span id="modusTekst">Woord nr. 1</span><button class="linkknop" id="knopOefen" type="button">Oefenen</button><button class="linkknop" id="knopDag" type="button" hidden>Naar woord van de dag</button></div>
+    <div class="modus"><span id="modusTekst">Woord nr. 1</span><button class="linkknop" id="knopOefen" type="button" hidden>Oefenen</button><button class="linkknop" id="knopDag" type="button" hidden>Naar woord van de dag</button></div>
     <div class="thema" id="thema">Thema: …</div>
   </section>
 
@@ -208,6 +208,7 @@ button{font:inherit;color:inherit;cursor:pointer}
     <h2 id="uitlegTitel">Zo <span class="accent">speel je</span></h2>
     <ul>
       <li>Raad het woord van de dag. Je hebt zes pogingen.</li>
+      <li>Je kunt het woord van de dag één keer spelen. Elke ochtend om 06:00 staat er een nieuw woord klaar.</li>
       <li>Het thema boven het raster helpt je op weg.</li>
       <li>Typ een woord met het goede aantal letters en druk op Enter. Het moet een bestaand Nederlands woord zijn, of een Maleis of Moluks woord.</li>
       <li>Na elke poging krijgen de vakjes een kleur.</li>
@@ -221,7 +222,7 @@ button{font:inherit;color:inherit;cursor:pointer}
       <div class="vak plek">A</div><p>Geel: de A zit in het woord maar op een andere plek.</p>
       <div class="vak mis">F</div><p>Grijs: de F zit niet in het woord.</p>
     </div>
-    <p class="klein">Elke dag staat er een nieuw woord klaar. Wil je meer spelen? Kies dan Oefenen. Oefenen telt niet mee voor je statistieken.</p>
+    <p class="klein">Je voortgang en statistieken worden bewaard op dit apparaat. Je hoeft niet in te loggen.</p>
     <p class="klein">Woordenlijst: OpenTaal (opentaal.org), CC BY.</p>
     <div class="knoppen"><button class="knop hoofd" type="button" data-sluit>Speel</button></div>
   </div>
@@ -233,7 +234,7 @@ button{font:inherit;color:inherit;cursor:pointer}
     <h2 id="statsTitel">Statistieken</h2>
     <div class="statsblok"></div>
     <div class="knoppen"><button class="knop" type="button" data-sluit>Sluiten</button></div>
-    <p class="eind-oefen"><button class="linkknop" type="button" id="knopReset">Begin opnieuw</button></p>
+    <p class="eind-oefen" id="resetRegel" hidden><button class="linkknop" type="button" id="knopReset">Begin opnieuw</button></p>
     <div class="reset-vraag" id="resetVraag" hidden>
       <p>Je statistieken en het woord van vandaag worden gewist. Weet je het zeker?</p>
       <div class="knoppen eind-knoppen"><button class="knop hoofd" type="button" id="resetJa">Ja, begin opnieuw</button><button class="knop" type="button" id="resetNee">Nee</button></div>
@@ -253,7 +254,7 @@ button{font:inherit;color:inherit;cursor:pointer}
       <button class="knop hoofd" type="button" id="knopDeel">Delen</button>
       <button class="knop" type="button" data-sluit>Afsluiten</button>
     </div>
-    <p class="eind-oefen"><button class="linkknop" type="button" id="knopNogEen">Of oefen met een ander woord</button></p>
+    <p class="eind-oefen" hidden><button class="linkknop" type="button" id="knopNogEen">Of oefen met een ander woord</button></p>
     <div class="deelbak" id="deelbak" hidden>
       <p class="klein">Kopiëren lukte niet. Selecteer de tekst hieronder en kopieer hem zelf.</p>
       <textarea id="deeltekst" readonly aria-label="Tekst om te delen"></textarea>
@@ -354,7 +355,7 @@ button{font:inherit;color:inherit;cursor:pointer}
   var VOLGORDE = maakVolgorde(WOORDEN, SEED);
 
   function dagNummer(){
-    var nu = new Date();
+    var nu = new Date(Date.now() - 6 * 3600000); /* een nieuw woord om 06:00 */
     var vandaag = Date.UTC(nu.getFullYear(), nu.getMonth(), nu.getDate());
     var start = Date.UTC(2026, 10, 7);
     return Math.floor((vandaag - start) / 86400000);
@@ -565,7 +566,7 @@ button{font:inherit;color:inherit;cursor:pointer}
     $("thema").textContent = "Thema: " + item.t;
     $("modusTekst").textContent = modus === "dag" ? "Woord nr. " + S.nr : "Oefenronde";
     $("knopDag").hidden = modus === "dag";
-    $("knopOefen").hidden = modus !== "dag";
+    $("knopOefen").hidden = true; /* geen oefenmodus: één keer per dag spelen */
     $("knopOefen").textContent = "Oefenen";
     bouwRaster();
     tekenHuidig(-1);
@@ -641,7 +642,8 @@ button{font:inherit;color:inherit;cursor:pointer}
   }
   var aftelTimer = null;
   function aftel(){
-    var nu = new Date(), morgen = new Date(nu.getFullYear(), nu.getMonth(), nu.getDate() + 1);
+    var nu = new Date(), morgen = new Date(nu.getFullYear(), nu.getMonth(), nu.getDate(), 6, 0, 0);
+    if (morgen <= nu) morgen = new Date(nu.getFullYear(), nu.getMonth(), nu.getDate() + 1, 6, 0, 0);
     var t = Math.max(0, Math.floor((morgen - nu) / 1000));
     var u = Math.floor(t / 3600), m = Math.floor(t % 3600 / 60), sec = t % 60;
     var el = $("aftel"); if (el) el.textContent = String(u).padStart(2,"0") + "u " + String(m).padStart(2,"0") + "m en " + String(sec).padStart(2,"0") + "s";
@@ -685,6 +687,7 @@ button{font:inherit;color:inherit;cursor:pointer}
   $("knopUitleg").addEventListener("click", function(){ toonVenster($("vensterUitleg")); });
   $("knopStats").addEventListener("click", toonStats);
 
+  try { if (/[?&]test=1/.test(location.search + (window.parent !== window ? window.parent.location.search : ""))) $("resetRegel").hidden = false; } catch (e){}
   $("knopReset").addEventListener("click", function(){ $("resetVraag").hidden = false; });
   $("resetNee").addEventListener("click", function(){ $("resetVraag").hidden = true; });
   $("resetJa").addEventListener("click", function(){
