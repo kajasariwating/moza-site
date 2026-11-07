@@ -19,6 +19,12 @@
     '.app{min-height:0!important}' +
     '.raster{--tile:min(58px, calc((100vw - 32px - (var(--cols) - 1) * var(--gap)) / var(--cols)), calc((var(--mz-ph,800px) - 330px) / 6))!important}';
 
+  /* Titel en intro staan al in het bericht zelf: in het spel verbergen. */
+  var DUBBEL = {
+    puzzel: 'header.kop,header.kop+p.intro{display:none!important}',
+    woord: '.kop .titel{display:none!important}.kop{justify-content:flex-end!important}'
+  };
+
   function start(el){
     if (el.getAttribute('data-geladen')) return;
     el.setAttribute('data-geladen', '1');
@@ -26,17 +32,17 @@
     if (!naam) return;
     el.innerHTML = '<p style="font-family:inherit;opacity:.7;padding:24px 0">Spel laden…</p>';
     fetch(BASE + naam + '.html').then(function(r){ if (!r.ok) throw new Error(r.status); return r.text(); })
-      .then(function(html){ bouw(el, html); })
+      .then(function(html){ bouw(el, html, naam); })
       .catch(function(){ el.innerHTML = '<p style="padding:24px 0">Het spel kon niet laden. Probeer het later nog eens.</p>'; });
   }
 
-  function bouw(el, html){
+  function bouw(el, html, naam){
     var f = document.createElement('iframe');
     f.title = 'MOZA spel';
     f.setAttribute('scrolling', 'no');
     f.style.cssText = 'display:block;width:100%;border:0;height:700px;overflow:hidden;background:transparent';
     f.srcdoc = '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
-      '<style>[hidden]{display:none!important}' + SHIM_CSS + '</style></head><body>' + html + '</body></html>';
+      '<style>[hidden]{display:none!important}' + SHIM_CSS + (DUBBEL[naam] || '') + '</style></head><body>' + html + '</body></html>';
     el.innerHTML = '';
     el.appendChild(f);
 
@@ -95,6 +101,10 @@
     var div = document.createElement('div');
     div.className = 'mz-spel'; div.setAttribute('data-spel', spel);
     div.style.cssText = 'margin:24px 0';
+    /* Leestijd heeft geen zin bij een spel */
+    var st = document.createElement('style'); st.id = 'mzsp-post-css';
+    st.textContent = '.blog-item-top-wrapper .moza-leestijd{display:none!important}';
+    document.head.appendChild(st);
     plek.appendChild(div);
   }
 
