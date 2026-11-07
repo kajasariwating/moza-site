@@ -160,7 +160,7 @@
     var css=function(n){return getComputedStyle(root).getPropertyValue(n).trim()};
     var isPhone=function(){return window.matchMedia('(max-width:760px)').matches};
     $('.mzt-load').remove();
-    function padFor(){return isPhone()?{paddingTopLeft:[16,60],paddingBottomRight:[16,40]}:{paddingTopLeft:[400,30],paddingBottomRight:[30,30]}}
+    function padFor(){return isPhone()?{paddingTopLeft:[16,60],paddingBottomRight:[16,40]}:{paddingTopLeft:[420,30],paddingBottomRight:[30,30]}}
 
     var map=L.map($('.mzt-map'),{zoomControl:false,attributionControl:false,minZoom:5,maxZoom:13,zoomSnap:.25,scrollWheelZoom:!isPhone(),maxBounds:[[-10,122],[4,138]],renderer:L.svg({padding:.5})});
     L.control.zoom({position:'topright',zoomInTitle:'Inzoomen',zoomOutTitle:'Uitzoomen'}).addTo(map);
@@ -177,7 +177,7 @@
     var land=L.featureGroup().addTo(map);
     LAND.l.forEach(function(s){L.polygon(dec(s,1e4),{interactive:false}).addTo(land)});
     function styleLand(){land.setStyle({fillColor:css('--land'),fillOpacity:1,color:css('--edge'),weight:1.4,opacity:1})}
-    [['LAUT BANDA',-5.6,127.6],['LAUT SERAM',-2.35,128.9],['LAUT MALUKU',0.9,125.7],['LAUT HALMAHERA',-0.35,129.4],['LAUT ARAFURA',-7.9,134.2],['SAMUDRA PASIFIK',2.9,130.2]].forEach(function(a){
+    [['LAUT BANDA',-5.6,127.6],['LAUT SERAM',-1.95,129.9],['LAUT MALUKU',2.1,125.6],['LAUT HALMAHERA',-0.35,129.4],['LAUT ARAFURA',-7.9,134.2],['SAMUDRA PASIFIK',2.9,130.2]].forEach(function(a){
       L.marker([a[1],a[2]],{interactive:false,keyboard:false,icon:L.divIcon({className:'',html:'<div class="seal">'+a[0]+'</div>',iconSize:[0,0]})}).addTo(map)});
 
     var talen=T.t.map(function(r){return {id:r[0],n:r[1],g:r[2],s:r[3],la:r[4],lo:r[5],iso:r[6],med:r[7],fam:r[8],dia:r[9],rel:r[10]}});
