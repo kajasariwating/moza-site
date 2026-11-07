@@ -109,8 +109,8 @@
    '<section><h3 class="mzt-t">Hoe levend is de taal?</h3><div class="mzt-tstat"></div><p class="mzt-hint">Hoe meer de stip gevuld is, hoe meer mensen de taal nog spreken.</p></section>'+
    '<section><h3 class="mzt-t">Taalgroep</h3><div class="mzt-groups"></div><p class="mzt-hint">Klik op een groep om die aan of uit te zetten. Maleis is een omgangstaal en heeft een vierkantje.</p></section>'+
    '<section class="mzt-uitleg"><h3 class="mzt-t">Wat is bahasa tanah?</h3>'+
-    '<p>Bahasa tanah betekent letterlijk taal van het land. Zo noemen Molukkers hun eigen talen, naast het Maleis dat iedereen spreekt.</p>'+
-    '<p>Er is niet één bahasa tanah. Het is geen oude oertaal die vroeger overal op de Molukken werd gesproken. Het is een verzamelnaam voor al die verschillende talen en dialecten op deze kaart. Soms spreekt het ene dorp een andere taal dan het dorp ernaast.</p>'+
+    '<p>Bahasa tanah betekent letterlijk taal van het land of oertaal. Zo noemen Molukkers hun eigen talen, naast het Maleis dat iedereen spreekt.</p>'+
+    '<p>Toch is er niet één bahasa tanah. Het is geen taal die vroeger overal op de Molukken werd gesproken. Het is een verzamelnaam voor al die verschillende talen en dialecten op deze kaart. Soms spreekt het ene dorp een andere taal dan het dorp ernaast.</p>'+
     '<p>De meeste van deze talen zijn wel familie van elkaar, net zoals Nederlands en Duits familie zijn. Ze horen bij de Austronesische taalfamilie, net als het Maleis. De talen van Noord-Halmahera horen bij een andere familie.</p>'+
    '</section>'+
    '<section class="mzt-uitleg"><h3 class="mzt-t">Wist je dat</h3><ul>'+
