@@ -1,4 +1,4 @@
-/* MOZA – Talen van Maluku: kaart van de eigen talen van de Molukken.
+/* MOZA – Talen van de Molukken: kaart van de eigen talen van de Molukken (pagina /kaarten/talen-molukken).
    Gegevens: Glottolog 5.3 (CC BY 4.0), glottolog-cldf commit d4d7a2f. Kustlijn afgeleid van wilayah_boundaries (MIT).
    - talen.json: per taal [glottocode, naam, groep, status 0-4, lat, lon, iso, beschrijving, familie, dialecten, verwante talen]
    - land.json: vereenvoudigde kustlijn (polyline)
@@ -77,6 +77,7 @@
   '#mzt .leaflet-control-attribution{display:none}',
   '#mzt .seal{font:italic 600 15px var(--fa);color:rgba(255,255,255,.55);white-space:nowrap;pointer-events:none;letter-spacing:.18em;transform:translate(-50%,-50%)}',
   '#mzt .tm{position:relative}',
+  '#mzt.mzt-klein .tm .tp{transform:scale(.62)}#mzt.mzt-klein .tm.sel .tp,#mzt.mzt-klein .tm.rel .tp{transform:none}',
   '#mzt .tm .tp{position:absolute;left:-9px;top:-9px;display:block;cursor:pointer}',
   '#mzt .tm.sel .tp{left:-12px;top:-12px;padding:3px;border:3px solid #111;border-radius:50%;background:#fff}',
   '#mzt .tm .tl{position:absolute;left:10px;top:-7px;white-space:nowrap;font:800 12px/14px var(--f);color:var(--lab);display:none;pointer-events:none;text-shadow:0 0 2px var(--halo),0 0 2px var(--halo),0 0 3px var(--halo),0 0 4px var(--halo),1px 1px 0 var(--halo),-1px -1px 0 var(--halo),1px -1px 0 var(--halo),-1px 1px 0 var(--halo)}',
@@ -100,7 +101,7 @@
   '<div class="mzt-map" role="application" aria-label="Kaart van de talen van de Molukken"><div class="mzt-load">Kaart laden…</div></div>'+
   '<svg class="mzt-cmp" viewBox="0 0 46 58" aria-hidden="true"><rect x="1.5" y="1.5" width="43" height="55" fill="#fff" stroke="#111" stroke-width="3"/><text x="23" y="17" text-anchor="middle" font-family="Hanken Grotesk, sans-serif" font-weight="900" font-size="13" fill="#111">N</text><path d="M23 22 L31 48 L23 42 L15 48 Z" fill="#111"/><path d="M23 22 L23 42 L15 48 Z" fill="#E9F25A" stroke="#111" stroke-width="1.5"/></svg>'+
   '<aside class="mzt-panel" aria-label="Kaartinformatie"><div class="mzt-scroll">'+
-   '<div><div class="mzt-eb">MOZA · Kaart</div><h2 class="mzt-h">De talen van <em>Maluku</em></h2>'+
+   '<div><div class="mzt-eb">MOZA · Kaart</div><h2 class="mzt-h">Talen van de <em>Molukken</em></h2>'+
    '<p class="mzt-lead">Op de Molukken spreken mensen meer dan honderd eigen talen, met nog veel meer dialecten. Veel daarvan worden steeds minder doorgegeven.</p></div>'+
    '<div class="mzt-stats"><div><b data-t="tot">–</b><span>talen</span></div><div><b data-t="gevaar">–</b><span>in gevaar</span></div><div><b data-t="weg">–</b><span>verdwenen</span></div></div>'+
    '<div><label class="mzt-lbl" for="mzt-q">Zoek een taal of dialect</label><input id="mzt-q" class="mzt-q" type="search" autocomplete="off" placeholder="Bijv. Haruku, Tobelo, Kei"><ul class="mzt-res" hidden></ul></div>'+
@@ -150,7 +151,7 @@
     var st=document.createElement('style');st.id='mzt-css';st.textContent=CSS;document.head.appendChild(st);
     inlAll(root);new MutationObserver(function(ms){ms.forEach(function(m){[].forEach.call(m.addedNodes,inlAll)})}).observe(root,{childList:true,subtree:true});
     var T=null,LAND=null,ready=0;function go(){if(++ready===3)build(root,T,LAND)}
-    function fail(e){if(window.console)console.error('MOZA Talen van Maluku',e);var el=root.querySelector('.mzt-load');if(el)el.textContent='De kaart kon niet laden. Probeer het later opnieuw.'}
+    function fail(e){if(window.console)console.error('MOZA Talen van de Molukken',e);var el=root.querySelector('.mzt-load');if(el)el.textContent='De kaart kon niet laden. Probeer het later opnieuw.'}
     loadLeaflet(go);
     fetch(BASE+'talen.json').then(function(r){if(!r.ok)throw r.status;return r.json()}).then(function(j){T=j;go()}).catch(fail);
     fetch(BASE+'land.json').then(function(r){if(!r.ok)throw r.status;return r.json()}).then(function(j){LAND=j;go()}).catch(fail);
@@ -204,6 +205,7 @@
     var _cv=document.createElement('canvas').getContext('2d'),_tw={};
     function textW(s,big){var k=(big?'B':'')+s;if(_tw[k])return _tw[k];_cv.font=(big?'800 13px ':'800 12px ')+'"Hanken Grotesk",system-ui,sans-serif';return _tw[k]=Math.ceil(_cv.measureText(s).width)}
     function place(){
+      root.classList.toggle('mzt-klein',map.getZoom()<6);
       var z=map.getZoom(),boxes=[],POS=['r','l','t','b'],ov=function(a,o){return !(a[2]<o[0]||a[0]>o[2]||a[3]<o[1]||a[1]>o[3])};
       var vb=map.getBounds().pad(.1),inV=talen.filter(function(t){return tLayer.hasLayer(t._m)&&vb.contains([t.la,t.lo])});
       var relSet={};if(sel)sel.rel.forEach(function(id){relSet[id]=1});

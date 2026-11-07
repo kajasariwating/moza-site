@@ -1,7 +1,7 @@
 /* MOZA – filters op de overzichtspagina /kaarten.
    Draait naast mzk-js (de pagina-injectie van Kaarten), die de tegels bouwt uit MZK.kaarten.
    Het thema per kaart staat in MZK.kaarten (veld th) in bron/header.html.
-   Ook: een eigen plaatje voor de tegel van Talen van Maluku.
+   Ook: een eigen plaatje voor de tegel van Talen van de Molukken.
    Gebruik in de pagina-injectie van /kaarten:
    <script id="mzk-filter-js" src="https://cdn.jsdelivr.net/gh/kajasariwating/moza-site@COMMIT/kaarten/overzicht/filters.js" defer></script> */
 (function(){
@@ -68,7 +68,7 @@
 
     var byU={};MZK.kaarten.forEach(function(k){byU[k.u]=k});
     var cards=[].slice.call(grid.querySelectorAll('a.k-card')).map(function(a){var k=byU[a.getAttribute('href')]||{};
-      if(k.u==='/kaarten/talen-maluku'){var m=a.querySelector('.k-map svg');if(m)m.outerHTML=TALEN_ART}
+      if(k.u==='/kaarten/talen-molukken'){var m=a.querySelector('.k-map svg');if(m)m.outerHTML=TALEN_ART}
       return {el:a,th:k.th||'',live:!!k.live}});
     function count(th,so){return cards.filter(function(c){return (!th||c.th===th)&&(so==='alle'||(so==='live')===c.live)}).length}
 
