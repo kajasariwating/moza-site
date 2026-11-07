@@ -2376,6 +2376,27 @@ html.moza-dark #moza-lz summary,html.moza-dark #moza-lz .lz-search,html.moza-dar
 html.moza-dark #moza-lz details[open] summary,html.moza-dark #moza-lz .mzs button[aria-pressed="true"]{background:#E9F25A;color:#111}
 html.moza-dark #moza-lz .kb-menu{background:#1E2029;color:#ECECF1;border-color:#ECECF1;box-shadow:6px 6px 0 #E9F25A}
 html.moza-dark #moza-lz .kb-menu label:hover{background:#2A2D38}
+#moza-lz .lzq{max-width:1240px;margin:0 auto;box-sizing:border-box;padding:24px 48px 0}
+#moza-lz .lzq-l{display:block;font:800 12px/1 "Hanken Grotesk",system-ui,sans-serif;letter-spacing:.12em;margin:0 0 10px}
+#moza-lz .lzq-row{display:flex;gap:8px;flex-wrap:wrap}
+#moza-lz .lzq-row button{font:800 15px/1.1 "Hanken Grotesk",system-ui,sans-serif;min-height:44px;padding:10px 16px;border:3px solid #111;background:#fff;color:#111;cursor:pointer}
+#moza-lz .lzq-row button:hover{background:#E9F25A}
+#moza-lz .lzq-row button[aria-pressed="true"]{background:#111;color:#E9F25A}
+#moza-lz .lzq-rub{margin-top:14px;border:3px solid #111;background:#F4F2EC;color:#111;padding:16px}
+#moza-lz .lzq-rub p{margin:0 0 12px;font-size:15px;line-height:1.4}
+#moza-lz .lzq-rub p b{font-size:20px;font-weight:900;margin-right:10px}
+#moza-lz .lzq-rr{display:flex;gap:8px;flex-wrap:wrap}
+#moza-lz .lzq-rr button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-height:44px;padding:8px 12px;border:2px solid #111;cursor:pointer;font-family:"Hanken Grotesk",system-ui,sans-serif;text-align:left}
+#moza-lz .lzq-rr button span{font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+#moza-lz .lzq-rr button i{font-style:normal;font-size:12px;font-weight:400}
+#moza-lz .lzq-rr button[aria-pressed="true"]{box-shadow:5px 5px 0 #111;transform:translate(-2px,-2px)}
+#moza-lz .lzq-mf{align-self:center;font-size:13px;font-weight:800}
+#moza-lz .lz-cat.lz-rubl{display:inline-block;align-self:flex-start;padding:3px 7px;border:2px solid #111;letter-spacing:.1em}
+html.moza-dark #moza-lz .lzq-row button{background:#1E2029;color:#ECECF1;border-color:#ECECF1}
+html.moza-dark #moza-lz .lzq-row button[aria-pressed="true"]{background:#E9F25A;color:#111;border-color:#E9F25A}
+html.moza-dark #moza-lz .lzq-rub{background:#1E2029;color:#ECECF1;border-color:#ECECF1}
+html.moza-dark #moza-lz .lzq-rr button{border-color:#ECECF1}
+@media (max-width:700px){#moza-lz .lzq{padding:18px 16px 0}#moza-lz .lzq-row{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:4px}#moza-lz .lzq-row::-webkit-scrollbar{display:none}#moza-lz .lzq-row button{flex:0 0 auto}}
 html.moza-dark #moza-lz .lzx-count,html.moza-dark #moza-lz .mzs span{color:#C9CBD3}
 @media (max-width:640px){
 #moza-lz div.lz-grid{grid-template-columns:1fr;padding:20px 20px 32px}
@@ -2402,6 +2423,12 @@ var G=[
  {k:'waar',l:'Waar',o:[['nl','Nederland',null],['maluku','Molukken',['maluku','ambon']],['wereld','Elders in de wereld',['buitenland','west-papoea','argentinie']]]}
 ];
 var MONTHS=MZ.MAANDEN;
+var RUB=[['dit weekend','Dit weekend','vrijdag','#1F3BD1','#fff'],['kaart van de week','Kaart van de week','maandag','#FF4D2E','#111'],['leeswijzer','Leeswijzer','woensdag','#FF7AB6','#111'],['woord van de week','Woord van de week','donderdag','#E9F25A','#111'],['deze week toen','Deze week toen','zaterdag','#111','#E9F25A'],['moza deze maand','MOZA deze maand','1e van de maand','#fff','#111'],['jullie zeiden','Jullie zeiden','na een peiling','#C9D3FF','#111'],['achter de foto','Achter de foto','op themadagen','#EDDCB8','#111']];
+function gopt(g,k){var x=G.filter(function(y){return y.k===g})[0];return x.o.filter(function(o){return o[0]===k})[0]}
+var QK=[['alles','Alles',null],['rubrieken','Rubrieken','R'],['politiek','Politiek',['thema','politiek']],['maluku','Maluku',['waar','maluku']],['erkenning','Erkenning',['thema','erkenning']],['geschiedenis','Geschiedenis',['thema','geschiedenis']],['cultuur','Cultuur',['thema','cultuur']],['gemeenschap','Gemeenschap',['thema','gemeenschap']],['opinie','Opinie',['soort','opinie']]];
+var qk='alles',rk='';
+function rubOf(i){if(i._t.indexOf('rubriek')===-1)return null;for(var r=0;r<RUB.length;r++)if(i._t.indexOf(RUB[r][0])!==-1)return RUB[r];return null}
+function qhit(i){if(qk==='alles')return true;var d=QK.filter(function(x){return x[0]===qk})[0];if(!d)return true;if(d[2]==='R')return i._t.indexOf('rubriek')!==-1;return hit(i,gopt(d[2][0],d[2][1]))}
 var items=[],sel={},extra='',q='',shown=PAGE,mode='new',views=null;
 try{mode=sessionStorage.getItem('mzlzsort')||'new'}catch(e){}
 function esc(s){return MZ.esc(s)}
@@ -2417,19 +2444,23 @@ function hit(i,o){return o[2]?has(i,o[2]):!(has(i,MAL)||has(i,WER))}
 function list(){var l=items.filter(function(i){
   for(var g=0;g<G.length;g++){var on=sel[G[g].k];if(on&&on.length&&!G[g].o.some(function(o){return on.indexOf(o[0])!==-1&&hit(i,o)}))return false}
   if(extra&&i._t.indexOf(extra)===-1)return false;
+  if(!qhit(i))return false;if(rk&&i._t.indexOf(rk)===-1)return false;
   if(q&&i._s.indexOf(q)===-1)return false;return true});
  if(mode==='views'&&views){l=l.map(function(i,k){return[i,k]}).sort(function(a,b){return(views[path(b[0].fullUrl)]||0)-(views[path(a[0].fullUrl)]||0)||a[1]-b[1]}).map(function(x){return x[0]})}
  return l}
-function filtered(){if(extra||q)return true;for(var k in sel)if(sel[k]&&sel[k].length)return true;return false}
+function filtered(){if(extra||q||rk||qk!=='alles')return true;for(var k in sel)if(sel[k]&&sel[k].length)return true;return false}
 window.mzLS=function(cur,mini){var n=document.createElement('nav');n.id='mz-ks';n.className='mz-ls'+(mini?' ks-mini':'');n.setAttribute('aria-label','Soorten nieuws');
  n.innerHTML='<span class="ks-l">Lezen bij MOZA</span><div class="ks-row">'+T.map(function(x){var on=x.u===cur;return '<a class="ks-t '+x.c+(on?' cur':'')+'" href="'+x.u+'"'+(on&&!mini?' aria-current="page"':'')+'><span class="ks-k">'+x.k+'</span><b>'+x.t+'</b><span class="ks-d">'+x.d+'</span></a>'}).join('')+'</div>';
  n.addEventListener('click',function(e){var a=e.target.closest('a');if(!a)return;if(a.hasAttribute('aria-current')){e.preventDefault();return}try{if(window.goatcounter&&goatcounter.count)goatcounter.count({path:'lezen-switch'+a.getAttribute('href'),event:true})}catch(x){}});
  return n};
 function render(){var el=document.getElementById('moza-lz');if(!el||!el.__mz2)return;
  var l=list(),top=!filtered()&&mode==='new';
- el.querySelector('.lzx-n').textContent=(items.length?l.length+(l.length===1?' artikel':' artikelen'):'Artikelen laden\u2026');
+ var rb=rk?RUB.filter(function(r){return r[0]===rk})[0]:null;el.querySelector('.lzx-n').textContent=(items.length?(rb?rb[1]+' \u00b7 ':qk==='rubrieken'?'Rubrieken \u00b7 ':'')+l.length+(qk==='rubrieken'||rk?(l.length===1?' stuk':' stukken'):(l.length===1?' artikel':' artikelen')):'Artikelen laden\u2026');
+ [].forEach.call(el.querySelectorAll('.lzq-row button'),function(b){b.setAttribute('aria-pressed',b.getAttribute('data-q')===qk?'true':'false')});
+ [].forEach.call(el.querySelectorAll('.lzq-rr button'),function(b){b.setAttribute('aria-pressed',b.getAttribute('data-r')===rk?'true':'false')});
+ var rbox=el.querySelector('.lzq-rub');if(rbox)rbox.style.display=qk==='rubrieken'?'':'none';
  el.querySelector('.lz-grid').innerHTML=l.slice(0,shown).map(function(i,k){var t=k===0&&top;var ex=t?strip(i.excerpt):'';if(ex.length>260)ex=ex.slice(0,257)+'\u2026';
-  return '<a class="lz-card'+(t?' is-top':'')+'" href="'+esc(i.fullUrl)+'"><span class="lz-cat">'+esc(cap((i.categories||[])[0]||'Lezen'))+'</span><span class="lz-title">'+esc(i.title)+'</span>'+(ex?'<span class="lz-ex">'+esc(ex)+'</span>':'')+'<span class="lz-date">'+date(i.publishOn||i.addedOn)+'</span></a>'}).join('')||(items.length?'<p style="font-size:20px">Geen artikelen gevonden. Probeer minder filters.</p>':'');
+  return '<a class="lz-card'+(t?' is-top':'')+'" href="'+esc(i.fullUrl)+'">'+(function(){var r=rubOf(i);return r?'<span class="lz-cat lz-rubl" style="background:'+r[3]+';color:'+r[4]+'">'+esc(r[1])+'</span>':'<span class="lz-cat">'+esc(cap((i.categories||[])[0]||'Lezen'))+'</span>'})()+'<span class="lz-title">'+esc(i.title)+'</span>'+(ex?'<span class="lz-ex">'+esc(ex)+'</span>':'')+'<span class="lz-date">'+date(i.publishOn||i.addedOn)+'</span></a>'}).join('')||(items.length?'<p style="font-size:20px">Geen artikelen gevonden. Probeer minder filters.</p>':'');
  el.querySelector('.lz-more').style.display=l.length>shown?'':'none';
  G.forEach(function(g){var n=el.querySelector('.kb-n[data-n="'+g.k+'"]'),c=(sel[g.k]||[]).length;if(n){n.textContent=c;n.style.display=c?'':'none'}});
  var pill=el.querySelector('.lzx-pill');pill.style.display=extra?'':'none';if(extra)pill.firstChild.textContent=cap(extra)+' ';
@@ -2447,7 +2478,9 @@ function build(){
  document.documentElement.classList.add('moza-lezen-list');
  var el=document.createElement('div');el.id='moza-lz';el.__mz2=true;
  el.innerHTML='<section class="lz-hero"><span class="lz-label">Nieuws, achtergrond en opinie</span><h1 class="lz-echo">Lezen</h1><span class="lz-serif">wat er speelt in de gemeenschap</span><p class="lz-intro">Het laatste nieuws over Molukkers in Nederland en de Molukken, met achtergrond en verdieping van de redactie.</p></section>'+
-  '<div class="lz-tools">'+G.map(function(g){return '<details data-k="'+g.k+'"><summary>'+g.l+' <span class="kb-n" data-n="'+g.k+'" style="display:none"></span></summary><div class="kb-menu">'+g.o.map(function(o){return '<label><input type="checkbox" value="'+o[0]+'">'+esc(o[1])+'</label>'}).join('')+'</div></details>'}).join('')+
+  '<div class="lzq"><span class="lzq-l">Snel naar</span><div class="lzq-row" role="group" aria-label="Snel naar">'+QK.map(function(x){return '<button type="button" data-q="'+x[0]+'" aria-pressed="'+(x[0]==='alles')+'">'+esc(x[1])+'</button>'}).join('')+'</div>'+
+  '<div class="lzq-rub" style="display:none"><p><b>Rubrieken</b>Elke dag een vaste rubriek. Kies er een, of bekijk ze allemaal.</p><div class="lzq-rr" role="group" aria-label="Rubrieken">'+RUB.map(function(r){return '<button type="button" data-r="'+r[0]+'" aria-pressed="false" style="background:'+r[3]+';color:'+r[4]+'"><span>'+esc(r[1])+'</span><i>'+esc(r[2])+'</i></button>'}).join('')+'</div></div></div>'+
+  '<div class="lz-tools"><span class="lzq-mf">Meer filters</span>'+G.map(function(g){return '<details data-k="'+g.k+'"><summary>'+g.l+' <span class="kb-n" data-n="'+g.k+'" style="display:none"></span></summary><div class="kb-menu">'+g.o.map(function(o){return '<label><input type="checkbox" value="'+o[0]+'">'+esc(o[1])+'</label>'}).join('')+'</div></details>'}).join('')+
   '<input class="lz-search" type="search" placeholder="Zoek in Lezen" aria-label="Zoek in Lezen"><button type="button" class="lzx-reset" style="display:none">Wis filters</button></div>'+
   '<div class="lzx-count"><span class="lzx-n">Artikelen laden\u2026</span><span class="mzs" role="group" aria-label="Sorteren"><span>Sorteer</span><button type="button" data-m="views" style="display:none">Meest gelezen</button><button type="button" data-m="new">Nieuwste</button></span><span class="lzx-pill" style="display:none">x<button type="button" aria-label="Filter weghalen">\u2715</button></span></div>'+
   '<div class="lz-grid"></div><button class="lz-more" type="button" style="display:none">Meer artikelen</button>';
@@ -2455,9 +2488,11 @@ function build(){
  el.querySelector('.lz-hero').insertAdjacentElement('afterend',mzLS('/lezen',false));
  el.addEventListener('change',function(e){var d=e.target.closest('details');if(!d||e.target.type!=='checkbox')return;sel[d.getAttribute('data-k')]=[].map.call(d.querySelectorAll('input:checked'),function(x){return x.value});shown=PAGE;render()});
  el.addEventListener('click',function(e){
+  var qb=e.target.closest('.lzq-row button');if(qb){qk=qb.getAttribute('data-q');rk='';shown=PAGE;try{if(window.goatcounter&&goatcounter.count)goatcounter.count({path:'lezen-snel/'+qk,event:true})}catch(x){}render();return}
+  var rbt=e.target.closest('.lzq-rr button');if(rbt){var v=rbt.getAttribute('data-r');rk=rk===v?'':v;qk='rubrieken';shown=PAGE;render();return}
   var c=e.target.closest('.lz-chip');if(c){extra=norm(c.getAttribute('data-c'));shown=PAGE;render();return}
   if(e.target.closest('.lzx-pill button')){extra='';shown=PAGE;try{history.replaceState(null,'',location.pathname)}catch(x){}render();return}
-  if(e.target.closest('.lzx-reset')){sel={};extra='';q='';el.querySelector('.lz-search').value='';[].forEach.call(el.querySelectorAll('.kb-menu input'),function(x){x.checked=false});shown=PAGE;try{history.replaceState(null,'',location.pathname)}catch(x){}render();return}
+  if(e.target.closest('.lzx-reset')){sel={};extra='';q='';qk='alles';rk='';el.querySelector('.lz-search').value='';[].forEach.call(el.querySelectorAll('.kb-menu input'),function(x){x.checked=false});shown=PAGE;try{history.replaceState(null,'',location.pathname)}catch(x){}render();return}
   var b=e.target.closest('.mzs button');if(b){mode=b.getAttribute('data-m');try{sessionStorage.setItem('mzlzsort',mode)}catch(x){}render();return}
   if(e.target.closest('.lz-more')){shown+=PAGE;render()}});
  document.addEventListener('click',function(e){[].forEach.call(el.querySelectorAll('details[open]'),function(d){if(!d.contains(e.target))d.removeAttribute('open')})});
