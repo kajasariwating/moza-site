@@ -94,6 +94,13 @@
   '#mzt .mzt-panel{position:relative;top:auto;left:auto;bottom:auto;width:auto;border:0;box-shadow:none}',
   '#mzt .mzt-scroll{overflow:visible;padding:18px 16px 16px}#mzt .mzt-foot{padding:10px 16px 14px}',
   '#mzt .mzt-ro{display:none}#mzt .mzt-cmp{top:12px;right:12px;width:38px;height:48px}#mzt .leaflet-top.leaflet-right{top:64px}#mzt h2.mzt-h{font-size:28px}}',
+  '#mzt .mzt-2v{position:absolute;left:50%;top:50%;z-index:1001;transform:translate(-50%,-50%);max-width:calc(100% - 48px);padding:10px 14px;background:#111;color:#E9F25A;border:3px solid #111;box-shadow:4px 4px 0 #FF7AB6;font:800 15px/1.3 var(--f);text-align:center;pointer-events:none;opacity:0;transition:opacity .2s}',
+  '#mzt .mzt-2v.on{opacity:1}',
+  '#mzt .mzt-gnote{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:10px 0 0;padding:10px 12px;border:2px solid var(--line);background:var(--card,transparent);font-size:14px;font-weight:600}',
+  '#mzt .mzt-gnote[hidden]{display:none}',
+  '#mzt .mzt-gnote button{min-height:40px;padding:0 12px;border:2px solid var(--line);background:none;color:var(--fg);font:800 14px var(--f);cursor:pointer;border-radius:0}',
+  '#mzt .mzt-gnote .mzt-naar{background:#E9F25A;color:#111;border-color:#111}',
+  '#mzt .mzkt-fs.leaflet-control{position:relative;bottom:auto;right:auto;margin:0 12px 10px 0}',
   '#mzm .mapw #mzt{margin:0;border:0}#mzm .mapw #moza-kaart{display:block}',
   '@media (prefers-reduced-motion:reduce){#mzt *{transition:none!important;animation:none!important}}'
   ].join('\n');
@@ -106,8 +113,8 @@
    '<div><label class="mzt-lbl" for="mzt-q">Zoek een taal of dialect</label><input id="mzt-q" class="mzt-q" type="search" autocomplete="off" placeholder="Bijv. Haruku, Tobelo, Kei"><ul class="mzt-res" hidden></ul></div>'+
    '<article class="mzt-card" hidden aria-live="polite"></article>'+
    '<section><h3 class="mzt-t">Hoe levend is de taal?</h3><div class="mzt-tstat"></div><p class="mzt-hint">Hoe meer de stip gevuld is, hoe meer mensen de taal nog spreken.</p></section>'+
-   '<section><h3 class="mzt-t">Taalgroep</h3><div class="mzt-groups"></div><p class="mzt-hint">Klik op een groep om die aan of uit te zetten. Maleis is een omgangstaal en heeft een vierkantje.</p></section>'+
-  '</div><div class="mzt-foot">Elke taal is één stip. Dialecten van dezelfde taal vallen eronder. Een stip is het midden van het taalgebied, geen grens. Bron: <a href="https://glottolog.org" target="_blank" rel="noopener">Glottolog 5.3</a> (CC BY 4.0). Bron: Glottolog 5.3 (CC BY 4.0).</div></aside>'+
+   '<section><h3 class="mzt-t">Taalgroep</h3><div class="mzt-groups"></div><p class="mzt-hint"><span class="mzt-kt">Klik</span> op een groep om die aan of uit te zetten. Maleis is een omgangstaal en heeft een vierkantje.</p><div class="mzt-gnote" hidden aria-live="polite"></div></section>'+
+  '</div><div class="mzt-foot">Elke taal is één stip. Dialecten van dezelfde taal vallen eronder. Een stip is het midden van het taalgebied, geen grens. Bron: Glottolog 5.3 (CC BY 4.0).</div></aside>'+
   '<div class="mzt-ro">Beweeg over de kaart</div>';
 
 
@@ -208,7 +215,14 @@
     var gwrap=$('.mzt-groups');
     function renderGroups(){gwrap.innerHTML='';Object.keys(TG).forEach(function(g){var b=document.createElement('button');b.type='button';b.className='mzt-grp';b.setAttribute('aria-pressed',visible[g]);
       b.innerHTML='<span class="tp">'+pie(g,0,7)+'</span><span>'+TG[g]+'</span><b>'+(cg[g]||0)+'</b>';
-      b.onclick=function(){visible[g]=!visible[g];renderGroups();applyVisibility()};gwrap.appendChild(b)})}
+      b.onclick=function(){visible[g]=!visible[g];renderGroups();applyVisibility();gnote(g)};gwrap.appendChild(b)})}
+    var gn=$('.mzt-gnote');if(isPhone()&&$('.mzt-kt'))$('.mzt-kt').textContent='Tik';
+    function gnote(g){if(!isPhone()){gn.hidden=true;return}
+      var uit=Object.keys(TG).filter(function(k){return !visible[k]}),n=talen.filter(function(t){return visible[t.g]}).length;
+      gn.innerHTML='<span>'+esc(TG[g])+' staat nu '+(visible[g]?'aan':'uit')+'. '+n+' talen op de kaart.</span><button type="button" class="mzt-naar">Bekijk op de kaart ↑</button>'+(uit.length?'<button type="button" class="mzt-alles">Alles aan</button>':'');
+      gn.hidden=false;
+      gn.querySelector('.mzt-naar').onclick=function(){$('.mzt-map').scrollIntoView({behavior:'smooth',block:'center'})};
+      var a=gn.querySelector('.mzt-alles');if(a)a.onclick=function(){Object.keys(TG).forEach(function(k){visible[k]=true});renderGroups();applyVisibility();gn.hidden=true}}
     function applyVisibility(){talen.forEach(function(t){var on=visible[t.g]||sel===t;if(on&&!tLayer.hasLayer(t._m))tLayer.addLayer(t._m);if(!on&&tLayer.hasLayer(t._m))tLayer.removeLayer(t._m)});place()}
     renderGroups();
 
@@ -231,6 +245,21 @@
           if(isS||!boxes.some(function(o){return ov(pad,o)})){pick=POS[i];break}}
         if(!pick)return;boxes.push(cand[pick]);el.firstChild.classList.add('show',pick);if(!isS&&!isR)t._m.setZIndexOffset(500)})}
     map.on('moveend',place);
+
+    /* Telefoon en tablet: met één vinger scroll je de pagina, met twee vingers beweeg je de kaart. In volledig scherm werkt één vinger wel. */
+    if(L.Browser.touch&&window.matchMedia('(pointer:coarse)').matches){
+      var mc=$('.mzt-map'),hint=document.createElement('div'),ht;hint.className='mzt-2v';hint.setAttribute('aria-hidden','true');hint.textContent='Gebruik twee vingers om de kaart te bewegen';mc.appendChild(hint);
+      var vol=function(){return !!root.closest('.mzkt-vol')};
+      var zet=function(){if(vol())map.dragging.enable();else map.dragging.disable()};zet();
+      var mainEl=root.closest('.main');if(mainEl)try{new MutationObserver(zet).observe(mainEl,{attributes:true,attributeFilter:['class']})}catch(e){}
+      mc.addEventListener('touchmove',function(e){if(vol())return;if(e.touches.length===1){hint.classList.add('on');clearTimeout(ht);ht=setTimeout(function(){hint.classList.remove('on')},1500)}else hint.classList.remove('on')},{passive:true});
+      mc.addEventListener('touchend',function(e){if(!e.touches.length){clearTimeout(ht);ht=setTimeout(function(){hint.classList.remove('on')},700)}},{passive:true});
+    }
+
+    /* De knop Volledig scherm (van mzkt-js) hoort in de hoek van de kaart, niet over het paneel. */
+    (function fsMove(n){var fb=root.closest('.mapw')&&root.closest('.mapw').querySelector(':scope>.mzkt-fs'),hk=mc2().querySelector('.leaflet-bottom.leaflet-right');
+      if(fb&&hk){fb.classList.add('leaflet-control');hk.insertBefore(fb,hk.firstChild);return}if(n<40)setTimeout(function(){fsMove(n+1)},250)})(0);
+    function mc2(){return $('.mzt-map')}
 
     function dms(v,pos,neg){var a=Math.abs(v),d=Math.floor(a),mf=(a-d)*60,m=Math.floor(mf),s=Math.round((mf-m)*60);if(s===60)s=59;return d+'°'+(m<10?'0':'')+m+'′'+(s<10?'0':'')+s+'″ '+(v<0?neg:pos)}
     map.on('mousemove',function(e){var t=e.originalEvent.target;if(t.closest&&t.closest('.tm'))return;ro.textContent=dms(e.latlng.lat,'NB','ZB')+'  '+dms(e.latlng.lng,'OL','WL')});
