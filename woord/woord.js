@@ -7,20 +7,20 @@ var SRC=(document.currentScript&&document.currentScript.src)||'';
 var BASE=SRC?SRC.replace(/woord\.js(\?.*)?$/,'audio/'):'https://cdn.jsdelivr.net/gh/kajasariwating/moza-site@main/woord/audio/';
 var ZONDAG=['selamat hari minggu','fijne zondag','selamat-hari-minggu'];
 var W=[
- ['pulang','naar huis gaan, teruggaan','pulang'],
+ ['pulang',"'Naar huis gaan': terugkeren naar de Molukken, tijdelijk of voorgoed.",'pulang'],
  ['jemput','iemand ophalen, bijvoorbeeld van het vliegveld','jemput'],
- ['papeda','dikke, kleverige pap van sagomeel en kokend water','papeda'],
- ['kewang','groep dorpsbewakers die toeziet op sasi en land en zee beschermt','kewang'],
+ ['papeda','Pap van sagomeel, van oudsher een basisgerecht op de Molukken.','papeda'],
+ ['kewang','Groep dorpsbewakers in een Molukse negeri. De kewang ziet toe op de regels van sasi en beschermt land, zee en dorp.','kewang'],
  ['ale','jij (tegen mensen van je eigen leeftijd of jonger)','ale'],
- ['kapata','oude gezongen verzen waarmee mensen verhalen en adat doorgeven','kapata'],
+ ['kapata','Oude gezongen verzen uit Centraal-Maluku. Met kapata geven mensen verhalen, geschiedenis en adat van hun dorp door, vaak in de bahasa tanah.','kapata'],
  ['selamat malam','goedenavond','selamat-malam'],
- ['sagu','sago, meel uit de stam van de sagopalm','sagu'],
- ['cakalele','eeuwenoude Molukse krijgsdans','cakalele'],
+ ['sagu','Sago: zetmeel uit de sagopalm en van oudsher basisvoedsel op de Molukken.','sagu'],
+ ['cakalele','Traditionele Molukse krijgsdans met parang en schild.','cakalele'],
  ['bandara','vliegveld','bandara'],
- ['gandong','broederschap tussen twee dorpen, soms al eeuwenlang','gandong'],
+ ['gandong','Broederschap tussen twee dorpen op de Molukken, soms al eeuwenlang.','gandong'],
  ['capeu','hoed, pet','capeu'],
  ['amato','tot ziens','amato'],
- ['totobuang','rek met kleine koperen gongs waarop je een melodie slaat','totobuang']
+ ['totobuang','Een rek met kleine koperen gongs waarop je een melodie slaat. Speelt vaak samen met de tifa: samen heet dat tifa totobuang.','totobuang']
 ];
 var START=Date.UTC(2026,10,7); /* zaterdag 7 november 2026 = eerste woord (pulang) */
 var DAG=['zo','ma','di','wo','do','vr','za'],MND=['jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
