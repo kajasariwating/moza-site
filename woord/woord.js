@@ -22,10 +22,10 @@ var W=[
  ['amato','tot ziens','amato'],
  ['totobuang','rek met kleine koperen gongs waarop je een melodie slaat','totobuang']
 ];
-var START=Date.UTC(2026,10,9); /* maandag 9 november 2026 = eerste woord */
+var START=Date.UTC(2026,10,7); /* zaterdag 7 november 2026 = eerste woord (pulang) */
 var DAG=['zo','ma','di','wo','do','vr','za'],MND=['jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
 function vandaag(){var s;try{s=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Amsterdam',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date())}catch(e){s=new Date().toISOString().slice(0,10)}var p=s.split('-');return Date.UTC(+p[0],+p[1]-1,+p[2])}
-function kies(t){var d=new Date(t);if(d.getUTCDay()===0)return ZONDAG;var n=Math.max(0,Math.round((t-START)/864e5));var i=Math.floor(n/7)*6+(n%7);return W[i%W.length]}
+function kies(t){var d=new Date(t);if(d.getUTCDay()===0)return ZONDAG;var i=0;for(var x=START;x<t;x+=864e5){if(new Date(x).getUTCDay()!==0)i++}return W[i%W.length]}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 var css='#mzmob .mzx-e.wd{background:#E9F25A;color:#111;padding:22px;gap:10px;display:flex;flex-direction:column;justify-content:flex-start}'+
 '#mzmob .mzx-e.wd .tg{font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;position:static}'+
