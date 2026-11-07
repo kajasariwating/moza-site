@@ -19,3 +19,4 @@ section.mzv-week{display:none!important}
 html.mz-lw #mzmob ul.mzx-list,html.mz-lw #mzmob .col.r .sec.o5 .tl{visibility:hidden;animation:mzzien 0s 2.5s forwards}
 html.mzr:not(.mz-nieuw) .moza-hero:not([data-mzrk]) img{visibility:hidden;animation:mzzien 0s 2.5s forwards}
 html.mzr:not(.mz-nieuw) body .moza-hero .blog-meta-item--categories,html.mzr:not(.mz-nieuw) body .moza-hero .blog-item-category-wrapper{display:none!important}
+html.mzr:not(.mz-nieuw) body .mzrk-uitleg{border:3px solid #111;border-left:12px solid #C9D3FF;background:#F4F2EC;color:#111;padding:12px 16px;margin:0 0 20px;font:400 16px/1.5 "Hanken Grotesk",system-ui,sans-serif}html.mzr:not(.mz-nieuw) body .mzrk-uitleg.roze{border-left-color:#FF7AB6}html.mzr:not(.mz-nieuw) body .mzrk-uitleg b{display:block;font-weight:800;font-size:12px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:4px}html.mzr:not(.mz-nieuw) body .mzrk-uitleg strong{font-weight:800}
