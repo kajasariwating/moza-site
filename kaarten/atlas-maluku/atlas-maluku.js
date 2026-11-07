@@ -90,8 +90,8 @@
   '#mzn .mzn-why .mzn-more{margin:0;color:var(--muted)}',
   '#mzn .pk{position:relative}',
   '#mzn .pk svg{position:absolute;left:-7px;top:-8px;display:block;overflow:visible}',
-  '#mzn .pk path{fill:#111;stroke:#fff;stroke-width:1.5}',
-  '#mzn .pk.v path{fill:#FF4D2E;stroke:#111}',
+  'html body #mzn .pk path{fill:#111!important;stroke:#fff!important;stroke-width:1.5}',
+  'html body #mzn .pk.v path{fill:#FF4D2E!important;stroke:#111!important}',
   '#mzn .pk .pl{position:absolute;left:9px;top:-9px;white-space:nowrap;font:italic 600 13px/1 var(--fa);color:var(--label-fg);background:var(--label-bg);padding:2px 5px 3px;border:1.5px dashed var(--edge);pointer-events:none}',
   '#mzn .pk .pl b{font:800 11px/1 var(--f);font-style:normal;margin-left:2px;font-variant-numeric:tabular-nums}',
   '#mzn .pk.nolb .pl{display:none}',
@@ -171,6 +171,9 @@
   function dec(str,f){var a=[],i=0,lat=0,lng=0;while(i<str.length){var b,s=0,r=0;do{b=str.charCodeAt(i++)-63;r|=(b&31)<<s;s+=5}while(b>=32);lat+=(r&1)?~(r>>1):(r>>1);s=0;r=0;do{b=str.charCodeAt(i++)-63;r|=(b&31)<<s;s+=5}while(b>=32);lng+=(r&1)?~(r>>1):(r>>1);a.push([lat/f,lng/f])}return a}
   function polys(enc,f){return enc.map(function(p){return p.map(function(r){return dec(r,f||1e4)})})}
 
+  function inl(el){['fill','stroke'].forEach(function(a){var v=el.getAttribute(a);if(v)el.style.setProperty(a,v,'important')})}
+  function inlAll(n){if(!n||n.nodeType!==1)return;if(n.hasAttribute('fill')||n.hasAttribute('stroke'))inl(n);
+    if(n.querySelectorAll)[].forEach.call(n.querySelectorAll('[fill],[stroke]'),inl)}
   function loadLeaflet(cb){
     if (window.L && window.L.map) return cb();
     if (!document.getElementById('mzb-lcss')){var l=document.createElement('link');l.id='mzb-lcss';l.rel='stylesheet';l.href='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css';document.head.appendChild(l)}
@@ -182,6 +185,9 @@
     var root=document.createElement('div');root.id='mzn';root.innerHTML=HTML;
     if(host){host.appendChild(root)}else{var m=document.querySelector('main#page')||document.querySelector('main')||document.body;m.insertBefore(root,m.firstChild)}
     var st=document.createElement('style');st.id='mzn-css';st.textContent=CSS;document.head.appendChild(st);
+    /* De nachtmodus van de site kleurt zwarte SVG-lijnen wit. Inline stijl gaat daar boven. */
+    inlAll(root);
+    new MutationObserver(function(ms){ms.forEach(function(m){[].forEach.call(m.addedNodes,inlAll)})}).observe(root,{childList:true,subtree:true});
     var data=null,ready=0;
     function go(){if(++ready===2)build(root,data)}
     var bergen=fetch(BASE+'bergen.json').then(function(r){return r.ok?r.json():null}).catch(function(){return null});
@@ -209,6 +215,10 @@
     L.control.scale({position:'bottomright',imperial:false,maxWidth:120}).addTo(map);
     map.fitBounds(START,padFor());
     var renderer=map.options.renderer;
+    var _us=renderer._updateStyle;
+    renderer._updateStyle=function(layer){_us.call(this,layer);var p=layer._path,o=layer.options;if(!p)return;
+      p.style.setProperty('stroke',o.stroke?o.color:'none','important');
+      p.style.setProperty('fill',o.fill?(o.fillColor||o.color):'none','important')};
 
     /* Lengte- en breedtelijnen */
     var gridMajor=L.featureGroup().addTo(map),gridMinor=L.featureGroup();
@@ -241,7 +251,7 @@
         p.setAttribute('id','mzn-h-'+g);p.setAttribute('width','7');p.setAttribute('height','7');p.setAttribute('patternUnits','userSpaceOnUse');p.setAttribute('patternTransform','rotate(45)');
         p.innerHTML='<rect width="7" height="7" class="mzn-hb-'+g+'"/><rect width="2.6" height="7" fill="#111" fill-opacity=".45"/>';defs.appendChild(p)});
       svg.insertBefore(defs,svg.firstChild);paintDefs()}
-    function paintDefs(){G.forEach(function(g){[].forEach.call(root.querySelectorAll('.mzn-hb-'+g),function(r){r.setAttribute('fill',css('--g-'+g))})})}
+    function paintDefs(){G.forEach(function(g){[].forEach.call(root.querySelectorAll('.mzn-hb-'+g),function(r){var c=css('--g-'+g);r.setAttribute('fill',c);r.style.setProperty('fill',c,'important')})})}
     ensureDefs();
 
     /* Grenzen per kabupaten laden */
