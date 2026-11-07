@@ -1,0 +1,401 @@
+<title>MOZA Puzzel</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@1,600&family=Hanken+Grotesk:wght@400;800;900&display=swap">
+<style>
+/* Layout: één kolom op telefoon; op breed scherm raster links, omschrijvingen rechts. MOZA-kaders: zwarte rand, geen ronding, harde schaduw. */
+:root{
+  --blauw:#1F3BD1; --geel:#E9F25A; --roze:#FF7AB6; --rood:#FF4D2E;
+  --bg:#F4F2EC; --vlak:#FFFFFF; --ink:#111111; --zacht:#5B5A55;
+  --rand:#111111; --cel:#FFFFFF; --woord:#F6F8C8; --actief:#E9F25A;
+  --vraag:#1F3BD1; --vraag-ink:#FFFFFF; --leeg:#E9E6DC; --hint:#1F3BD1; --fout:#FF4D2E;
+  --schaduw:#1F3BD1;
+  --f-body:"Hanken Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-accent:"Fraunces",Georgia,"Times New Roman",serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121212; --vlak:#1C1C1C; --ink:#F4F2EC; --zacht:#B4B2AA; --rand:#F4F2EC;
+  --cel:#1E1E1E; --woord:#3A3C18; --actief:#8E9420; --vraag:#2B48E8; --vraag-ink:#FFFFFF;
+  --leeg:#2A2A2A; --hint:#8FA2FF; --schaduw:#FF7AB6; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121212; --vlak:#1C1C1C; --ink:#F4F2EC; --zacht:#B4B2AA; --rand:#F4F2EC;
+  --cel:#1E1E1E; --woord:#3A3C18; --actief:#8E9420; --vraag:#2B48E8; --vraag-ink:#FFFFFF;
+  --leeg:#2A2A2A; --hint:#8FA2FF; --schaduw:#FF7AB6; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.45}
+.wrap{max-width:1040px;margin:0 auto;padding-block:20px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{margin:0;text-wrap:balance}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,.cel:focus-visible{outline:3px solid var(--roze);outline-offset:2px}
+.kop{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:20px}
+.logo{font-weight:900;font-size:clamp(34px,7vw,52px);letter-spacing:-.02em;line-height:1}
+.logo em{font-family:var(--f-accent);font-style:italic;font-weight:600;color:var(--blauw);letter-spacing:0}
+:root[data-theme="dark"] .logo em{color:var(--roze)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .logo em{color:var(--roze)}}
+.reeks{font-weight:800;font-size:14px;border:2px solid var(--rand);background:var(--geel);color:#111;padding:6px 10px;box-shadow:3px 3px 0 var(--schaduw)}
+.intro{max-width:60ch;color:var(--zacht);margin:0 0 24px}
+.kader{border:3px solid var(--rand);background:var(--vlak);box-shadow:6px 6px 0 var(--schaduw)}
+.knop{border:2px solid var(--rand);background:var(--vlak);font-weight:800;padding:10px 14px;box-shadow:3px 3px 0 var(--rand);transition:transform .08s,box-shadow .08s}
+.knop:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--rand)}
+.knop.blauw{background:var(--blauw);color:#fff}
+.knop.geel{background:var(--geel);color:#111}
+/* Overzicht */
+.niveaus{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;margin-bottom:36px}
+.niveau{padding:18px;display:flex;flex-direction:column;gap:12px}
+.niveau .lab{font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--zacht)}
+.niveau h2{font-size:28px;font-weight:900}
+.niveau .meta{display:flex;gap:16px;font-size:14px;color:var(--zacht);font-variant-numeric:tabular-nums}
+.niveau .meta b{color:var(--ink)}
+.mini{display:grid;gap:2px;width:72px;border:2px solid var(--rand);background:var(--rand)}
+.mini i{aspect-ratio:1;background:var(--cel)}
+.mini i.z{background:var(--vraag)}
+.niveau .top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.archief h2{font-size:24px;font-weight:900;margin-bottom:6px}
+.archief p{color:var(--zacht);margin:0 0 14px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.tab{border:2px solid var(--rand);background:var(--vlak);font-weight:800;padding:6px 12px}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--bg)}
+.nummers{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:8px}
+.nr{border:2px solid var(--rand);background:var(--vlak);padding:8px 4px;text-align:center;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.2;position:relative}
+.nr small{display:block;font-weight:400;font-size:11px;color:var(--zacht)}
+.nr.klaar{background:var(--geel);color:#111}
+.nr.klaar small{color:#333}
+.nr.vandaag{box-shadow:3px 3px 0 var(--roze)}
+.nr.bezig small{color:var(--blauw)}
+/* Spel */
+.spelkop{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.spelkop .titel{font-weight:900;font-size:20px;flex:1;min-width:0;line-height:1.2}
+@media (max-width:520px){.spelkop .terugtekst{display:none}.spelkop .titel{font-size:17px}}
+.spelkop .titel small{display:block;font-weight:400;font-size:13px;color:var(--zacht)}
+.tijd{font-weight:800;font-size:22px;font-variant-numeric:tabular-nums;min-width:4.2ch;text-align:right}
+.speelveld{display:grid;grid-template-columns:minmax(0,640px) minmax(0,1fr);gap:24px;align-items:start}
+@media (max-width:860px){.speelveld{grid-template-columns:minmax(0,1fr)}}
+.links{min-width:0;display:flex;flex-direction:column;gap:12px}
+.balk{display:flex;align-items:center;background:var(--blauw);color:#fff;border:3px solid var(--rand);min-height:56px}
+.balk button{background:none;border:0;color:#fff;font-size:22px;font-weight:900;padding:8px 14px;align-self:stretch}
+.balk .tekst{flex:1;text-align:center;font-weight:800;font-size:17px;padding:6px 4px;line-height:1.25}
+.balk .tekst small{display:block;font-weight:400;font-size:12px;opacity:.85}
+.raster-houder{position:relative}
+.raster{display:grid;grid-template-columns:repeat(var(--n),1fr);border:3px solid var(--rand);background:var(--rand);gap:1px;box-shadow:6px 6px 0 var(--schaduw);user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.cel{aspect-ratio:1;background:var(--cel);position:relative;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:calc(var(--c) * .52);text-transform:uppercase;border:0;padding:0;min-width:0}
+.cel.l.woord{background:var(--woord)}
+.cel.l.act{background:var(--actief)}
+.cel.l.hint{color:var(--hint)}
+.cel.l.fout{color:var(--fout);text-decoration:line-through}
+.cel.l.mol::after{content:"";position:absolute;top:3px;right:3px;width:max(5px,calc(var(--c)*.12));height:max(5px,calc(var(--c)*.12));background:var(--roze);border-radius:50%}
+.cel.v{background:var(--vraag);color:var(--vraag-ink);flex-direction:column;align-items:stretch;justify-content:stretch;font-weight:800;text-transform:none;cursor:pointer}
+.cel.leeg{background:var(--leeg);background-image:repeating-linear-gradient(45deg,transparent 0 5px,color-mix(in srgb,var(--roze) 35%,transparent) 5px 7px)}
+.cel.hoek{background:#111;color:var(--geel);outline:1px solid var(--rand);font-weight:900;font-size:calc(var(--c)*.22);letter-spacing:.02em}
+.vr{flex:1;display:flex;align-items:center;justify-content:center;text-align:center;padding:1px 2px;font-size:clamp(7px,calc(var(--c)*.135),12px);line-height:1.1;position:relative;overflow:hidden;hyphens:auto;word-break:break-word}
+.vr+.vr{border-top:1px solid color-mix(in srgb,#fff 45%,transparent)}
+.vr.on{background:color-mix(in srgb,var(--geel) 30%,transparent)}
+.compact .vr{font-size:calc(var(--c)*.3);font-weight:900}
+.pijl{position:absolute;width:0;height:0;border:solid transparent;z-index:2}
+.pijl.r{right:0;top:50%;transform:translateY(-50%);border-width:4px 0 4px 6px;border-left-color:var(--geel)}
+.pijl.o{bottom:0;left:50%;transform:translateX(-50%);border-width:6px 4px 0 4px;border-top-color:var(--geel)}
+.pauze{position:absolute;inset:0;background:var(--bg);border:3px solid var(--rand);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:5}
+.pauze p{margin:0;font-weight:800;font-size:22px}
+.legenda{font-size:13px;color:var(--zacht);display:flex;gap:6px;align-items:center}
+.legenda i{width:9px;height:9px;border-radius:50%;background:var(--roze);display:inline-block}
+.gereedschap{display:flex;gap:8px;flex-wrap:wrap}
+.gereedschap .knop{padding:8px 12px;font-size:15px}
+.gereedschap .knop small{font-weight:400;color:var(--zacht)}
+.toets{display:none;flex-direction:column;gap:6px;margin-top:4px}
+.toets div{display:flex;gap:4px;justify-content:center}
+.toets button{flex:1;max-width:44px;height:46px;border:2px solid var(--rand);background:var(--vlak);font-weight:800;font-size:17px;padding:0;box-shadow:2px 2px 0 var(--rand)}
+.toets button.wis{max-width:72px;flex:1.6;background:var(--geel);color:#111}
+.toets button:active{transform:translate(2px,2px);box-shadow:none}
+@media (pointer:coarse),(max-width:700px){.toets{display:flex}}
+.lijsten{display:flex;flex-direction:column;gap:16px;min-width:0}
+.lijst{padding:12px 0}
+.lijst h3{font-size:20px;font-weight:900;padding:0 16px 8px}
+.lijst ol{list-style:none;margin:0;padding:0;max-height:300px;overflow:auto}
+.lijst li button{display:flex;gap:12px;width:100%;text-align:left;background:none;border:0;padding:7px 16px;font-size:15px}
+.lijst li button b{min-width:2ch;font-variant-numeric:tabular-nums}
+.lijst li button.on{background:var(--blauw);color:#fff}
+.lijst li button.af{color:var(--zacht);text-decoration:line-through}
+@media (max-width:860px){.lijst ol{max-height:none}}
+.melding{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);font-weight:800;padding:10px 16px;border:2px solid var(--rand);z-index:20;max-width:calc(100% - 32px);text-align:center}
+/* Klaar */
+.klaarscherm{position:fixed;inset:0;background:color-mix(in srgb,#111 55%,transparent);display:flex;align-items:center;justify-content:center;z-index:30;padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.klaarkaart{max-width:440px;width:100%;padding:24px;display:flex;flex-direction:column;gap:14px;max-height:100%;overflow:auto}
+.klaarkaart h2{font-size:30px;font-weight:900;line-height:1.1}
+.klaarkaart h2 em{font-family:var(--f-accent);font-weight:600;color:var(--blauw)}
+.grote-tijd{font-size:44px;font-weight:900;font-variant-numeric:tabular-nums;line-height:1}
+.grote-tijd small{display:block;font-size:14px;font-weight:400;color:var(--zacht);margin-top:4px}
+.molbox{border:2px solid var(--rand);background:var(--geel);color:#111;padding:12px 14px}
+.molbox b{font-size:12px;letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:2px}
+.molbox .w{font-family:var(--f-accent);font-style:italic;font-weight:600;font-size:24px}
+.molbox p{margin:4px 0 0}
+.rij{display:flex;gap:10px;flex-wrap:wrap}
+.voorbeeld{font-size:12px;color:var(--zacht);margin-top:28px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style><style>
+.raster.open{background:transparent;border:0;gap:0;box-shadow:none}
+.puzzelkaart{padding:14px}
+.cel.x{background:transparent;pointer-events:none}
+.cel.l{box-shadow:0 0 0 1.5px var(--rand);z-index:1}
+.cel.l.act{z-index:2}
+.cel .gnr{position:absolute;top:2px;left:3px;font-size:max(9px,calc(var(--c)*.24));font-weight:800;line-height:1;color:var(--zacht)}
+.cel.l.vast{color:var(--blauw)}
+.cel.l.goed{color:var(--blauw)}
+:root[data-theme="dark"] .cel.l.vast,:root[data-theme="dark"] .cel.l.goed,:root[data-theme="dark"] .lijst li .opl{color:#8FA2FF}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .cel.l.vast,:root:not([data-theme="light"]) .cel.l.goed,:root:not([data-theme="light"]) .lijst li .opl{color:#8FA2FF}}
+.weetje{border:2px solid var(--rand);background:var(--geel);color:#111;padding:10px 14px;font-size:15px}
+.weetje b{display:block;font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+.lijst li .uit{display:block;font-size:13px;color:var(--zacht);margin-top:2px}
+.lijst li button.af{text-decoration:none;color:var(--ink)}
+.lijst li button.af .om{color:var(--zacht)}
+.lijst li .opl{font-weight:800;color:var(--blauw)}
+.lijst li button.on .opl,.lijst li button.on .uit,.lijst li button.on .om{color:#fff}
+.niv{margin-bottom:32px}
+.niv>h2{font-size:26px;font-weight:900;margin-bottom:4px}
+.niv>p{color:var(--zacht);margin:0 0 14px;max-width:60ch}
+.thema{padding:16px;display:flex;flex-direction:column;gap:10px}
+.thema .lab{font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--zacht)}
+.thema h3{font-size:22px;font-weight:900}
+.thema .meta{font-size:14px;color:var(--zacht);font-variant-numeric:tabular-nums}
+.thema .meta b{color:var(--ink)}
+</style>
+<div class="wrap" id="app"></div>
+<div class="melding" id="melding" hidden></div>
+<script>
+const DATA = [{"id":"makkelijk-1","lv":"makkelijk","titel":"Puzzel 1","R":10,"C":10,"words":[{"w":"SAHULEKA","r":2,"c":3,"d":"V","clue":"Daniël ...: zanger van You make my world so colourful","uitleg":"Zijn vader kwam van Saparua. Het nummer kwam uit in 1976.","disp":"Sahuleka"},{"w":"APELDOORN","r":7,"c":1,"d":"H","clue":"Stad van de RMS-herdenking vanaf 2009","uitleg":"De herdenking was in theater Orpheus. In 2024 ging hij naar Den Bosch.","disp":"Apeldoorn"},{"w":"MASSADA","r":2,"c":5,"d":"V","clue":"Molukse band uit Nederland, opgericht rond 1973","uitleg":"Massada mengt latin, funk en rock.","disp":"Massada"},{"w":"LAOS","r":6,"c":1,"d":"V","clue":"Wortel uit de gemberfamilie, gaat in de bumbu","uitleg":"Laos geeft de bumbu een frisse, kruidige smaak.","disp":"laos"},{"w":"BETA","r":3,"c":0,"d":"H","clue":"Maleis voor ik","uitleg":"Beta is ik in het Maleis.","disp":"beta"},{"w":"SCHIP","r":4,"c":5,"d":"H","clue":"Hoe de Molukkers in 1951 naar Nederland kwamen","uitleg":"In de loop der jaren kwamen er ruim 12.000 Molukkers per schip.","disp":"schip"},{"w":"DIA","r":3,"c":8,"d":"V","clue":"Maleis voor hij of zij","uitleg":"Dia betekent hij of zij.","disp":"dia"},{"w":"BUMBU","r":0,"c":0,"d":"V","clue":"Kruidenmengsel voor de vis","uitleg":"In de bumbu gaan onder meer ui, knoflook, laos, gember, citroengras en kurkuma.","disp":"bumbu"}]},{"id":"makkelijk-2","lv":"makkelijk","titel":"Puzzel 2","R":10,"C":10,"words":[{"w":"NEDERLAND","r":9,"c":0,"d":"H","clue":"Land van de regering in ballingschap","uitleg":"Sinds 1966 zit de regering in ballingschap in Nederland.","disp":"Nederland"},{"w":"DENHELDER","r":1,"c":4,"d":"V","clue":"Hier woonden veel gezinnen van Molukse marinemannen","uitleg":"In 2024 kwam bij het Marinemuseum een monument voor hen.","disp":"Den Helder"},{"w":"MARINJO","r":3,"c":0,"d":"H","clue":"Informatieblad voor de Molukse gemeenschap, sinds 1978","uitleg":"Robert Hallatu maakte er later een onafhankelijk blad van.","disp":"Marinjo"},{"w":"SOUMOKIL","r":0,"c":0,"d":"V","clue":"Tweede president van de RMS","uitleg":"Chris Soumokil volgde Manuhutu op. Hij werd in 1966 geëxecuteerd.","disp":"Soumokil"},{"w":"KATONG","r":0,"c":6,"d":"V","clue":"Maleis voor wij","uitleg":"Katong betekent wij. De ander hoort er ook bij.","disp":"katong"},{"w":"SENG","r":5,"c":3,"d":"H","clue":"Maleis voor nee of niet","uitleg":"Seng betekent nee.","disp":"seng"},{"w":"KNIL","r":0,"c":6,"d":"H","clue":"Leger waarin de Molukse mannen dienden","uitleg":"Het KNIL was het leger waarin veel Molukse mannen dienden.","disp":"KNIL"},{"w":"LIMO","r":0,"c":9,"d":"V","clue":"Landelijk Moluks overlegorgaan uit 2024 (afk.)","uitleg":"LIMO wil de gemeenschap weer een vaste stem geven bij de overheid.","disp":"LIMO"}]},{"id":"makkelijk-3","lv":"makkelijk","titel":"Puzzel 3","R":9,"C":10,"words":[{"w":"LLOYDKADE","r":6,"c":1,"d":"H","clue":"Kade in Rotterdam waar het eerste schip aankwam","uitleg":"Op de Lloydkade staat sinds 21 juni 2026 het monument Ulu Kora.","disp":"Lloydkade"},{"w":"ROTTERDAM","r":0,"c":8,"d":"V","clue":"Havenstad waar Molukse gezinnen per schip aankwamen","uitleg":"In 1951 kwamen de eerste Molukkers per schip naar Nederland.","disp":"Rotterdam"},{"w":"MALUKU","r":2,"c":6,"d":"V","clue":"Museum ...: naam van het Moluks Historisch Museum vanaf 2008","uitleg":"Het museum opende in 1990 in Utrecht.","disp":"Maluku"},{"w":"ARNHEM","r":2,"c":1,"d":"H","clue":"Stad van het Openluchtmuseum met een Molukse barak","uitleg":"In het Nederlands Openluchtmuseum kun je de barak bezoeken.","disp":"Arnhem"},{"w":"AJAX","r":0,"c":1,"d":"V","clue":"Club waar Simon Tahamata in 1976 debuteerde","uitleg":"Tahamata speelde later ook voor Standard Luik en Feyenoord.","disp":"Ajax"},{"w":"GONG","r":0,"c":3,"d":"V","clue":"Slaginstrument van brons in de totobuang","uitleg":"De totobuang is een rij kleine gongs. Soms speelt er ook een grote gong mee.","disp":"gong"},{"w":"IYO","r":5,"c":4,"d":"V","clue":"Maleis voor ja","uitleg":"Iyo betekent ja.","disp":"iyo"},{"w":"DANGKE","r":0,"c":0,"d":"H","clue":"Maleis voor bedankt","uitleg":"Dangke betekent dank je wel.","disp":"dangke"}]},{"id":"makkelijk-4","lv":"makkelijk","titel":"Puzzel 4","R":9,"C":9,"words":[{"w":"KOTAINTEN","r":4,"c":0,"d":"H","clue":"Eerste schip met Molukse gezinnen, maart 1951","uitleg":"De Kota Inten kwam op 21 maart 1951 aan in Rotterdam, met 1.022 passagiers.","disp":"Kota Inten"},{"w":"VETERAAN","r":1,"c":7,"d":"V","clue":"In 2017 erkend als ...: de Molukse KNIL-militairen","uitleg":"Velen vonden dat de erkenning erg laat kwam.","disp":"veteraan"},{"w":"TIFA","r":3,"c":4,"d":"V","clue":"Molukse trom","uitleg":"De tifa bestaat in vijf maten, van tifa jekir tot tifa bas.","disp":"tifa"},{"w":"VUGHT","r":0,"c":2,"d":"V","clue":"Plaats van woonoord Lunetten","uitleg":"Het woonoord lag op het terrein van een voormalig concentratiekamp.","disp":"Vught"},{"w":"DISINI","r":8,"c":3,"d":"H","clue":"Beta ...: ik ben hier","uitleg":"Beta Disini was het programma van Museum Maluku bij 70 jaar Molukse aanwezigheid.","disp":"disini"},{"w":"BARAK","r":6,"c":1,"d":"H","clue":"Eenvoudige woning in het woonoord","uitleg":"Veel gezinnen woonden jaren in een barak.","disp":"barak"},{"w":"TUGU","r":1,"c":1,"d":"H","clue":"... Soumokil: gedenkteken in Vught uit 2026","uitleg":"Het werd onthuld zestig jaar na de executie van Soumokil.","disp":"tugu"},{"w":"ALE","r":2,"c":5,"d":"H","clue":"Ander Maleis woord voor jij","uitleg":"Naast ose zeg je ook ale voor jij.","disp":"ale"}]},{"id":"makkelijk-5","lv":"makkelijk","titel":"Puzzel 5","R":9,"C":8,"words":[{"w":"PATTIMURA","r":0,"c":5,"d":"V","clue":"Vliegveld van Ambon","uitleg":"In oktober 2026 ging het weer open nadat de rook van bosbranden was opgetrokken.","disp":"Pattimura"},{"w":"TAHAMATA","r":8,"c":0,"d":"H","clue":"Simon ...: eerste Molukse profvoetballer","uitleg":"Hij debuteerde in 1976 bij Ajax en speelde 22 keer voor Oranje.","disp":"Tahamata"},{"w":"LUNETTEN","r":3,"c":0,"d":"H","clue":"Woonoord dat als enige niet werd opgeheven","uitleg":"Lunetten in Vught is het enige woonoord dat bleef bestaan.","disp":"Lunetten"},{"w":"SERAM","r":2,"c":3,"d":"V","clue":"Hierheen ging de RMS-regering na de inname van Ambon","uitleg":"Soumokil leidde daar later de strijd. Seram is een groot Moluks eiland.","disp":"Seram"},{"w":"PANDAN","r":1,"c":7,"d":"V","clue":"Geurig blad uit de keuken","uitleg":"Pandanblad was in de beginjaren in Nederland lastig te vinden.","disp":"pandan"},{"w":"SAGU","r":0,"c":1,"d":"V","clue":"Zetmeel uit de sagopalm","uitleg":"Van sagomeel maak je onder meer papeda.","disp":"sagu"},{"w":"MOZA","r":5,"c":0,"d":"H","clue":"Platform voor, door en met Molukkers, sinds 2022","uitleg":"MOZA is kort voor Molukse Zaken.","disp":"MOZA"},{"w":"OSE","r":0,"c":0,"d":"H","clue":"Maleis voor jij (uit het Portugees)","uitleg":"Ose komt van het Portugese você.","disp":"ose"}]},{"id":"moeilijk-1","lv":"moeilijk","titel":"Puzzel 1","R":12,"C":12,"words":[{"w":"SCHATTENBERG","r":8,"c":0,"d":"H","clue":"Woonoord in het voormalige Kamp Westerbork","uitleg":"Op het hoogtepunt woonden er bijna 3.000 mensen. Het werd de grootste Molukse woonplek.","disp":"Schattenberg"},{"w":"TOTOBUANG","r":2,"c":3,"d":"V","clue":"Tifa ...: Moluks ensemble met gongs en trommen","uitleg":"Bij de totobuang liggen de kleine gongs meestal in twee rijen.","disp":"totobuang"},{"w":"WESTERBORK","r":2,"c":0,"d":"H","clue":"Woonoord in Drenthe op het terrein van een voormalig kamp","uitleg":"Ook Westerbork werd na de oorlog een woonoord voor Molukse gezinnen.","disp":"Westerbork"},{"w":"MANUSAMA","r":4,"c":0,"d":"V","clue":"Eerste president in ballingschap","uitleg":"Johan Manusama was president van 1966 tot 1993.","disp":"Manusama"},{"w":"COLOCOLO","r":5,"c":2,"d":"H","clue":"Pittige sambal uit Ambon","uitleg":"Colo-colo maak je met onder meer peper, tomaat, sjalot en limoen. Je eet het bij vis.","disp":"colo-colo"},{"w":"LUBBERS","r":5,"c":8,"d":"V","clue":"Premier die in 1986 de Gezamenlijke Verklaring tekende","uitleg":"Hij tekende met ds. Samuel Metiarij van de Badan Persatuan.","disp":"Lubbers"},{"w":"APONNO","r":0,"c":7,"d":"V","clue":"Sergeant-majoor die in 1950 de staat voor de rechter daagde","uitleg":"De rechter verbood de staat de militairen tegen hun wil weg te sturen.","disp":"Aponno"},{"w":"PAPEDA","r":0,"c":2,"d":"H","clue":"Dikke pap van sagomeel","uitleg":"Papeda eet je met ikan pindang kuning: vis in een kruidige gele saus.","disp":"papeda"},{"w":"TIEL","r":8,"c":5,"d":"V","clue":"Eerste gemeente die de graven van de eerste generatie beschermde","uitleg":"In oktober 2026 deden 54 gemeenten dat.","disp":"Tiel"}]},{"id":"moeilijk-2","lv":"moeilijk","titel":"Puzzel 2","R":12,"C":12,"words":[{"w":"WYLDEMERK","r":3,"c":11,"d":"V","clue":"Kamp bij Balk waar de meeste islamitische Molukkers gingen wonen","uitleg":"Wyldemerk ligt in Friesland.","disp":"Wyldemerk"},{"w":"JAVAKADE","r":9,"c":4,"d":"H","clue":"Kade in Amsterdam waar vier schepen aankwamen","uitleg":"Het eerste schip daar was de New Australia, op 29 april 1951.","disp":"Javakade"},{"w":"LAGEMIERDE","r":7,"c":2,"d":"H","clue":"Brabants dorp, een barak daarvan staat in het Openluchtmuseum","uitleg":"Een barak uit Lage Mierde staat nu in Arnhem.","disp":"Lage Mierde"},{"w":"ARUMBAI","r":2,"c":3,"d":"V","clue":"Bekend nummer van Massada","uitleg":"Arumbai is een van de bekendste nummers van Massada.","disp":"Arumbai"},{"w":"AMBON","r":2,"c":3,"d":"H","clue":"Eiland en stad waar de RMS werd uitgeroepen","uitleg":"De uitroeping was in 1950 op Ambon.","disp":"Ambon"},{"w":"LENSO","r":0,"c":7,"d":"V","clue":"Sawat ...: dans op tifa totobuang","uitleg":"De tifa totobuang kan de sawat lenso begeleiden.","disp":"lenso"},{"w":"IKAN","r":7,"c":7,"d":"V","clue":"Ikan pindang kuning: het eerste woord betekent ...","uitleg":"Ikan betekent vis.","disp":"ikan"},{"w":"PORMES","r":5,"c":0,"d":"H","clue":"Sam ...: eerste Moluks Eerste Kamerlid","uitleg":"Hij werd in 2001 senator voor GroenLinks.","disp":"Pormes"},{"w":"SOPHIAHOF","r":3,"c":0,"d":"V","clue":"Museum in Den Haag waar het Moluks Historisch Museum onder valt","uitleg":"Museum Sophiahof ging open op 27 juni 2019.","disp":"Sophiahof"}]},{"id":"moeilijk-3","lv":"moeilijk","titel":"Puzzel 3","R":12,"C":11,"words":[{"w":"MANUHUTU","r":4,"c":8,"d":"V","clue":"Eerste president van de RMS","uitleg":"Johanis Manuhutu was president van 25 april tot 3 mei 1950.","disp":"Manuhutu"},{"w":"KORAKORA","r":5,"c":1,"d":"H","clue":"Molukse boot; de boeg ervan is het monument Ulu Kora","uitleg":"Het monument is gemaakt door Jaïr Pattipeilohy en Maurice den Boer.","disp":"kora-kora"},{"w":"CAKALELE","r":4,"c":4,"d":"V","clue":"Molukse krijgsdans","uitleg":"De cakalele is een traditionele krijgsdans van de Molukken.","disp":"cakalele"},{"w":"ZELFZORG","r":0,"c":6,"d":"V","clue":"Regeling uit 1956: gezinnen betalen zelf eten en kleding","uitleg":"Zo heette de Uitkeringsregeling Ambonezen in de woonoorden.","disp":"zelfzorg"},{"w":"PAHLAWAN","r":2,"c":3,"d":"H","clue":"12 april: Hari ...","uitleg":"Op Hari Pahlawan herdenken veel Molukkers iedereen die omkwam in de strijd voor de RMS.","disp":"Pahlawan"},{"w":"BAKUBAE","r":3,"c":1,"d":"V","clue":"Maleis voor vrede","uitleg":"Bakubae betekent vrede of verzoening.","disp":"bakubae"},{"w":"JETTEN","r":9,"c":0,"d":"H","clue":"Premier die in 2026 excuses aanbood aan Molukkers","uitleg":"Hij deed dat bij de onthulling van Ulu Kora in Rotterdam.","disp":"Jetten"},{"w":"KUNING","r":0,"c":10,"d":"V","clue":"Ikan pindang ...: vis in gele saus","uitleg":"Kuning betekent geel. De saus krijgt die kleur van kurkuma.","disp":"kuning"},{"w":"ASSEN","r":11,"c":1,"d":"H","clue":"Hierheen verhuisden de meeste gezinnen uit Schattenberg","uitleg":"Dat gebeurde in 1964 en 1965.","disp":"Assen"}]},{"id":"moeilijk-4","lv":"moeilijk","titel":"Puzzel 4","R":13,"C":11,"words":[{"w":"TUTUHATUNEWA","r":0,"c":4,"d":"V","clue":"President van de RMS van 1993 tot 2010","uitleg":"Frans Tutuhatunewa volgde Manusama op.","disp":"Tutuhatunewa"},{"w":"WATTILETE","r":6,"c":2,"d":"H","clue":"President van de RMS sinds 2010","uitleg":"John Wattilete is president sinds april 2010.","disp":"Wattilete"},{"w":"RIETKERK","r":4,"c":8,"d":"V","clue":"...-uitkering voor de eerste generatie","uitleg":"De uitkering is genoemd naar minister Koos Rietkerk.","disp":"Rietkerk"},{"w":"WYLDEMERK","r":0,"c":10,"d":"V","clue":"Kamp bij Balk waar de meeste islamitische Molukkers gingen wonen","uitleg":"Wyldemerk ligt in Friesland.","disp":"Wyldemerk"},{"w":"ULUKORA","r":1,"c":2,"d":"H","clue":"Nationaal Moluks Monument aan de Lloydkade","uitleg":"Het is de bronzen boeg van een kora-kora. Het werd onthuld op 21 juni 2026.","disp":"Ulu Kora"},{"w":"PANDAN","r":11,"c":0,"d":"H","clue":"Geurig blad uit de keuken","uitleg":"Pandanblad was in de beginjaren in Nederland lastig te vinden.","disp":"pandan"},{"w":"SALAM","r":8,"c":1,"d":"V","clue":"Daun ...: soort laurierblad","uitleg":"Daun salam was vroeger in Nederland moeilijk te krijgen.","disp":"salam"},{"w":"ASSEN","r":8,"c":0,"d":"H","clue":"Hierheen verhuisden de meeste gezinnen uit Schattenberg","uitleg":"Dat gebeurde in 1964 en 1965.","disp":"Assen"},{"w":"SCHIP","r":3,"c":6,"d":"V","clue":"Hoe de Molukkers in 1951 naar Nederland kwamen","uitleg":"In de loop der jaren kwamen er ruim 12.000 Molukkers per schip.","disp":"schip"}]},{"id":"moeilijk-5","lv":"moeilijk","titel":"Puzzel 5","R":9,"C":13,"words":[{"w":"COLOCOLO","r":1,"c":5,"d":"H","clue":"Pittige sambal uit Ambon","uitleg":"Colo-colo maak je met onder meer peper, tomaat, sjalot en limoen. Je eet het bij vis.","disp":"colo-colo"},{"w":"KOTAINTEN","r":0,"c":8,"d":"V","clue":"Eerste schip met Molukse gezinnen, maart 1951","uitleg":"De Kota Inten kwam op 21 maart 1951 aan in Rotterdam, met 1.022 passagiers.","disp":"Kota Inten"},{"w":"CAKALELE","r":1,"c":5,"d":"V","clue":"Molukse krijgsdans","uitleg":"De cakalele is een traditionele krijgsdans van de Molukken.","disp":"cakalele"},{"w":"BAKUBAE","r":3,"c":3,"d":"H","clue":"Maleis voor vrede","uitleg":"Bakubae betekent vrede of verzoening.","disp":"bakubae"},{"w":"CAPELLE","r":7,"c":0,"d":"H","clue":"Joost Manusama werd hier burgemeester: ... aan den IJssel","uitleg":"Hij is de eerste burgemeester van Molukse afkomst in Nederland (2024).","disp":"Capelle"},{"w":"MANUSAMA","r":0,"c":1,"d":"V","clue":"Eerste president in ballingschap","uitleg":"Johan Manusama was president van 1966 tot 1993.","disp":"Manusama"},{"w":"LILIPALY","r":1,"c":11,"d":"V","clue":"John ...: eerste Moluks Tweede Kamerlid","uitleg":"Hij zat van 1986 tot 1998 in de Kamer.","disp":"Lilipaly"},{"w":"TIFA","r":6,"c":8,"d":"H","clue":"Molukse trom","uitleg":"De tifa bestaat in vijf maten, van tifa jekir tot tifa bas.","disp":"tifa"},{"w":"APRIL","r":5,"c":1,"d":"H","clue":"Maand van de uitroeping van de RMS","uitleg":"De RMS werd uitgeroepen op 25 april 1950.","disp":"april"}]}];
+const NIVEAUS = [
+  {id:'makkelijk', naam:'Makkelijk', uitleg:'De eerste letter van elk woord staat er al.'},
+  {id:'moeilijk', naam:'Moeilijk', uitleg:'Geen letters vooraf. Voor wie de Molukse geschiedenis kent.'}
+];
+const STRAF_HINT = 30, KEY='mozaThema.v1';
+let S={prog:{},done:{},best:{}};
+try{const raw=localStorage.getItem(KEY); if(raw) S=Object.assign(S,JSON.parse(raw));}catch(e){}
+function bewaar(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+function fmt(s){s=Math.max(0,Math.round(s));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');}
+function esc(s){return String(s).replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));}
+const app=document.getElementById('app');
+let P=null, ST=null, timerId=null;
+
+function ontleed(idx){
+  const pz=DATA[idx], R=pz.R, C=pz.C;
+  const g=Array.from({length:R},()=>Array(C).fill('#'));
+  const slots=pz.words.map(w=>{
+    const cells=[...w.w].map((ch,k)=>{const r=w.r+(w.d==='V'?k:0), c=w.c+(w.d==='H'?k:0); g[r][c]=ch; return [r,c];});
+    return Object.assign({},w,{cells});
+  });
+  slots.sort((a,b)=>(a.r-b.r)||(a.c-b.c)||(a.d==='H'?-1:1));
+  let nr=0; const nrs={};
+  slots.forEach((s,k)=>{const key=s.r+','+s.c; if(!nrs[key]) nrs[key]=++nr; s.nr=nrs[key]; s.idx=k;});
+  return {idx, id:pz.id, lv:pz.lv, titel:pz.titel, R, C, g:g.map(r=>r.join('')), slots, nrs};
+}
+
+function overzicht(){
+  stopTimer(); P=null;
+  let h='<header class="kop"><h1 class="logo">MOZA <em>Puzzel</em></h1></header>'+
+   '<p class="intro">Kruiswoordpuzzels over de Molukken en Molukkers in Nederland: eten, taal, muziek, geschiedenis en de RMS door elkaar. Los je een woord op, dan lees je er meteen iets over.</p>';
+  NIVEAUS.forEach(n=>{
+    h+='<section class="niv"><h2>'+n.naam+'</h2><p>'+n.uitleg+'</p><div class="niveaus">';
+    DATA.forEach((pz,i)=>{ if(pz.lv!==n.id) return;
+      const d=S.done[pz.id], b=S.prog[pz.id];
+      h+='<article class="kader thema"><div class="lab">'+NIVEAUS.find(n=>n.id===pz.lv).naam+'</div><h3>'+esc(pz.titel)+'</h3>'+
+        '<div class="meta"><b>'+pz.words.length+'</b> woorden'+(d?' · opgelost in <b>'+fmt(d.t)+'</b>':'')+'</div>'+
+        '<button class="knop '+(d?'geel':'blauw')+'" data-i="'+i+'">'+(d?'Bekijk opgelost':(b?'Verder puzzelen':'Starten'))+'</button></article>';
+    });
+    h+='</div></section>';
+  });
+  h+='<p class="voorbeeld">Voorbeeldversie voor moza.nu. Je voortgang wordt alleen in deze browser bewaard.</p>';
+  app.innerHTML=h;
+  app.querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>spel(+b.dataset.i));
+  window.scrollTo(0,0);
+}
+
+function spel(idx){
+  P=ontleed(idx);
+  const op=S.prog[P.id], klaar=S.done[P.id];
+  const leeg=P.g.map(r=>r.replace(/[^#]/g,'.'));
+  ST={f:(klaar?P.g:(op?op.f:leeg)).map(r=>r.split('')), t:klaar?klaar.t:(op?op.t:0), h:new Set(op?op.h:[]), vast:new Set(), fout:new Set(), sel:null, dir:'H', pauze:false, klaar:!!klaar, gezien:new Set()};
+  if(P.lv==='makkelijk') P.slots.forEach(s=>{const [r,c]=s.cells[0]; ST.vast.add(r+','+c); ST.f[r][c]=P.g[r][c];});
+  P.slots.forEach(s=>{ if(woordGoed(s)) ST.gezien.add(s.idx); });
+  const niv=NIVEAUS.find(n=>n.id===P.lv).naam;
+  app.innerHTML='<div class="spelkop"><button class="knop" id="terug" aria-label="Terug naar overzicht">←<span class="terugtekst"> Overzicht</span></button>'+
+   '<div class="titel">'+esc(P.titel)+'<small>'+niv+' · '+P.slots.length+' woorden</small></div>'+
+   '<span class="tijd" id="tijd">0:00</span><button class="knop" id="pauzeKnop" aria-label="Pauze">❚❚</button></div>'+
+   '<div class="speelveld"><div class="links">'+
+   '<div class="balk"><button id="vorige" aria-label="Vorige omschrijving">‹</button><div class="tekst" id="balk"></div><button id="volgende" aria-label="Volgende omschrijving">›</button></div>'+
+   '<div class="kader puzzelkaart"><div class="raster-houder"><div class="raster open" id="raster" style="--n:'+P.C+'"></div>'+
+   '<div class="pauze" id="pauze" hidden><p>Even pauze</p><button class="knop blauw" id="verder">Verder puzzelen</button></div></div></div>'+
+   '<div class="weetje" id="weetje" hidden></div>'+
+   '<div class="gereedschap"><button class="knop" id="hint">Hint <small>+'+STRAF_HINT+' s</small></button><button class="knop" id="check">Controleer</button><button class="knop" id="wis">Wis woord</button></div>'+
+   '<div class="toets" id="toets"></div></div>'+
+   '<div class="lijsten"><section class="kader lijst"><h3>Horizontaal</h3><ol id="lijstH"></ol></section><section class="kader lijst"><h3>Verticaal</h3><ol id="lijstV"></ol></section></div></div>';
+  bouwRaster(); bouwLijsten(); bouwToetsen();
+  document.getElementById('terug').onclick=overzicht;
+  document.getElementById('pauzeKnop').onclick=()=>zetPauze(true);
+  document.getElementById('verder').onclick=()=>zetPauze(false);
+  document.getElementById('vorige').onclick=()=>springSlot(-1);
+  document.getElementById('volgende').onclick=()=>springSlot(1);
+  document.getElementById('hint').onclick=hint;
+  document.getElementById('check').onclick=controleer;
+  document.getElementById('wis').onclick=wisWoord;
+  kiesSlot(P.slots.find(s=>s.cells.some(([r,c])=>ST.f[r][c]==='.'))||P.slots[0], true);
+  toonTijd(); if(!ST.klaar) startTimer();
+  window.scrollTo(0,0);
+}
+
+function bouwRaster(){
+  const el=document.getElementById('raster'); let h='';
+  for(let r=0;r<P.R;r++) for(let c=0;c<P.C;c++){
+    if(P.g[r][c]==='#'){ h+='<div class="cel x" aria-hidden="true"></div>'; continue; }
+    const n=P.nrs[r+','+c];
+    h+='<button class="cel l" data-r="'+r+'" data-c="'+c+'" aria-label="Vakje rij '+(r+1)+' kolom '+(c+1)+'">'+(n?'<span class="gnr">'+n+'</span>':'')+'<span class="lt"></span></button>';
+  }
+  el.innerHTML=h;
+  el.addEventListener('click',e=>{
+    const b=e.target.closest('.cel.l'); if(!b) return;
+    const r=+b.dataset.r, c=+b.dataset.c;
+    if(ST.sel&&ST.sel[0]===r&&ST.sel[1]===c){const a=slotVan(r,c,ST.dir==='H'?'V':'H'); if(a) ST.dir=a.d;}
+    else { ST.sel=[r,c]; if(!slotVan(r,c,ST.dir)) ST.dir=ST.dir==='H'?'V':'H'; }
+    teken();
+  });
+  new ResizeObserver(()=>el.style.setProperty('--c',(el.clientWidth/P.C)+'px')).observe(el);
+}
+function bouwLijsten(){
+  ['H','V'].forEach(d=>{ document.getElementById('lijst'+d).innerHTML=P.slots.filter(s=>s.d===d).map(s=>'<li><button data-slot="'+s.idx+'"><b>'+s.nr+'</b><span class="inh"></span></button></li>').join(''); });
+  document.querySelectorAll('.lijst [data-slot]').forEach(b=>b.onclick=()=>kiesSlot(P.slots[+b.dataset.slot],true));
+}
+function bouwToetsen(){
+  const rijen=['QWERTYUIOP','ASDFGHJKL','ZXCVBNM'];
+  document.getElementById('toets').innerHTML=rijen.map((r,k)=>'<div>'+r.split('').map(l=>'<button data-k="'+l+'">'+l+'</button>').join('')+(k===2?'<button class="wis" data-k="DEL" aria-label="Wissen">⌫</button>':'')+'</div>').join('');
+  document.querySelectorAll('#toets button').forEach(b=>b.onclick=()=>{b.dataset.k==='DEL'?terugToets():typ(b.dataset.k);});
+}
+function slotVan(r,c,d){return P.slots.find(s=>s.d===d&&s.cells.some(([a,b])=>a===r&&b===c));}
+function huidig(){return ST.sel?slotVan(ST.sel[0],ST.sel[1],ST.dir):null;}
+function woordGoed(s){return s.cells.every(([r,c])=>ST.f[r][c]===P.g[r][c]);}
+function kiesSlot(s,naarLeeg){ST.dir=s.d; const leeg=naarLeeg&&s.cells.find(([r,c])=>ST.f[r][c]==='.'); ST.sel=(leeg||s.cells[0]).slice(); teken();}
+function springSlot(st){const s=huidig(); const k=((s?s.idx:-1)+st+P.slots.length)%P.slots.length; kiesSlot(P.slots[k],true);}
+
+function teken(){
+  const s=huidig(), inW=new Set(s?s.cells.map(x=>x.join(',')):[]);
+  const goed=new Set(); P.slots.forEach(x=>{ if(woordGoed(x)) x.cells.forEach(c=>goed.add(c.join(','))); });
+  document.querySelectorAll('#raster .cel.l').forEach(b=>{
+    const r=+b.dataset.r, c=+b.dataset.c, k=r+','+c, ch=ST.f[r][c];
+    b.querySelector('.lt').textContent=ch==='.'?'':ch;
+    b.classList.toggle('woord',inW.has(k));
+    b.classList.toggle('act',!!ST.sel&&ST.sel[0]===r&&ST.sel[1]===c);
+    b.classList.toggle('hint',ST.h.has(k));
+    b.classList.toggle('vast',ST.vast.has(k));
+    b.classList.toggle('fout',ST.fout.has(k));
+    b.classList.toggle('goed',goed.has(k)&&!ST.h.has(k));
+  });
+  document.querySelectorAll('.lijst [data-slot]').forEach(b=>{
+    const x=P.slots[+b.dataset.slot], ok=woordGoed(x);
+    b.classList.toggle('on',!!s&&x.idx===s.idx); b.classList.toggle('af',ok);
+    b.querySelector('.inh').innerHTML= ok ? '<span class="om">'+esc(x.clue)+'</span> <span class="opl">'+esc(x.disp)+'</span><span class="uit">'+esc(x.uitleg)+'</span>' : '<span class="om">'+esc(x.clue)+'</span>';
+  });
+  if(s){
+    document.getElementById('balk').innerHTML=esc(s.clue)+'<small>'+s.nr+' '+(s.d==='H'?'horizontaal':'verticaal')+' · '+s.cells.length+' letters</small>';
+    const a=document.querySelector('.lijst [data-slot="'+s.idx+'"]'); if(a&&window.matchMedia('(min-width:861px)').matches) a.scrollIntoView({block:'nearest'});
+  }
+}
+function toonWeetje(s){
+  const w=document.getElementById('weetje'); if(!w) return;
+  w.innerHTML='<b>Goed: '+esc(s.disp)+'</b>'+esc(s.uitleg); w.hidden=false;
+}
+function zet(r,c,l){ if(ST.vast.has(r+','+c)) return; ST.f[r][c]=l; ST.fout.delete(r+','+c); if(l==='.') ST.h.delete(r+','+c); }
+function nieuwGoed(){
+  P.slots.forEach(s=>{ if(!ST.gezien.has(s.idx)&&woordGoed(s)){ ST.gezien.add(s.idx); toonWeetje(s); } });
+}
+function volgendeCel(s,k){
+  for(let j=k+1;j<s.cells.length;j++){const [a,b]=s.cells[j]; if(ST.f[a][b]==='.') return s.cells[j];}
+  return null;
+}
+function typ(l){
+  if(ST.klaar||ST.pauze||!ST.sel) return;
+  const s=huidig(), [r,c]=ST.sel;
+  if(ST.vast.has(r+','+c)){
+    if(!s) return;
+    const k=s.cells.findIndex(([a,b])=>a===r&&b===c);
+    const vrij=s.cells.slice(k+1).find(([a,b])=>!ST.vast.has(a+','+b));
+    if(!vrij){ teken(); return; }
+    ST.sel=vrij.slice(); return typ(l);
+  }
+  zet(r,c,l);
+  if(s){
+    const k=s.cells.findIndex(([a,b])=>a===r&&b===c);
+    let v=volgendeCel(s,k);
+    if(!v && s.cells[k+1] && s.cells.slice(k+1).some(([a,b])=>!ST.vast.has(a+','+b))) v=s.cells.slice(k+1).find(([a,b])=>!ST.vast.has(a+','+b));
+    if(v) ST.sel=v.slice();
+    else { const open=P.slots.slice(s.idx+1).concat(P.slots.slice(0,s.idx)).find(x=>x.cells.some(([a,b])=>ST.f[a][b]==='.')); if(open){ nieuwGoed(); kiesSlot(open,true); bewaarV(); kijkKlaar(); return; } }
+  }
+  nieuwGoed(); teken(); bewaarV(); kijkKlaar();
+}
+function terugToets(){
+  if(ST.klaar||ST.pauze||!ST.sel) return;
+  const [r,c]=ST.sel, s=huidig(), k=r+','+c;
+  if(ST.f[r][c]!=='.'&&!ST.vast.has(k)) zet(r,c,'.');
+  else if(s){ let i=s.cells.findIndex(([a,b])=>a===r&&b===c)-1; while(i>=0&&ST.vast.has(s.cells[i].join(','))) i--; if(i>=0){ST.sel=s.cells[i].slice(); zet(ST.sel[0],ST.sel[1],'.');} }
+  teken(); bewaarV();
+}
+function beweeg(dr,dc){
+  if(!ST.sel) return; let [r,c]=ST.sel; const d=dc?'H':'V';
+  for(let k=0;k<Math.max(P.R,P.C);k++){ r+=dr; c+=dc; if(r<0||c<0||r>=P.R||c>=P.C) return; if(P.g[r][c]!=='#'){ ST.sel=[r,c]; if(slotVan(r,c,d)) ST.dir=d; else if(!slotVan(r,c,ST.dir)) ST.dir=d==='H'?'V':'H'; teken(); return; } }
+}
+function hint(){
+  if(ST.klaar||ST.pauze||!ST.sel) return;
+  const s=huidig(); let doel=ST.sel;
+  if(ST.f[doel[0]][doel[1]]===P.g[doel[0]][doel[1]]&&s){ const f=s.cells.find(([a,b])=>ST.f[a][b]!==P.g[a][b]); if(f) doel=f; else { melding('Dit woord klopt al.'); return; } }
+  const [r,c]=doel; ST.f[r][c]=P.g[r][c]; ST.h.add(r+','+c); ST.fout.delete(r+','+c); ST.t+=STRAF_HINT;
+  ST.sel=[r,c]; toonTijd(); nieuwGoed(); teken(); bewaarV(); kijkKlaar();
+}
+function controleer(){
+  if(ST.klaar) return; ST.fout.clear(); let n=0;
+  for(let r=0;r<P.R;r++) for(let c=0;c<P.C;c++){ const v=ST.f[r][c]; if(v!=='#'&&v!=='.'&&v!==P.g[r][c]){ST.fout.add(r+','+c); n++;} }
+  teken(); melding(n?(n===1?'1 letter klopt niet.':n+' letters kloppen niet.'):'Alles wat je hebt ingevuld klopt.');
+}
+function wisWoord(){ if(ST.klaar) return; const s=huidig(); if(!s) return; s.cells.forEach(([r,c])=>{ if(!ST.h.has(r+','+c)) zet(r,c,'.'); }); kiesSlot(s,true); bewaarV(); }
+function bewaarV(){ if(!P||ST.klaar) return; S.prog[P.id]={f:ST.f.map(r=>r.join('')),t:ST.t,h:[...ST.h]}; bewaar(); }
+function kijkKlaar(){
+  if(ST.f.some(r=>r.includes('.'))) return;
+  if(!ST.f.every((r,i)=>r.join('')===P.g[i])){ melding('Alles is ingevuld, maar er zit nog een fout in. Tik op Controleer.'); return; }
+  ST.klaar=true; stopTimer();
+  const t=ST.t, eerder=S.best[P.id], record=!eerder||t<eerder; if(record) S.best[P.id]=t;
+  S.done[P.id]={t}; delete S.prog[P.id]; bewaar();
+  setTimeout(()=>klaarScherm(t,record),400);
+}
+function klaarScherm(t,record){
+  const deel='Ik loste de MOZA Puzzel "'+P.titel+'" op in '+fmt(t)+'. Kun jij het sneller? moza.nu';
+  const ov=document.createElement('div'); ov.className='klaarscherm';
+  ov.innerHTML='<div class="kader klaarkaart" role="dialog" aria-label="Puzzel opgelost"><h2>Dangke voor <em>het puzzelen!</em></h2>'+
+    '<div class="grote-tijd">'+fmt(t)+'<small>'+esc(P.titel)+(record?' · nieuw record':' · record '+fmt(S.best[P.id]))+(ST.h.size?' · '+ST.h.size+' hint'+(ST.h.size>1?'s':''):'')+'</small></div>'+
+    '<div class="molbox"><b>Wist je dat?</b><p>'+esc(P.slots[Math.floor(Math.random()*P.slots.length)].uitleg)+'</p></div>'+
+    '<div class="rij"><button class="knop blauw" id="nog">Volgende puzzel</button><button class="knop" id="deel">Deel je tijd</button></div>'+
+    '<div class="rij"><button class="knop" id="sluit">Lees alle weetjes</button><button class="knop" id="naarOv">Overzicht</button></div></div>';
+  document.body.appendChild(ov);
+  const weg=()=>ov.remove();
+  ov.querySelector('#nog').onclick=()=>{weg(); volgende();};
+  ov.querySelector('#sluit').onclick=()=>{weg(); teken(); document.querySelector('.lijsten').scrollIntoView({behavior:'smooth'});};
+  ov.querySelector('#naarOv').onclick=()=>{weg(); overzicht();};
+  ov.querySelector('#deel').onclick=()=>{ try{navigator.clipboard.writeText(deel).then(()=>melding('Gekopieerd. Plak het waar je wilt.'),()=>melding(deel));}catch(e){melding(deel);} };
+  ov.querySelector('#nog').focus();
+}
+function volgende(){
+  for(let k=1;k<=DATA.length;k++){ const i=(P.idx+k)%DATA.length; if(!S.done[DATA[i].id]) return spel(i); }
+  melding('Je hebt alle voorbeeldpuzzels opgelost!'); overzicht();
+}
+function toonTijd(){const el=document.getElementById('tijd'); if(el) el.textContent=fmt(ST.t);}
+function startTimer(){stopTimer(); timerId=setInterval(()=>{ if(!ST.pauze&&!ST.klaar&&document.visibilityState==='visible'){ST.t++; toonTijd(); if(ST.t%5===0) bewaarV();} },1000);}
+function stopTimer(){if(timerId) clearInterval(timerId); timerId=null;}
+function zetPauze(a){ if(!P||ST.klaar) return; ST.pauze=a; document.getElementById('pauze').hidden=!a; if(a) bewaarV(); }
+document.addEventListener('keydown',e=>{
+  if(!P||document.querySelector('.klaarscherm')||e.metaKey||e.ctrlKey||e.altKey) return;
+  const k=e.key;
+  if(/^[a-zA-Z]$/.test(k)){typ(k.toUpperCase()); e.preventDefault();}
+  else if(k==='Backspace'){terugToets(); e.preventDefault();}
+  else if(k==='ArrowLeft'){beweeg(0,-1); e.preventDefault();}
+  else if(k==='ArrowRight'){beweeg(0,1); e.preventDefault();}
+  else if(k==='ArrowUp'){beweeg(-1,0); e.preventDefault();}
+  else if(k==='ArrowDown'){beweeg(1,0); e.preventDefault();}
+  else if(k==='Enter'||k==='Tab'){springSlot(e.shiftKey?-1:1); e.preventDefault();}
+});
+let mt=null; function melding(t){const m=document.getElementById('melding'); m.textContent=t; m.hidden=false; clearTimeout(mt); mt=setTimeout(()=>m.hidden=true,3200);}
+overzicht();
+</script>
