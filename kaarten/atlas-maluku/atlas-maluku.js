@@ -88,6 +88,15 @@
   '#mzn .mzn-why p{margin:0 0 8px}',
   '#mzn .mzn-why a{color:var(--fg);text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:2px;font-weight:700}',
   '#mzn .mzn-why .mzn-more{margin:0;color:var(--muted)}',
+  '#mzn .pk{position:relative}',
+  '#mzn .pk svg{position:absolute;left:-7px;top:-8px;display:block;overflow:visible}',
+  '#mzn .pk path{fill:#111;stroke:#fff;stroke-width:1.5}',
+  '#mzn .pk.v path{fill:#FF4D2E;stroke:#111}',
+  '#mzn .pk .pl{position:absolute;left:9px;top:-9px;white-space:nowrap;font:italic 600 13px/1 var(--fa);color:var(--label-fg);background:var(--label-bg);padding:2px 5px 3px;border:1.5px dashed var(--edge);pointer-events:none}',
+  '#mzn .pk .pl b{font:800 11px/1 var(--f);font-style:normal;margin-left:2px;font-variant-numeric:tabular-nums}',
+  '#mzn .pk.nolb .pl{display:none}',
+  '#mzn .mzn-chk{display:flex;align-items:center;gap:8px;font-weight:700;cursor:pointer;margin-top:2px}',
+  '#mzn .mzn-chk input{width:18px;height:18px;accent-color:#111;margin:0}',
   '#mzn .mzn-foot{font-size:11.5px;color:var(--muted);border-top:2px solid var(--line);padding:10px 18px 12px}#mzn .mzn-foot a{color:inherit}',
   '#mzn .mzn-ro{position:absolute;z-index:1000;left:398px;bottom:16px;background:var(--panel);color:var(--fg);border:2px solid var(--line);box-shadow:4px 4px 0 #111;padding:6px 10px;font:600 12px var(--f);font-variant-numeric:tabular-nums;pointer-events:none;max-width:50%}',
   '#mzn .mzn-cmp{position:absolute;z-index:999;right:16px;top:16px;width:46px;height:58px;pointer-events:none}',
@@ -134,6 +143,11 @@
      '<div class="mzn-key"><svg width="30" height="20"><rect x="1" y="1" width="28" height="18" fill="#E9F25A" stroke="#111" stroke-width="2"/><circle cx="15" cy="10" r="3.5" fill="#111" stroke="#fff" stroke-width="1.5"/></svg><span><b>Dorp</b>: officieel een desa, met een eigen dorpsbestuur</span></div>'+
      '<div class="mzn-key"><svg width="30" height="20"><defs><pattern id="mzn-lgh" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="#E9F25A"/><rect width="2.4" height="6" fill="#111" fill-opacity=".55"/></pattern></defs><rect x="1" y="1" width="28" height="18" fill="url(#mzn-lgh)" stroke="#111" stroke-width="2"/><rect x="11.5" y="6.5" width="7" height="7" fill="#111" stroke="#fff" stroke-width="1.5"/></svg><span><b>Kelurahan</b>: wijk met een lurah (ambtenaar) als hoofd, vooral in de stad</span></div>'+
     '</div></section>'+
+    '<section><h3 class="mzn-t">Bergen</h3><div class="mzn-keys">'+
+     '<div class="mzn-key"><svg width="30" height="20"><path d="M15 3 L24 17 H6 Z" fill="#111" stroke="#fff" stroke-width="1.5"/></svg><span>Bergtop met hoogte in meters</span></div>'+
+     '<div class="mzn-key"><svg width="30" height="20"><path d="M15 3 L24 17 H6 Z" fill="#FF4D2E" stroke="#111" stroke-width="1.5"/></svg><span>Vulkaan met hoogte in meters</span></div>'+
+     '<label class="mzn-chk"><input type="checkbox" id="mzn-bergen" checked> Toon bergen</label>'+
+    '</div><p class="mzn-hint">Uitgezoomd zie je alleen de hoogste toppen. Hoogtes uit OpenStreetMap, alleen toppen waarvan de hoogte bekend is.</p></section>'+
     '<section><h3 class="mzn-t">Lijnen en vlakken</h3><div class="mzn-keys">'+
      '<div class="mzn-key"><svg width="30" height="20"><line x1="1" y1="10" x2="29" y2="10" stroke="currentColor" stroke-width="3.5"/></svg><span>Kust</span></div>'+
      '<div class="mzn-key"><svg width="30" height="20"><line x1="1" y1="10" x2="29" y2="10" stroke="currentColor" stroke-width="2" stroke-dasharray="6 3"/></svg><span>Grens kecamatan (district)</span></div>'+
@@ -145,7 +159,7 @@
     '<p>Op de Molukken heeft een dorp niet overal dezelfde naam. Op Ambon, de Lease-eilanden en Seram zeg je vooral negeri. Op de Kei-eilanden heet een dorp ohoi. In delen van Seram en op de Zuidwestereilanden hoor je ook aman of hena. Elders hebben dorpen een eigen naam in de lokale taal.</p>'+
     '<p>Deze kaart laat alle Molukken zien. Daarom gebruiken we het gewone woord dorp. Zo doen we geen enkele streek tekort. De overheid noemt een dorp desa. Een kelurahan is een wijk met een ambtenaar als hoofd.</p>'+
     '<p class="mzn-more">Lees meer: <a href="/kennisbank/wat-is-een-negeri-en-wat-doet-een-raja-in-de-molukken">Wat is een negeri?</a> en <a href="/kennisbank/waar-ligt-de-eilandengroep-molukken-precies">Waar liggen de Molukken?</a></p></section>'+
-  '</div><div class="mzn-foot">Bron: grenzen en codes uit <a href="https://github.com/cahyadsn/wilayah_boundaries" target="_blank" rel="noopener">wilayah_boundaries</a> (open data, MIT-licentie), provincies Maluku en Maluku Utara. Grenzen zijn vereenvoudigd en niet geschikt voor juridisch gebruik.</div></aside>'+
+  '</div><div class="mzn-foot">Bron: grenzen en codes uit <a href="https://github.com/cahyadsn/wilayah_boundaries" target="_blank" rel="noopener">wilayah_boundaries</a> (open data, MIT-licentie), provincies Maluku en Maluku Utara. Grenzen zijn vereenvoudigd en niet geschikt voor juridisch gebruik. Bergen: © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap-bijdragers</a> (ODbL).</div></aside>'+
   '<div class="mzn-ro">Beweeg over de kaart</div>';
 
   function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
@@ -165,6 +179,8 @@
     var st=document.createElement('style');st.id='mzn-css';st.textContent=CSS;document.head.appendChild(st);
     var data=null,ready=0;
     function go(){if(++ready===2)build(root,data)}
+    var bergen=fetch(BASE+'bergen.json').then(function(r){return r.ok?r.json():null}).catch(function(){return null});
+    root._bergen=bergen;
     loadLeaflet(go);
     fetch(BASE+'index.json').then(function(r){if(!r.ok)throw r.status;return r.json()}).then(function(j){data=j;go()})
       .catch(function(e){if(window.console)console.error('MOZA Atlas Maluku',e);var el=root.querySelector('.mzn-load');if(el)el.textContent='De kaart kon niet laden. Probeer het later opnieuw.'});
@@ -253,6 +269,29 @@
         html:'<div class="vm '+(f.t==='kel'?'kel':'desa')+(isSel(f)?' sel':'')+'"><span class="dot"></span><span class="lb">'+esc(f.n)+'</span></div>'})});
       m.on('click',function(){select(f,false)});m.on('mouseover',function(){readout(f)});f._m=m;return m}
 
+    /* Bergen */
+    var peaks=[],peakLayer=L.layerGroup().addTo(map),showPeaks=true;
+    function fmtM(e){return e.toLocaleString('nl-NL')+' m'}
+    (root._bergen||Promise.resolve(null)).then(function(B){if(!B)return;
+      peaks=B.p.map(function(r){return {n:r[0],e:r[1],v:!!r[2],la:r[3],lo:r[4]}});
+      peaks.forEach(function(p){
+        p._m=L.marker([p.la,p.lo],{keyboard:false,zIndexOffset:500,title:p.n+' ('+fmtM(p.e)+')',icon:L.divIcon({className:'',iconSize:[0,0],
+          html:'<div class="pk'+(p.v?' v':'')+'"><svg width="14" height="12" viewBox="0 0 14 12"><path d="M7 1 L13 11 H1 Z"/></svg><span class="pl">'+esc(p.n)+' <b>'+fmtM(p.e)+'</b></span></div>'})});
+        p._m.on('click',function(){peakCard(p)});
+      });
+      placeLabels()});
+    function peakMin(z){return z<6.5?2000:z<7.5?1400:z<8.75?800:0}
+    function peakCard(p){
+      if(selected)clearSel();
+      card.innerHTML='<button class="x" type="button">Sluit</button>'+
+        '<span class="mzn-tag" style="background:'+(p.v?'#FF4D2E':'#fff')+'">'+(p.v?'Vulkaan':'Berg')+'</span>'+
+        '<div class="nm">'+esc(p.n)+'</div><dl>'+
+        '<dt>Hoogte</dt><dd>'+fmtM(p.e)+'</dd>'+
+        '<dt>Ligging</dt><dd>'+dms(p.la,'NB','ZB')+'<br>'+dms(p.lo,'OL','WL')+'</dd>'+
+        '<dt>Bron</dt><dd>OpenStreetMap</dd></dl>';
+      card.hidden=false;card.querySelector('.x').onclick=function(){card.hidden=true};
+      ro.innerHTML='<b>'+esc(p.n)+'</b> · '+fmtM(p.e)}
+
     function placeLabels(){
       var z=map.getZoom(),size=map.getSize(),boxes=[],minZ=isPhone()?10.5:10,showDots=z>=(isPhone()?10:8.75);
       var vb=map.getBounds().pad(.15),inView=[];
@@ -263,6 +302,16 @@
       inView.forEach(function(f){var m=markerFor(f);m._fk=f.k;if(!marks.hasLayer(m))marks.addLayer(m)});
       inView.sort(function(a,b){return (isSel(b)?1:0)-(isSel(a)?1:0)||b._a-a._a});
       inView.forEach(function(f){var el=f._m.getElement();if(el)el.firstChild.classList.remove('show')});
+      /* bergen gaan voor: hoogste eerst */
+      var pmin=peakMin(z),vbp=map.getBounds();
+      peaks.slice().sort(function(a,b){return b.e-a.e}).forEach(function(p){
+        var want=showPeaks&&p.e>=pmin&&vbp.contains([p.la,p.lo]);
+        if(!want){if(peakLayer.hasLayer(p._m))peakLayer.removeLayer(p._m);return}
+        var pt=map.latLngToContainerPoint([p.la,p.lo]),w=(p.n.length+7)*6.6+10,bx=[pt.x-7,pt.y-8,pt.x+10+w,pt.y+8];
+        var hit=boxes.some(function(o){return !(bx[2]<o[0]||bx[0]>o[2]||bx[3]<o[1]||bx[1]>o[3])});
+        if(!peakLayer.hasLayer(p._m))peakLayer.addLayer(p._m);
+        var el=p._m.getElement();if(el)el.firstChild.classList.toggle('nolb',hit);
+        if(!hit)boxes.push(bx)});
       if(z<minZ)return;
       inView.forEach(function(f){var el=f._m.getElement();if(!el)return;
         var pt=map.latLngToContainerPoint(f._m.getLatLng());if(pt.x<-50||pt.y<-20||pt.x>size.x+50||pt.y>size.y+20)return;
@@ -326,7 +375,7 @@
       var e=f._m&&f._m.getElement();e&&e.firstChild.classList.remove('sel');f._m&&f._m.setZIndexOffset(0);card.hidden=true;placeLabels()}
 
     /* Ga naar: per eilandgroep */
-    var GB={};feats.forEach(function(f){(GB[f.g]=GB[f.g]||L.latLngBounds([f.la,f.lo],[f.la,f.lo])).extend([f.la,f.lo])});
+    var GB={};feats.forEach(function(f){if(f.kb==='81.01'&&f.la<-5)return;(GB[f.g]=GB[f.g]||L.latLngBounds([f.la,f.lo],[f.la,f.lo])).extend([f.la,f.lo])});
     var jump=$('.mzn-jump');
     G.concat(['all']).forEach(function(g){var b=document.createElement('button');b.type='button';b.textContent=g==='all'?'Alles':KNOP[g];
       b.onclick=function(){var bb=g==='all'?L.latLngBounds(feats.map(function(f){return [f.la,f.lo]})):GB[g];
@@ -340,6 +389,7 @@
       b.innerHTML='<span class="sw" style="background:'+css('--g-'+g)+'"></span><span>'+o.naam+'<small>'+o.sub+'</small></span><span class="n">'+n.toLocaleString('nl-NL')+'</span>';
       b.onclick=function(){visible[g]=!visible[g];renderGroups();applyVisibility()};gwrap.appendChild(b)})}
     renderGroups();
+    $('#mzn-bergen').addEventListener('change',function(e){showPeaks=e.target.checked;placeLabels()});
     $('[data-s="tot"]').textContent=feats.length.toLocaleString('nl-NL');
     $('[data-s="desa"]').textContent=feats.filter(function(f){return f.t==='desa'}).length.toLocaleString('nl-NL');
     $('[data-s="kel"]').textContent=feats.filter(function(f){return f.t==='kel'}).length.toLocaleString('nl-NL');
