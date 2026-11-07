@@ -44,7 +44,7 @@
   ' #mzk .k-fil{margin:0 -20px 22px;padding:14px 0 14px;border-left:0;border-right:0;box-shadow:none;gap:10px}',
   ' #mzk .k-fr{flex-direction:column;align-items:stretch;gap:6px}',
   ' #mzk .k-fl{width:auto;padding:0 20px}',
-  ' #mzk .k-chips{flex-wrap:nowrap;overflow-x:auto;scroll-snap-type:x proximity;padding:2px 20px 6px;scrollbar-width:none;-webkit-overflow-scrolling:touch}',
+  ' #mzk .k-chips{flex-wrap:nowrap;overflow-x:auto;scroll-snap-type:x proximity;scroll-padding-inline:20px;padding:2px 20px 6px;scrollbar-width:none;-webkit-overflow-scrolling:touch}',
   ' #mzk .k-chips::-webkit-scrollbar{display:none}',
   ' #mzk .k-chips .k-chip{scroll-snap-align:start}',
   ' #mzk .k-seg{margin:0 20px;display:flex}',
@@ -103,7 +103,7 @@
     seg.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;state.so=b.getAttribute('data-so');render();setHash();gc('kaarten-filter/soort/'+state.so)});
     none.querySelector('.k-reset').addEventListener('click',function(){state={th:'',so:'alle'};render();setHash()});
     render();
-    var cur=chips.querySelector('[aria-pressed="true"]');if(cur&&state.th)setTimeout(function(){chips.scrollLeft=Math.max(0,cur.offsetLeft-chips.offsetLeft-20)},60);
+    var cur=chips.querySelector('[aria-pressed="true"]');setTimeout(function(){chips.scrollLeft=state.th&&cur?Math.max(0,cur.offsetLeft-chips.offsetLeft-20):0},60);
     return true;
   }
   var n=0;(function go(){if(init()||++n>100)return;setTimeout(go,120)})();
