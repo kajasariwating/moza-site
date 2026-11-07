@@ -103,8 +103,30 @@
     div.style.cssText = 'margin:24px 0';
     /* Leestijd heeft geen zin bij een spel */
     var st = document.createElement('style'); st.id = 'mzsp-post-css';
-    st.textContent = '.blog-item-top-wrapper .moza-leestijd{display:none!important}';
+    st.textContent =
+      '.mzsp-regels{margin:8px 0 0;border:2px solid currentColor}' +
+      '.mzsp-regels>summary{cursor:pointer;font-weight:800;padding:12px 16px;list-style:none;display:flex;justify-content:space-between;gap:12px}' +
+      '.mzsp-regels>summary::-webkit-details-marker{display:none}' +
+      '.mzsp-regels>summary::after{content:"+";font-weight:900}' +
+      '.mzsp-regels[open]>summary::after{content:"\\2212"}' +
+      '.mzsp-regels>div{padding:0 16px 8px}';
     document.head.appendChild(st);
+    /* De site zet de leestijd met een zeer sterke regel; inline met !important wint altijd. */
+    var weg = function(){ [].forEach.call(document.querySelectorAll('.blog-item-top-wrapper .moza-leestijd'), function(e){ e.style.setProperty('display', 'none', 'important'); }); };
+    weg(); var n = 0, t = setInterval(function(){ weg(); if (++n > 20) clearInterval(t); }, 250);
+    /* Spelregels inklappen, zodat het spel op de telefoon meteen in beeld is. */
+    try {
+      var kop = [].slice.call(plek.querySelectorAll('p, h2, h3, h4')).filter(function(p){ return /^\s*zo werkt het spel/i.test(p.textContent); })[0];
+      if (kop) {
+        var det = document.createElement('details'); det.className = 'mzsp-regels';
+        var sum = document.createElement('summary'); sum.textContent = 'Zo werkt het spel'; det.appendChild(sum);
+        var inh = document.createElement('div'); det.appendChild(inh);
+        var blok = kop.closest('.sqs-html-content') || kop.parentNode;
+        var n2 = kop.nextElementSibling;
+        while (n2 && n2.parentNode === kop.parentNode) { var volg = n2.nextElementSibling; inh.appendChild(n2); n2 = volg; }
+        kop.parentNode.replaceChild(det, kop);
+      }
+    } catch(e){}
     plek.appendChild(div);
   }
 
