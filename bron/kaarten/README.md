@@ -9,3 +9,9 @@ Een nieuwe kaart:
 2. Zet de nieuwe `mzm-cfg` in de header-injectie van die pagina.
 3. Voeg een regel toe aan `MZK.kaarten` (blok `mz-ks-js`), een kleur aan `COL` (blok `mz-kmore-js`), een regel aan `KA` (zoeken) en aan het menu (blok `mztabs-js`).
 4. Optioneel: een eigen plaatje voor het overzicht op /kaarten (functie `art` in de header-injectie van de pagina Kaarten).
+
+## Talen van Maluku
+Deze kaart gebruikt niet `mzKaart`, maar een eigen script in `kaarten/talen-maluku/`. In `MZK.kaarten` staat `na:'#mzt-kop'`: daarachter zet de site de kennisbalk en de rij Meer kaarten.
+
+## Filters op /kaarten
+`kaarten/overzicht/filters.js` voegt filters toe aan het overzicht. Het thema per kaart staat in `MZK.kaarten` (veld `th`: natuur, weer, aarde, geschiedenis, mensen). Een nieuwe kaart heeft dus ook een `th` nodig. Het script staat als `<script id="mzk-filter-js">` in de pagina-injectie van de pagina Kaarten.

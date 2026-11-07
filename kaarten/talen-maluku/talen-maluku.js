@@ -144,7 +144,9 @@
     var root=document.createElement('div');root.id='mzt';root.innerHTML=HTML;
     /* #moza-kaart: de nachtmodus-hulp van de site (moza-dark-js) laat alles hierbinnen met rust. */
     var wrap=document.createElement('div');wrap.id='moza-kaart';wrap.appendChild(root);
-    if(host){host.appendChild(wrap)}else{var m=document.querySelector('main#page')||document.querySelector('main')||document.body;m.insertBefore(wrap,m.firstChild)}
+    /* #mzt-kop: hierachter zet de site de kennisbalk en de rij Meer kaarten (MZK.kaarten, na:'#mzt-kop'). */
+    var kop=document.createElement('div');kop.id='mzt-kop';
+    if(host){host.appendChild(kop);host.appendChild(wrap)}else{var m=document.querySelector('main#page')||document.querySelector('main')||document.body;m.insertBefore(wrap,m.firstChild);m.insertBefore(kop,wrap)}
     var st=document.createElement('style');st.id='mzt-css';st.textContent=CSS;document.head.appendChild(st);
     inlAll(root);new MutationObserver(function(ms){ms.forEach(function(m){[].forEach.call(m.addedNodes,inlAll)})}).observe(root,{childList:true,subtree:true});
     var T=null,LAND=null,ready=0;function go(){if(++ready===3)build(root,T,LAND)}
