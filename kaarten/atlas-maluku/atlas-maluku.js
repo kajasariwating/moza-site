@@ -1,8 +1,9 @@
-/* MOZA – Kaart van alle negeri van de Molukken (provincies Maluku en Maluku Utara).
+/* MOZA – Atlas Maluku: kaart van alle dorpen van de Molukken (provincies Maluku en Maluku Utara).
+   We schrijven 'dorp' (officieel desa), niet negeri: negeri hoort vooral bij Ambon, Lease en Seram. Zie de toelichting in het paneel.
    Gegevens: cahyadsn/wilayah_boundaries (MIT), commit 2c0d8c7. Grenzen vereenvoudigd en gecodeerd (polyline).
-   - index.json: alle negeri als punt (voor zoeken en labels) en per kabupaten een grove omtrek.
+   - index.json: alle dorpen als punt (voor zoeken en labels) en per kabupaten een grove omtrek.
    - kab/<code>.json: de echte grenzen per kabupaten. Die laden pas als je inzoomt.
-   Gebruik op een pagina: <script src="https://cdn.jsdelivr.net/gh/kajasariwating/moza-site@COMMIT/kaarten/negeri/negeri.js" defer></script>
+   Gebruik op een pagina: <script src="https://cdn.jsdelivr.net/gh/kajasariwating/moza-site@COMMIT/kaarten/atlas-maluku/atlas-maluku.js" defer></script>
    De kaart komt in <div id="mzn-plek"></div> als die er is, anders bovenaan de pagina. */
 (function(){
   if (window.__mzNegeri) return; window.__mzNegeri = 1;
@@ -83,6 +84,10 @@
   '#mzn .mzn-card .warn{margin:10px 0 0;font-size:12.5px;padding:8px 10px;background:var(--geel);color:#111;border:2px solid #111}',
   '#mzn .mzn-card .x{float:right;border:2px solid var(--line);background:none;color:var(--fg);font:800 12px var(--f);padding:3px 8px;cursor:pointer;border-radius:0}',
   '#mzn .mzn-tag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:2px 6px;border:2px solid #111;color:#111}',
+  '#mzn .mzn-why{border-top:2px solid var(--line);padding-top:14px;font-size:13.5px}',
+  '#mzn .mzn-why p{margin:0 0 8px}',
+  '#mzn .mzn-why a{color:var(--fg);text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:2px;font-weight:700}',
+  '#mzn .mzn-why .mzn-more{margin:0;color:var(--muted)}',
   '#mzn .mzn-foot{font-size:11.5px;color:var(--muted);border-top:2px solid var(--line);padding:10px 18px 12px}#mzn .mzn-foot a{color:inherit}',
   '#mzn .mzn-ro{position:absolute;z-index:1000;left:398px;bottom:16px;background:var(--panel);color:var(--fg);border:2px solid var(--line);box-shadow:4px 4px 0 #111;padding:6px 10px;font:600 12px var(--f);font-variant-numeric:tabular-nums;pointer-events:none;max-width:50%}',
   '#mzn .mzn-cmp{position:absolute;z-index:999;right:16px;top:16px;width:46px;height:58px;pointer-events:none}',
@@ -113,29 +118,33 @@
   '@media (prefers-reduced-motion:reduce){#mzn *{transition:none!important;animation:none!important}}'
   ].join('\n');
   var HTML = ''+
-  '<div class="mzn-map" role="application" aria-label="Kaart van alle negeri van de Molukken"><div class="mzn-load">Kaart laden…</div></div>'+
+  '<div class="mzn-map" role="application" aria-label="Atlas Maluku: kaart van alle dorpen van de Molukken"><div class="mzn-load">Kaart laden…</div></div>'+
   '<div class="mzn-busy" hidden>Grenzen laden…</div>'+
   '<svg class="mzn-cmp" viewBox="0 0 46 58" aria-hidden="true"><rect x="1.5" y="1.5" width="43" height="55" fill="#fff" stroke="#111" stroke-width="3"/><text x="23" y="17" text-anchor="middle" font-family="Hanken Grotesk, sans-serif" font-weight="900" font-size="13" fill="#111">N</text><path d="M23 22 L31 48 L23 42 L15 48 Z" fill="#111"/><path d="M23 22 L23 42 L15 48 Z" fill="#E9F25A" stroke="#111" stroke-width="1.5"/></svg>'+
   '<aside class="mzn-panel" aria-label="Kaartinformatie"><div class="mzn-scroll">'+
-   '<div class="mzn-head"><div class="mzn-eb">MOZA · Kaart</div><h2 class="mzn-h">Alle negeri van de <em>Molukken</em></h2>'+
-   '<p class="mzn-lead">Van Morotai tot Wetar en van Sula tot Aru. Elk vlak is een negeri of een stadswijk, met de echte grenzen.</p></div>'+
-   '<div class="mzn-stats"><div><b data-s="tot">–</b><span>totaal</span></div><div><b data-s="desa">–</b><span>negeri</span></div><div><b data-s="kel">–</b><span>kelurahan</span></div></div>'+
-   '<div class="mzn-search"><label class="mzn-lbl" for="mzn-q">Zoek een negeri</label><input id="mzn-q" class="mzn-q" type="search" autocomplete="off" placeholder="Bijv. Hila, Tulehu, Soahuku"><ul class="mzn-res" hidden></ul></div>'+
+   '<div class="mzn-head"><div class="mzn-eb">MOZA · Kaart</div><h2 class="mzn-h">Atlas <em>Maluku</em></h2>'+
+   '<p class="mzn-lead">Alle dorpen van de Molukken, van Morotai tot Wetar en van Sula tot Aru. Elk vlak is een dorp of een stadswijk, met de echte grenzen.</p></div>'+
+   '<div class="mzn-stats"><div><b data-s="tot">–</b><span>totaal</span></div><div><b data-s="desa">–</b><span>dorpen</span></div><div><b data-s="kel">–</b><span>kelurahan</span></div></div>'+
+   '<div class="mzn-search"><label class="mzn-lbl" for="mzn-q">Zoek een dorp</label><input id="mzn-q" class="mzn-q" type="search" autocomplete="off" placeholder="Bijv. Hila, Tulehu, Soahuku"><ul class="mzn-res" hidden></ul></div>'+
    '<article class="mzn-card" hidden aria-live="polite"></article>'+
    '<div><h3 class="mzn-t">Ga naar</h3><div class="mzn-jump" aria-label="Ga naar gebied"></div></div>'+
    '<div class="mzn-leg">'+
     '<section><h3 class="mzn-t">Eilandgroep</h3><div class="mzn-groups"></div><p class="mzn-hint">Klik op een groep om die aan of uit te zetten.</p></section>'+
     '<section><h3 class="mzn-t">Soort gebied</h3><div class="mzn-keys">'+
-     '<div class="mzn-key"><svg width="30" height="20"><rect x="1" y="1" width="28" height="18" fill="#E9F25A" stroke="#111" stroke-width="2"/><circle cx="15" cy="10" r="3.5" fill="#111" stroke="#fff" stroke-width="1.5"/></svg><span><b>Negeri</b>: dorp met een eigen bestuur. De overheid noemt dit een desa.</span></div>'+
+     '<div class="mzn-key"><svg width="30" height="20"><rect x="1" y="1" width="28" height="18" fill="#E9F25A" stroke="#111" stroke-width="2"/><circle cx="15" cy="10" r="3.5" fill="#111" stroke="#fff" stroke-width="1.5"/></svg><span><b>Dorp</b>: officieel een desa, met een eigen dorpsbestuur</span></div>'+
      '<div class="mzn-key"><svg width="30" height="20"><defs><pattern id="mzn-lgh" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="#E9F25A"/><rect width="2.4" height="6" fill="#111" fill-opacity=".55"/></pattern></defs><rect x="1" y="1" width="28" height="18" fill="url(#mzn-lgh)" stroke="#111" stroke-width="2"/><rect x="11.5" y="6.5" width="7" height="7" fill="#111" stroke="#fff" stroke-width="1.5"/></svg><span><b>Kelurahan</b>: wijk met een lurah (ambtenaar) als hoofd, vooral in de stad</span></div>'+
     '</div></section>'+
     '<section><h3 class="mzn-t">Lijnen en vlakken</h3><div class="mzn-keys">'+
      '<div class="mzn-key"><svg width="30" height="20"><line x1="1" y1="10" x2="29" y2="10" stroke="currentColor" stroke-width="3.5"/></svg><span>Kust</span></div>'+
      '<div class="mzn-key"><svg width="30" height="20"><line x1="1" y1="10" x2="29" y2="10" stroke="currentColor" stroke-width="2" stroke-dasharray="6 3"/></svg><span>Grens kecamatan (district)</span></div>'+
-     '<div class="mzn-key"><svg width="30" height="20"><line x1="1" y1="10" x2="29" y2="10" stroke="currentColor" stroke-width="1" stroke-opacity=".55"/></svg><span>Grens negeri of wijk</span></div>'+
+     '<div class="mzn-key"><svg width="30" height="20"><line x1="1" y1="10" x2="29" y2="10" stroke="currentColor" stroke-width="1" stroke-opacity=".55"/></svg><span>Grens dorp of wijk</span></div>'+
      '<div class="mzn-key"><svg width="30" height="20"><rect x="1" y="1" width="28" height="18" fill="#1F3BD1"/><line x1="1" y1="10" x2="29" y2="10" stroke="#fff" stroke-opacity=".4"/><line x1="15" y1="1" x2="15" y2="19" stroke="#fff" stroke-opacity=".4"/></svg><span>Zee, met lijnen per graad (ingezoomd per ¼ graad)</span></div>'+
-    '</div><p class="mzn-hint">Ver uitgezoomd zie je alleen de eilanden. Zoom in om de grenzen van elke negeri te zien.</p></section>'+
+    '</div><p class="mzn-hint">Ver uitgezoomd zie je alleen de eilanden. Zoom in om de grenzen van elk dorp te zien.</p></section>'+
    '</div>'+
+   '<section class="mzn-why"><h3 class="mzn-t">Waarom dorp en niet negeri?</h3>'+
+    '<p>Op de Molukken heeft een dorp niet overal dezelfde naam. Op Ambon, de Lease-eilanden en Seram zeg je vooral negeri. Op de Kei-eilanden heet een dorp ohoi. In delen van Seram en op de Zuidwestereilanden hoor je ook aman of hena. Elders hebben dorpen een eigen naam in de lokale taal.</p>'+
+    '<p>Deze kaart laat alle Molukken zien. Daarom gebruiken we het gewone woord dorp. Zo doen we geen enkele streek tekort. De overheid noemt een dorp desa. Een kelurahan is een wijk met een ambtenaar als hoofd.</p>'+
+    '<p class="mzn-more">Lees meer: <a href="/kennisbank/wat-is-een-negeri-en-wat-doet-een-raja-in-de-molukken">Wat is een negeri?</a> en <a href="/kennisbank/waar-ligt-de-eilandengroep-molukken-precies">Waar liggen de Molukken?</a></p></section>'+
   '</div><div class="mzn-foot">Bron: grenzen en codes uit <a href="https://github.com/cahyadsn/wilayah_boundaries" target="_blank" rel="noopener">wilayah_boundaries</a> (open data, MIT-licentie), provincies Maluku en Maluku Utara. Grenzen zijn vereenvoudigd en niet geschikt voor juridisch gebruik.</div></aside>'+
   '<div class="mzn-ro">Beweeg over de kaart</div>';
 
@@ -158,7 +167,7 @@
     function go(){if(++ready===2)build(root,data)}
     loadLeaflet(go);
     fetch(BASE+'index.json').then(function(r){if(!r.ok)throw r.status;return r.json()}).then(function(j){data=j;go()})
-      .catch(function(e){if(window.console)console.error('MOZA negeri-kaart',e);var el=root.querySelector('.mzn-load');if(el)el.textContent='De kaart kon niet laden. Probeer het later opnieuw.'});
+      .catch(function(e){if(window.console)console.error('MOZA Atlas Maluku',e);var el=root.querySelector('.mzn-load');if(el)el.textContent='De kaart kon niet laden. Probeer het later opnieuw.'});
   }
 
   function build(root,D){
@@ -168,7 +177,7 @@
     $('.mzn-load').remove();
     var G=Object.keys(GROUPS);
 
-    /* Kabupaten en negeri uit de index */
+    /* Kabupaten en dorpen uit de index */
     var KABS={};D.kab.forEach(function(k){KABS[k.k]={k:k.k,n:k.n,b:L.latLngBounds([k.b[0],k.b[1]],[k.b[2],k.b[3]]),o:k.o,state:0,feats:[]}});
     var feats=D.p.map(function(r){var off=r[1];return {k:r[0],off:off,n:NAMEN[off]||off,kec:D.kec[r[2]],t:r[3]?'kel':'desa',g:r[4],la:r[5],lo:r[6],nog:!!r[7],kb:r[0].slice(0,5),_a:0}});
     var byK={};feats.forEach(function(f){byK[f.k]=f;KABS[f.kb].feats.push(f)});
@@ -232,7 +241,7 @@
         if(d.kust.length)L.polygon(polys(d.kust),{interactive:false,fill:false,color:css('--edge'),weight:3.2,opacity:1}).addTo(kust);
         K.state=2;applyVisibility();ensureDefs();kec.bringToFront();kust.bringToFront();
         if(selected&&selected.kb===kb&&selected._l){selected._l.setStyle(styleFor(selected,false));selected._l.bringToFront()}
-      }).catch(function(e){K.state=0;K.p=null;if(window.console)console.error('MOZA negeri-kaart',kb,e)})
+      }).catch(function(e){K.state=0;K.p=null;if(window.console)console.error('MOZA Atlas Maluku',kb,e)})
         .then(function(){if(--loading<=0){loading=0;busy.hidden=true}placeLabels()});
       return K.p}
     function loadVisible(){if(map.getZoom()<DETAIL_ZOOM)return;var vb=map.getBounds().pad(.1);
@@ -296,14 +305,14 @@
       card.innerHTML='<button class="x" type="button">Sluit</button>'+
         '<span class="mzn-tag" style="background:'+css('--g-'+f.g)+'">'+GROUPS[f.g].naam+'</span>'+
         '<div class="nm">'+esc(f.n)+'</div><dl>'+
-        '<dt>Soort</dt><dd>'+(f.t==='kel'?'Kelurahan (wijk)':'Negeri (officieel: desa)')+'</dd>'+
+        '<dt>Soort</dt><dd>'+(f.t==='kel'?'Kelurahan (wijk)':'Dorp (desa)')+'</dd>'+
         (f.off!==f.n?'<dt>Officieel</dt><dd>'+esc(f.off)+'</dd>':'')+
         '<dt>Kecamatan</dt><dd>'+esc(f.kec)+'</dd>'+
         '<dt>Bestuur</dt><dd>'+esc(K.n)+'</dd>'+
         '<dt>Provincie</dt><dd>'+PROV[f.k.slice(0,2)]+'</dd>'+
         '<dt>Ligging</dt><dd>'+dms(f.la,'NB','ZB')+'<br>'+dms(f.lo,'OL','WL')+'</dd>'+
         '<dt>Code</dt><dd>'+f.k+'</dd></dl>'+
-        (f.nog?'<p class="warn">De brondata heeft voor deze negeri geen grens. De stip geeft de ligging bij benadering.</p>':'')+
+        (f.nog?'<p class="warn">De brondata heeft voor dit dorp geen grens. De stip geeft de ligging bij benadering.</p>':'')+
         (f.kb==='81.01'&&f.la<-5?'<p class="warn">Let op: de brondata zet dit gebied ver ten zuiden van Seram. Mogelijk klopt de ligging niet.</p>':'');
       card.hidden=false;card.querySelector('.x').onclick=clearSel;readout(f);
       if(fly){
@@ -341,7 +350,7 @@
     function search(){var v=norm(q.value);res.innerHTML='';if(!v){res.hidden=true;return []}
       var hits=feats.filter(function(f){return f._s.indexOf(v)>-1||f._o.indexOf(v)>-1})
         .sort(function(a,b){return (a._s.indexOf(v)===0?0:1)-(b._s.indexOf(v)===0?0:1)||a.n.localeCompare(b.n)}).slice(0,10);
-      if(!hits.length){res.innerHTML='<li><button type="button" disabled>Geen negeri gevonden. Probeer een andere spelling.</button></li>';res.hidden=false;return []}
+      if(!hits.length){res.innerHTML='<li><button type="button" disabled>Geen dorp gevonden. Probeer een andere spelling.</button></li>';res.hidden=false;return []}
       hits.forEach(function(f){var li=document.createElement('li'),b=document.createElement('button');b.type='button';
         b.innerHTML='<span>'+esc(f.n)+'<span class="k">'+esc(f.kec)+' · '+esc(KABS[f.kb].n.replace(/^Kabupaten /,''))+'</span></span>';
         b.onclick=function(){select(f,true);res.hidden=true;q.value=f.n};li.appendChild(b);res.appendChild(li)});
