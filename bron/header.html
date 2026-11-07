@@ -2573,7 +2573,7 @@ window.MZK={kaarten:[
  {u:'/kaarten/grafstatus',t:'Beschermde graven',d:'Welke gemeenten de graven van de eerste generatie Molukkers een bijzondere status gaven.',bron:'MOZA-onderzoek en gemeenten',live:false,th:'geschiedenis'},
  {u:'/kaarten/vulkanen',t:'Vulkanen op de Molukken',kort:'Vulkanen',d:'Waar de vulkanen liggen en wanneer ze voor het laatst uitbarstten.',bron:'Smithsonian Global Volcanism Program',live:false,th:'aarde'},
  {u:'/kaarten/forten',t:'Forten en specerijen',kort:'Forten',d:'Waar de forten van Portugal, Spanje en de VOC staan en waar de specerijen groeiden.',bron:'Atlas of Mutual Heritage',live:false,th:'geschiedenis'},
- {u:'/kaarten/talen-molukken',t:'Talen van de Molukken',kort:'Talen',d:'Meer dan honderd eigen talen en dialecten, en hoe levend ze nog zijn.',bron:'Glottolog',live:false,th:'mensen',na:'#mzt-kop'},
+ {u:'/kaarten/talen-molukken',t:'Talen van de Molukken',kort:'Talen',d:'Meer dan honderd eigen talen en dialecten, en hoe levend ze nog zijn.',bron:'Glottolog',live:false,th:'mensen'},
  {u:'/kaarten/koraal',t:'Koraalriffen rond de Molukken',kort:'Koraalriffen',d:'Waar koraal en zeegras groeien in de ondiepe zee.',bron:'Allen Coral Atlas',live:false,th:'natuur'},
  {u:'/kaarten/vluchten',t:'Vluchten van en naar Ambon',kort:'Vluchten',d:'Vluchtenbord met vertrektijden en alle rechtstreekse routes van en naar Ambon.',bron:'FlightConnections en FlightsFrom',live:false,th:'mensen'}
 ]};
@@ -2623,8 +2623,6 @@ function more(){var s=document.createElement('section');s.id='mz-kmore';s.setAtt
  return s}
 var tries=0;
 function place(){var root=document.querySelector('#mzm,#mzb');var ks=document.getElementById('mz-ks');
- var tw=!root&&document.querySelector('#moza-kaart > #mzt')?document.getElementById('moza-kaart'):null;
- if(tw){if(!document.getElementById('mz-kchips'))(ks||tw).insertAdjacentElement(ks?'afterend':'beforebegin',chips());if(!document.getElementById('mz-kmore'))tw.after(more());if(document.getElementById('mz-kchips')&&document.getElementById('mz-kmore'))return}
  if(root&&!document.getElementById('mz-kchips')){var at=ks||root.querySelector(':scope > .hero');if(at)at.after(chips())}
  if(root&&!document.getElementById('mz-kmore')){var info=root.querySelector(':scope > .info');if(info)info.after(more())}
  if((document.getElementById('mz-kchips')&&document.getElementById('mz-kmore'))||++tries>60)return;setTimeout(place,250)}

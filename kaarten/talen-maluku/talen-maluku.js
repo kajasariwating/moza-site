@@ -94,6 +94,7 @@
   '#mzt .mzt-panel{position:relative;top:auto;left:auto;bottom:auto;width:auto;border:0;box-shadow:none}',
   '#mzt .mzt-scroll{overflow:visible;padding:18px 16px 16px}#mzt .mzt-foot{padding:10px 16px 14px}',
   '#mzt .mzt-ro{display:none}#mzt .mzt-cmp{top:12px;right:12px;width:38px;height:48px}#mzt .leaflet-top.leaflet-right{top:64px}#mzt h2.mzt-h{font-size:28px}}',
+  '#mzm .mapw #mzt{margin:0;border:0}#mzm .mapw #moza-kaart{display:block}',
   '@media (prefers-reduced-motion:reduce){#mzt *{transition:none!important;animation:none!important}}'
   ].join('\n');
 
@@ -101,25 +102,24 @@
   '<div class="mzt-map" role="application" aria-label="Kaart van de talen van de Molukken"><div class="mzt-load">Kaart laden…</div></div>'+
   '<svg class="mzt-cmp" viewBox="0 0 46 58" aria-hidden="true"><rect x="1.5" y="1.5" width="43" height="55" fill="#fff" stroke="#111" stroke-width="3"/><text x="23" y="17" text-anchor="middle" font-family="Hanken Grotesk, sans-serif" font-weight="900" font-size="13" fill="#111">N</text><path d="M23 22 L31 48 L23 42 L15 48 Z" fill="#111"/><path d="M23 22 L23 42 L15 48 Z" fill="#E9F25A" stroke="#111" stroke-width="1.5"/></svg>'+
   '<aside class="mzt-panel" aria-label="Kaartinformatie"><div class="mzt-scroll">'+
-   '<div><div class="mzt-eb">MOZA · Kaart</div><h2 class="mzt-h">Talen van de <em>Molukken</em></h2>'+
-   '<p class="mzt-lead">Op de Molukken spreken mensen meer dan honderd eigen talen, met nog veel meer dialecten. Veel daarvan worden steeds minder doorgegeven.</p></div>'+
    '<div class="mzt-stats"><div><b data-t="tot">–</b><span>talen</span></div><div><b data-t="gevaar">–</b><span>in gevaar</span></div><div><b data-t="weg">–</b><span>verdwenen</span></div></div>'+
    '<div><label class="mzt-lbl" for="mzt-q">Zoek een taal of dialect</label><input id="mzt-q" class="mzt-q" type="search" autocomplete="off" placeholder="Bijv. Haruku, Tobelo, Kei"><ul class="mzt-res" hidden></ul></div>'+
    '<article class="mzt-card" hidden aria-live="polite"></article>'+
    '<section><h3 class="mzt-t">Hoe levend is de taal?</h3><div class="mzt-tstat"></div><p class="mzt-hint">Hoe meer de stip gevuld is, hoe meer mensen de taal nog spreken.</p></section>'+
    '<section><h3 class="mzt-t">Taalgroep</h3><div class="mzt-groups"></div><p class="mzt-hint">Klik op een groep om die aan of uit te zetten. Maleis is een omgangstaal en heeft een vierkantje.</p></section>'+
-   '<section class="mzt-uitleg"><h3 class="mzt-t">Wat is bahasa tanah?</h3>'+
-    '<p>Bahasa tanah betekent letterlijk taal van het land of oertaal. Zo noemen Molukkers hun eigen talen, naast het Maleis dat iedereen spreekt.</p>'+
-    '<p>Toch is er niet één bahasa tanah. Het is geen taal die vroeger overal op de Molukken werd gesproken. Het is een verzamelnaam voor al die verschillende talen en dialecten op deze kaart. Soms spreekt het ene dorp een andere taal dan het dorp ernaast.</p>'+
-    '<p>De meeste van deze talen zijn wel familie van elkaar, net zoals Nederlands en Duits familie zijn. Ze horen bij de Austronesische taalfamilie, net als het Maleis. De talen van Noord-Halmahera horen bij een andere familie.</p>'+
-   '</section>'+
-   '<section class="mzt-uitleg"><h3 class="mzt-t">Wist je dat</h3><ul>'+
-    '<li>Ternate, Tidore, Tobelo en Galela zijn geen Austronesische talen. Ze horen bij een Papoea-taalfamilie, net als Oirata op Kisar.</li>'+
-    '<li>De taal Banda leeft verder op Kei Besar. Bandanezen vluchtten daarheen na de genocide door de VOC in 1621.</li>'+
-    '<li>Op Ambon en Lease spreken de meeste mensen nu Ambonees Maleis. Bijna alle eigen talen daar zijn bedreigd of al verdwenen.</li>'+
-   '</ul></section>'+
-  '</div><div class="mzt-foot">Elke taal is één stip. Dialecten van dezelfde taal vallen eronder. Een stip is het midden van het taalgebied, geen grens. Bron: <a href="https://glottolog.org" target="_blank" rel="noopener">Glottolog 5.3</a> (CC BY 4.0). Kustlijn: <a href="https://github.com/cahyadsn/wilayah_boundaries" target="_blank" rel="noopener">wilayah_boundaries</a> (MIT).</div></aside>'+
+  '</div><div class="mzt-foot">Elke taal is één stip. Dialecten van dezelfde taal vallen eronder. Een stip is het midden van het taalgebied, geen grens. Bron: <a href="https://glottolog.org" target="_blank" rel="noopener">Glottolog 5.3</a> (CC BY 4.0). Bron: Glottolog 5.3 (CC BY 4.0).</div></aside>'+
   '<div class="mzt-ro">Beweeg over de kaart</div>';
+
+
+  /* Blokken onder de kaart, in de vaste kaartopmaak van de site (#mzm .info). */
+  var HERO='<div class="in"><span class="lbl"><span class="dot st" aria-hidden="true"></span>Kaart · Talen</span><h1>Talen van de Molukken</h1><span class="serif">meer dan honderd eigen talen</span><p>Op de Molukken spreken mensen meer dan honderd eigen talen, met nog veel meer dialecten. Veel daarvan worden steeds minder doorgegeven. Op deze kaart zie je waar ze gesproken worden en hoe levend ze nog zijn.</p></div>';
+  var INFO='<div class="in">'+
+   '<div><h2>Wat zie je hier?</h2><p>Elke stip is een taal. De kleur laat zien bij welke taalgroep de taal hoort. Hoe voller de stip, hoe meer mensen de taal nog spreken. Een lege stippelring is een taal die verdwenen is.</p><p>Klik op een stip voor de dialecten en verwante talen. Verwante talen krijgen een stippellijn op de kaart. Je kunt ook zoeken op de naam van een dialect.</p></div>'+
+   '<div><h2>Wat zie je niet?</h2><p>Een stip is het midden van het gebied waar een taal gesproken wordt, geen grens. Hoeveel mensen een taal spreken, staat er niet bij.</p><p>Hoe levend een taal is, is een schatting van taalkundigen. Van veel dialecten is niets vastgelegd. In werkelijkheid zijn er dus meer dialecten dan op deze kaart.</p></div>'+
+   '<div><h2>Wat is bahasa tanah?</h2><p>Bahasa tanah betekent letterlijk taal van het land of oertaal. Zo noemen Molukkers hun eigen talen, naast het Maleis dat iedereen spreekt.</p><p>Toch is er niet één bahasa tanah. Het is geen taal die vroeger overal op de Molukken werd gesproken. Het is een verzamelnaam voor al die verschillende talen en dialecten op deze kaart. Soms spreekt het ene dorp een andere taal dan het dorp ernaast.</p><p>De meeste van deze talen zijn wel familie van elkaar, net zoals Nederlands en Duits familie zijn. Ze horen bij de Austronesische taalfamilie, net als het Maleis. De talen van Noord-Halmahera horen bij een andere familie.</p></div>'+
+   '<div><h2>Wist je dat?</h2><p>Ternate, Tidore, Tobelo en Galela zijn geen Austronesische talen. Ze horen bij een Papoea-taalfamilie, net als Oirata op Kisar.</p><p>De taal Banda leeft verder op Kei Besar. Bandanezen vluchtten daarheen na de genocide door de VOC in 1621.</p><p>Op Ambon en Lease spreken de meeste mensen nu Ambonees Maleis. Bijna alle eigen talen daar zijn bedreigd of al verdwenen.</p></div>'+
+   '<div><h2>Waar komen de gegevens vandaan?</h2><p>De talen, dialecten, taalfamilies en hoe levend ze zijn komen uit <a href="https://glottolog.org" target="_blank" rel="noopener">Glottolog 5.3</a> van het Max Planck Instituut (CC BY 4.0). De kustlijn komt uit <a href="https://github.com/cahyadsn/wilayah_boundaries" target="_blank" rel="noopener">wilayah_boundaries</a> (MIT).</p></div>'+
+  '</div>';
 
   function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
   function dec(str,f){var a=[],i=0,lat=0,lng=0;while(i<str.length){var b,s=0,r=0;do{b=str.charCodeAt(i++)-63;r|=(b&31)<<s;s+=5}while(b>=32);lat+=(r&1)?~(r>>1):(r>>1);s=0;r=0;do{b=str.charCodeAt(i++)-63;r|=(b&31)<<s;s+=5}while(b>=32);lng+=(r&1)?~(r>>1):(r>>1);a.push([lat/f,lng/f])}return a}
@@ -145,9 +145,19 @@
     var root=document.createElement('div');root.id='mzt';root.innerHTML=HTML;
     /* #moza-kaart: de nachtmodus-hulp van de site (moza-dark-js) laat alles hierbinnen met rust. */
     var wrap=document.createElement('div');wrap.id='moza-kaart';wrap.appendChild(root);
-    /* #mzt-kop: hierachter zet de site de kennisbalk en de rij Meer kaarten (MZK.kaarten, na:'#mzt-kop'). */
-    var kop=document.createElement('div');kop.id='mzt-kop';
-    if(host){host.appendChild(kop);host.appendChild(wrap)}else{var m=document.querySelector('main#page')||document.querySelector('main')||document.body;m.insertBefore(wrap,m.firstChild);m.insertBefore(kop,wrap)}
+    if(host){host.appendChild(wrap)}
+    else{
+      /* Zelfde opbouw als mzKaart: #mzm > header.hero, .mzm-ks, .main > .mapw, section.info. mzkt-js maakt er de vaste kaartopmaak van. */
+      var page=document.querySelector('#page #sections')||document.querySelector('#page')||document.body;
+      var w=document.createElement('div');w.id='mzm';
+      w.innerHTML='<header class="hero">'+HERO+'</header><div class="mzm-ks"></div><div class="main"><div class="mapw"></div></div><section class="info">'+INFO+'</section>';
+      w.querySelector('.mapw').appendChild(wrap);
+      if(page===document.body)document.body.appendChild(w);else page.parentNode.insertBefore(w,page.nextSibling);
+      document.documentElement.classList.add('mzm-on');
+      if(window.mzKS)w.querySelector('.mzm-ks').appendChild(window.mzKS('/kaarten',true));
+      var pad=function(){var hd=document.querySelector('#header');if(!hd)return;var cs=getComputedStyle(hd),hb=hd.getBoundingClientRect().bottom,cur=parseFloat(w.style.marginTop)||0,wt=w.getBoundingClientRect().top-cur,fixed=cs.position==='fixed'||cs.position==='sticky'||cs.position==='absolute';var n=fixed&&window.scrollY<5?Math.max(0,Math.ceil(hb-wt)):cur;w.style.marginTop=n?n+'px':''};
+      pad();setTimeout(pad,300);setTimeout(pad,1200);addEventListener('resize',pad);
+    }
     var st=document.createElement('style');st.id='mzt-css';st.textContent=CSS;document.head.appendChild(st);
     inlAll(root);new MutationObserver(function(ms){ms.forEach(function(m){[].forEach.call(m.addedNodes,inlAll)})}).observe(root,{childList:true,subtree:true});
     var T=null,LAND=null,ready=0;function go(){if(++ready===3)build(root,T,LAND)}

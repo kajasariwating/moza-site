@@ -11,7 +11,7 @@ Een nieuwe kaart:
 4. Optioneel: een eigen plaatje voor het overzicht op /kaarten (functie `art` in de header-injectie van de pagina Kaarten).
 
 ## Talen van de Molukken (/kaarten/talen-molukken)
-Deze kaart gebruikt niet `mzKaart`, maar een eigen script in `kaarten/talen-maluku/`. In `MZK.kaarten` staat `na:'#mzt-kop'`: daarachter zet de site de kennisbalk en de rij Meer kaarten.
+Deze kaart gebruikt niet `mzKaart`, maar een eigen script in `kaarten/talen-maluku/`. Dat bouwt wel dezelfde opbouw (`#mzm` met `.hero`, `.mzm-ks`, `.main > .mapw` en `.info`), zodat de site er de vaste kaartopmaak, Over deze kaart, Volledig scherm en Meer kaarten bij zet.
 
 ## Filters op /kaarten
 `kaarten/overzicht/filters.js` voegt filters toe aan het overzicht. Het thema per kaart staat in `MZK.kaarten` (veld `th`: natuur, weer, aarde, geschiedenis, mensen). Een nieuwe kaart heeft dus ook een `th` nodig. Het script staat als `<script id="mzk-filter-js">` in de pagina-injectie van de pagina Kaarten.
