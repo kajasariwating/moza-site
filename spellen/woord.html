@@ -1,4 +1,4 @@
-<title>MOZA Woord</title>
+<title>Raad het woord</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@1,600&family=Hanken+Grotesk:wght@400;800;900&display=swap">
 <style>
@@ -179,7 +179,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 
 <div class="app">
   <header class="kop">
-    <h1 class="titel">MOZA <em>Woord</em></h1>
+    <h1 class="titel">Raad het <em>woord</em></h1>
     <div class="kopknoppen">
       <button class="ikoon" id="knopUitleg" type="button" aria-label="Uitleg">?</button>
       <button class="ikoon" id="knopStats" type="button" aria-label="Statistieken">
@@ -661,7 +661,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 
   var BLOK = {goed:"🟦", plek:"🟨", mis:"⬜"};
   function deelTekst(){
-    var kop = S.modus === "dag" ? "MOZA Woord nr. " + S.nr : "MOZA Woord (oefenen)";
+    var kop = S.modus === "dag" ? "Raad het woord nr. " + S.nr : "Raad het woord (oefenen)";
     var score = (S.gewonnen ? S.gokken.length : "X") + "/6";
     var rijen = S.gokken.map(function(g){ return kleur(g, S.woord).map(function(k){ return BLOK[k]; }).join(""); });
     return kop + " " + score + "\n\n" + rijen.join("\n") + "\n\nmoza.nu";
