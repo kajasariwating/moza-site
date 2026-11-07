@@ -54,7 +54,6 @@
   '#mzt .mzt-rels{display:flex;flex-wrap:wrap;gap:4px}',
   '#mzt .mzt-rels button{font:700 12.5px var(--f);padding:2px 7px;border:2px solid var(--line);background:var(--panel);color:var(--fg);cursor:pointer;border-radius:0}',
   '#mzt .mzt-rels button:hover,#mzt .mzt-rels button:focus-visible{background:var(--geel);color:#111;border-color:#111;outline:none}',
-  '#mzt .mzt-glotto{display:inline-block;margin-top:10px;font-weight:900;color:var(--fg)}',
   '#mzt .mzt-trow{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:10px;align-items:center;font-size:13px}',
   '#mzt .mzt-tstat{display:grid;gap:6px}',
   '#mzt .mzt-groups{display:grid;gap:3px}',
@@ -235,8 +234,7 @@
         (t.dia.length?'<dt>Dialecten</dt><dd>'+t.dia.map(esc).join(', ')+'</dd>':'')+
         (rels.length?'<dt>Verwant</dt><dd class="mzt-rels">'+rels.map(function(r){return '<button type="button" data-id="'+r.id+'">'+esc(r.n)+'</button>'}).join('')+'</dd>':'')+
         (t.med?'<dt>Vastgelegd</dt><dd>'+esc(t.med)+'</dd>':'')+
-        '<dt>Taalcode</dt><dd>'+(t.iso?esc(t.iso)+' · ':'')+esc(t.id)+'</dd></dl>'+
-        '<a class="mzt-glotto" href="https://glottolog.org/resource/languoid/id/'+encodeURIComponent(t.id)+'" target="_blank" rel="noopener">Bekijk op Glottolog →</a>';
+        '<dt>Taalcode</dt><dd>'+(t.iso?esc(t.iso)+' · ':'')+esc(t.id)+'</dd></dl>';
       card.hidden=false;card.querySelector('.x').onclick=clear;
       [].forEach.call(card.querySelectorAll('.mzt-rels button'),function(b){b.onclick=function(){select(byId[b.getAttribute('data-id')],true)}});
       if((was&&!visible[was.g])||!visible[t.g])applyVisibility();
