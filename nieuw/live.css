@@ -18,3 +18,4 @@ section.mzv-week{display:none!important}
 @keyframes mzzien{to{visibility:visible}}
 html.mz-lw #mzmob ul.mzx-list,html.mz-lw #mzmob .col.r .sec.o5 .tl{visibility:hidden;animation:mzzien 0s 2.5s forwards}
 html.mzr:not(.mz-nieuw) .moza-hero:not([data-mzrk]) img{visibility:hidden;animation:mzzien 0s 2.5s forwards}
+html.mzr:not(.mz-nieuw) body .moza-hero .blog-meta-item--categories,html.mzr:not(.mz-nieuw) body .moza-hero .blog-item-category-wrapper{display:none!important}

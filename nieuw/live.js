@@ -12,7 +12,9 @@
     if(hero.getAttribute('data-mzrk'))return true;hero.setAttribute('data-mzrk','1');
     var naam='';for(var k in NM)if(H.classList.contains('mzr-'+k))naam=NM[k];
     var rij=hero.querySelector('.moza-chiprow .blog-item-meta-wrapper')||hero.querySelector('.moza-chiprow');
-    if(naam&&rij){var c=document.createElement('span');c.className='mzrk-tag'+(/^dit weekend/i.test(naam)?' roze':'');c.textContent=naam;rij.insertBefore(c,rij.firstChild)}
+    function zetTag(){var h=document.querySelector('.moza-hero');if(!h||h.querySelector('.mzrk-tag'))return;var r=h.querySelector('.moza-chiprow .blog-item-meta-wrapper')||h.querySelector('.moza-chiprow');if(!naam||!r)return;var c=document.createElement('span');c.className='mzrk-tag'+(/^dit weekend/i.test(naam)?' roze':'');c.textContent=naam;r.insertBefore(c,r.firstChild)}
+    /* Het rubrieklabel vervangt "Geplaatst in van de redactie"; andere scripts bouwen de chips soms opnieuw op, dus een paar seconden blijven controleren */
+    zetTag();var tt=0,ti=setInterval(function(){zetTag();if(++tt>40)clearInterval(ti)},250);
     var img=hero.querySelector('img');
     /* Tag "foto in tekst": de foto blijft in de tekst staan en de kop houdt de vaste cover */
     if(img&&VASTE.test(img.getAttribute('src')||img.src||'')&&!document.querySelector('article.tag-foto-in-tekst')){
