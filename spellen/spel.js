@@ -82,7 +82,23 @@
     });
   }
 
-  function alles(){ [].forEach.call(document.querySelectorAll('.mz-spel[data-spel]'), start); }
+  /* Automatisch: in de pagina-injectie van de blog /spellen staat
+       window.mzSpellen = {'raad-het-woord':'woord', 'kruiswoordpuzzel':'puzzel'};
+     Op een bericht met zo'n adres zet dit script het spel onder de tekst van het bericht. */
+  function auto(){
+    var map = window.mzSpellen || {};
+    var slug = location.pathname.replace(/\/+$/, '').split('/').pop();
+    var spel = map[slug];
+    if (!spel || document.querySelector('.mz-spel[data-spel]')) return;
+    var plek = document.querySelector('.blog-item-content') || document.querySelector('article .sqs-layout') || document.querySelector('article');
+    if (!plek) return;
+    var div = document.createElement('div');
+    div.className = 'mz-spel'; div.setAttribute('data-spel', spel);
+    div.style.cssText = 'margin:24px 0';
+    plek.appendChild(div);
+  }
+
+  function alles(){ try { auto(); } catch(e){} [].forEach.call(document.querySelectorAll('.mz-spel[data-spel]'), start); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', alles); else alles();
   window.addEventListener('mercury:load', alles); /* Squarespace laadt pagina's soms zonder herladen */
 })();
