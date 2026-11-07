@@ -31,7 +31,9 @@ var css='#mzmob .mzx-e.wd{background:#E9F25A;color:#111;padding:22px;gap:10px;di
 '#mzmob .mzx-e.wd .tg{font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;position:static}'+
 '#mzmob .mzx-e.wd .wd-r{display:flex;align-items:center;gap:14px}'+
 '#mzmob .mzx-e.wd b.w{font-family:Fraunces,Georgia,serif;font-style:italic;font-weight:600;font-size:40px;line-height:1.05;overflow-wrap:anywhere}'+
-'#mzmob .mzx-e.wd .wd-p{flex:0 0 48px;width:48px;height:48px;border-radius:50%;border:3px solid #111;background:#FF7AB6;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;color:#111}'+
+'#mzmob .mzx-e.wd .wd-p{flex:0 0 44px;width:44px;height:44px;border-radius:50%;border:3px solid #111;background:#FF7AB6;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;color:#111}'+
+'#mzmob .mzx-e.wd .wd-p svg{width:20px!important;height:20px!important;min-width:0!important;stroke-width:2.5px!important;display:block!important;position:static!important;margin:0!important}'+
+'#mzmob .mzx-e.wd b.w,#mzmob .mzx-e.wd:hover b.w{text-decoration:none!important;border:0!important}'+
 '#mzmob .mzx-e.wd .wd-p:focus-visible{outline:3px solid #1F3BD1;outline-offset:3px}'+
 '#mzmob .mzx-e.wd .wd-p.speelt{background:#fff}'+
 '#mzmob .mzx-e.wd span.x{display:block!important;font-size:16px;line-height:1.45;color:#111}'+
@@ -43,7 +45,7 @@ function maak(){var t=vandaag(),w=kies(t),d=new Date(t);
  el.innerHTML='<span class="tg">Woord van de dag · '+DAG[d.getUTCDay()]+' '+d.getUTCDate()+' '+MND[d.getUTCMonth()]+'</span>'+
   '<div class="wd-r"><b class="w" lang="ms">'+esc(w[0])+'</b><button type="button" class="wd-p" aria-label="Luister hoe je '+esc(w[0])+' zegt"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a10 10 0 0 1 0 14"/></svg></button></div>'+
   '<span class="x">'+esc(w[1])+'</span>'+
-  '<a class="wd-l" href="/kennisbank/woordenlijst-moluks-maleis">Hele woordenlijst →</a>';
+  '<a class="wd-l" href="/begrippen">Alle begrippen →</a>';
  var b=el.querySelector('.wd-p'),au=null;
  b.addEventListener('click',function(){try{if(!au){au=new Audio(BASE+w[2]+'.mp3');au.addEventListener('ended',function(){b.classList.remove('speelt')})}au.currentTime=0;b.classList.add('speelt');var p=au.play();if(p&&p.catch)p.catch(function(){b.classList.remove('speelt')})}catch(e){}});
  return el}
