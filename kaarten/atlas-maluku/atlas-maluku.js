@@ -183,7 +183,9 @@
   function mount(){
     var host=document.getElementById('mzn-plek');
     var root=document.createElement('div');root.id='mzn';root.innerHTML=HTML;
-    if(host){host.appendChild(root)}else{var m=document.querySelector('main#page')||document.querySelector('main')||document.body;m.insertBefore(root,m.firstChild)}
+    /* #moza-kaart: de nachtmodus-hulp van de site (moza-dark-js) laat alles hierbinnen met rust. */
+    var wrap=document.getElementById('moza-kaart')||document.createElement('div');wrap.id='moza-kaart';wrap.appendChild(root);
+    if(!wrap.parentNode){if(host){host.appendChild(wrap)}else{var m=document.querySelector('main#page')||document.querySelector('main')||document.body;m.insertBefore(wrap,m.firstChild)}}
     var st=document.createElement('style');st.id='mzn-css';st.textContent=CSS;document.head.appendChild(st);
     /* De nachtmodus van de site kleurt zwarte SVG-lijnen wit. Inline stijl gaat daar boven. */
     inlAll(root);
