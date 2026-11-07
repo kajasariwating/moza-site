@@ -1593,8 +1593,8 @@ window.__mzoMain();
       '<a class="mm-acct" href="/account"><b>Mijn MOZA</b><span>Inloggen en bestellingen</span></a>'+
       '<nav class="mm-main" aria-label="Menu">'+
         '<a href="/lezen"><b>Lezen</b><span>Nieuws en verhalen</span></a>'+
-        '<a href="/weten"><b>Kennisbank</b><span>Uitleg van MOZA</span></a>'+'<a href="/onderzoek"><b>Onderzoek</b><span>Studies van anderen</span></a>'+'<a href="/kaarten"><b>Kaarten</b><span>Live data</span></a>'+'<a href="/organisaties"><b>Organisaties</b><span>Zoek een organisatie</span></a>'+
-        '<a href="/podium"><b>Podium</b><span>Deel jouw verhaal</span></a>'+'<a href="/evenementen"><b>Agenda</b><span>Molukse evenementen</span></a>'+
+        '<a href="/weten"><b>Kennisbank</b><span>Uitleg van MOZA</span></a>'+'<a href="/onderzoek"><b>Onderzoek</b><span>Studies van anderen</span></a>'+'<a href="/organisaties"><b>Organisaties</b><span>Zoek een organisatie</span></a>'+'<a href="/jaartallen"><b>Jaartallen</b><span>Molukse geschiedenis van de VOC tot nu</span></a>'+
+        '<a href="/podium"><b>Podium</b><span>Deel jouw verhaal</span></a>'+
 '<a href="/uploaden"><b>Insturen</b><span>Tip de redactie</span></a>'+
         '<a href="/boekenplank"><b>Boekenplank</b><span>Boekentips</span></a>'+
         '<a href="/store"><b>Toko Buku</b><span>Boeken en prints</span></a>'+
@@ -2966,7 +2966,7 @@ function tiles(){return '<div class="tl" aria-label="Snel naar">'+
  '<a class="ag" href="/evenementen">'+sv('kal')+'<b>Agenda</b><small data-agw></small></a>'+'<a href="/kaarten"><span class="bd">LIVE</span>'+sv('kaart')+'<b>Live kaarten</b></a>'+
  
  '<a href="/begrippen">'+sv('aa')+'<b>Begrippen</b></a>'+
- '<a href="/organisaties"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 4.5a3 3 0 0 1 0 6"/><path d="M21 20a6 6 0 0 0-3.5-5.4"/></svg><b>Organisaties</b></a>'+'<a class="pl" href="/peilingen">'+sv('poll')+'<b>Jouw mening</b><small>2 peilingen</small></a></div>'}
+ '<a href="/organisaties"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 4.5a3 3 0 0 1 0 6"/><path d="M21 20a6 6 0 0 0-3.5-5.4"/></svg><b>Organisaties</b></a>'+'<a href="/jaartallen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h18"/><circle cx="6" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="18" cy="12" r="2"/><path d="M6 5v5M12 14v5M18 5v5"/></svg><b>Jaartallen</b></a>'+'<a class="pl" href="/peilingen">'+sv('poll')+'<b>Jouw mening</b><small>2 peilingen</small></a></div>'}
 function html(){return '<div class="row"><nav class="tb" aria-label="Rubrieken"><a href="/"'+cur('/')+'>Voorpagina</a><a href="/lezen"'+cur('/lezen')+'>Net binnen</a><a href="/nieuws/maluku"'+cur('/nieuws/maluku')+'>Maluku</a><button type="button" class="meer" aria-expanded="false" aria-controls="mztabs-mp"><span>Meer</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button></nav>'+tiles()+'</div>'+
  '<div class="mp" id="mztabs-mp" hidden>'+G.map(function(g){var dark=g[3]==='#E9F25A'||g[3]==='#EDDCB8';return '<div class="mg"><span class="ico" style="background:'+g[3]+';color:'+(dark?'#111':'#fff')+'">'+sv(g[4])+'</span><h3><a href="'+g[1]+'" style="color:'+g[2]+'">'+g[0]+'</a></h3><ul>'+g[5].map(function(l){return '<li><a href="'+l[1]+'">'+l[0]+'</a></li>'}).join('')+'</ul></div>'}).join('')+'</div>'}
 function fill(d){
