@@ -511,7 +511,7 @@ def dorp_html(d, ctx, nu):
         jaren = bos.get('perjaar') or {}
         mx = max(jaren.values()) if jaren else 0
         staaf = ''
-        reeks = list(range(2001, max([int(y) for y in jaren] + [2001]) + 1))
+        reeks = list(range(2001, max([int(y) for y in jaren] + [ctx.get('bosjaar', 2001)]) + 1))
         for y in reeks:
             v = jaren.get(str(y), 0)
             hgt = 4 + 96 * v / mx if mx else 4
@@ -707,7 +707,7 @@ def main():
             'lu': lucht_bij(lcel.get(per_l[d['code']]) if lcel else None, nu),
             'zz': zee_bij(zcel.get(per_w[d['code']]) if zcel else None, wr, nu),
             'nw': nieuws_bij(d, items),
-            'bos': bosdata.get(d['code']),
+            'bos': bosdata.get(d['code']), 'bosjaar': int(str(bosdata.get('_versie', 'GFC-2001')).split('-')[1]),
             'buren': buren, 'kust': kust.get(d['kab'], []), 'buurlinks': buurlinks,
         }
         f = uit / d['slug'] / 'index.html'
