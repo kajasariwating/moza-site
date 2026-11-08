@@ -1,3 +1,4 @@
 dorp/.cache/
 dorp/gegevens/bos-test.json
 _site/
+__pycache__/
