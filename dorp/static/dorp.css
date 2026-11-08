@@ -237,3 +237,4 @@ html.moza-dark .mz-mm .mm-wa{border-color:#2e2e36}
 html.moza-dark .mz-mm .mm-beeld{border-top-color:#ECECF1}
 html.moza-dark .mz-mm a:not(.mm-acct):not(.mm-btn):not(.mm-kabar){color:#ECECF1}
 html.moza-dark .mznav a{color:#ECECF1}
+#mzk-meer{bottom:0;padding-bottom:calc(70px + env(safe-area-inset-bottom,0px))}
