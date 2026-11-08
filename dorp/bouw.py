@@ -339,7 +339,7 @@ PLAUSIBLE = ('<script>(function(){if(!/(^|\\.)moza\\.nu$/.test(location.hostname
              's.src="https://plausible.io/js/script.js";document.head.appendChild(s)})();</script>')
 
 
-def pagina(titel, omschrijving, pad, body, extra_head=''):
+def pagina(titel, omschrijving, pad, body, extra_head='', robots='index,follow'):
     return f'''<!doctype html>
 <html lang="nl">
 <head>
@@ -350,6 +350,7 @@ window.mzThema=function(){{var dk=!d.classList.contains('moza-dark');d.classList
 <title>{e(titel)}</title>
 <meta name="description" content="{e(omschrijving)}">
 <link rel="canonical" href="{SITE}{pad}">
+<meta name="robots" content="{robots}">
 <meta property="og:title" content="{e(titel)}">
 <meta property="og:description" content="{e(omschrijving)}">
 <meta property="og:url" content="{SITE}{pad}">
@@ -452,9 +453,10 @@ def dorp_html(d, ctx, nu):
                f'<b>Zon onder {z0["onder"]:%H:%M}</b><small>in Nederland {nl(z0["onder"])}</small></span></div>')
     samen = samenvatting(d, br, bv, wr, lu, nu)
     delen.append(f'''<section class="hero" aria-labelledby="h1"><div class="w">
-<p class="label live"><i></i>Kabar Maluku Live</p>
+<nav class="label kruim" aria-label="Kruimelpad"><i></i><a href="/">Kabar Maluku Live</a> › <a href="/eiland/{d["groep"]}/">{e(groep)}</a></nav>
 <h1 id="h1">{e(naam)}</h1>
 <p class="sub">{sub}</p>
+<p class="intro">Brand, weer, zee en aardbevingen bij {e(naam)}{" (officieel " + e(d["officieel"]) + ")" if d["officieel"] != naam else ""} in {e(d["kec"])}, {e(d["kabnaam"])}. Elk uur bijgewerkt.</p>
 <div class="chips">{''.join(chips)}</div>{zon}
 <p class="samen">{samen}</p>
 <p class="accent">zo staat het er nu voor</p>
@@ -637,12 +639,26 @@ def dorp_html(d, ctx, nu):
 </section>''')
     delen.append('<main class="w">' + ''.join(m) + '</main>')
 
-    titel = f'{naam}: brand, weer en aardbevingen bij het dorp | Kabar Maluku Live'
-    import re
-    omschrijving = re.sub(r'<[^>]+>', '', samen)[:155]
-    ld = json.dumps({'@context': 'https://schema.org', '@type': 'Place', 'name': naam,
-                     'geo': {'@type': 'GeoCoordinates', 'latitude': d['la'], 'longitude': d['lo']},
-                     'containedInPlace': {'@type': 'Place', 'name': f'{d["kec"]}, {d["prov"]}, Indonesië'}}, ensure_ascii=False)
+    plek = T.plek_kort(d)
+    titel = f'{naam} ({plek}): brand, weer en aardbevingen | Kabar Maluku Live'
+    omschrijving = (f'Is er brand bij {naam} op {plek}? Zie elk uur wat er speelt: brand, weer voor 7 dagen, '
+                    f'zee, lucht en aardbevingen. {d["kec"]}, {d["kabnaam"]}.')
+    url = f'{SITE}/{d["slug"]}/'
+    graaf = {'@context': 'https://schema.org', '@graph': [
+        {'@type': 'WebPage', '@id': url, 'url': url, 'name': titel, 'description': omschrijving, 'inLanguage': 'nl',
+         'dateModified': nu.isoformat(), 'isPartOf': {'@id': SITE + '/#site'}, 'about': {'@id': url + '#plaats'},
+         'breadcrumb': {'@id': url + '#kruim'}},
+        {'@type': 'Place', '@id': url + '#plaats', 'name': naam,
+         **({'alternateName': d['officieel']} if d['officieel'] != naam else {}),
+         'geo': {'@type': 'GeoCoordinates', 'latitude': d['la'], 'longitude': d['lo']},
+         'address': {'@type': 'PostalAddress', 'addressLocality': d['kec'], 'addressRegion': d['prov'], 'addressCountry': 'ID'},
+         'containedInPlace': {'@type': 'AdministrativeArea', 'name': f'{d["kabnaam"]}, {d["prov"]}'}},
+        {'@type': 'BreadcrumbList', '@id': url + '#kruim', 'itemListElement': [
+            {'@type': 'ListItem', 'position': 1, 'name': 'Kabar Maluku Live', 'item': SITE + '/'},
+            {'@type': 'ListItem', 'position': 2, 'name': groep, 'item': f'{SITE}/eiland/{d["groep"]}/'},
+            {'@type': 'ListItem', 'position': 3, 'name': naam, 'item': url}]},
+    ]}
+    ld = json.dumps(graaf, ensure_ascii=False)
     return pagina(titel, omschrijving, f'/{d["slug"]}/', ''.join(delen) + klok_js(verschil),
                   f'<script type="application/ld+json">{ld}</script>\n')
 
@@ -658,14 +674,20 @@ def eiland_html(g, lijst, nu, brandset):
         f'<div class="kec"><h3>{e(k)}</h3><ul>' + ''.join(
             f'<li><a href="/{d["slug"]}/">{"<i aria-label=brand></i>" if d["code"] in brandset else ""}{e(d["naam"])}</a></li>' for d in ds) + '</ul></div>'
         for k, ds in per.items())
-    body = f'''<section class="hero"><div class="w"><p class="label">Eilandgroep</p><h1>{e(D.GROEPEN[g])}</h1>
+    body = f'''<section class="hero"><div class="w"><nav class="label kruim" aria-label="Kruimelpad"><a href="/">Kabar Maluku Live</a> › Eilandgroep</nav><h1>{e(D.GROEPEN[g])}</h1>
 <p class="sub">{e(D.GROEP_SUB[g])} · {len(lijst)} dorpen</p>
 <p class="samen">{f'Deze week zag de satelliet brand bij <b>{nbrand} {"dorp" if nbrand == 1 else "dorpen"}</b>. Die zijn gemarkeerd met een rode stip.' if nbrand else 'Deze week zag de satelliet <b>geen brand</b> bij de dorpen hier.'}</p></div></section>
 <div class="streep"><span></span><span></span><span></span></div>
 <main class="w"><section><h2>Kies je dorp</h2>{blokken}</section></main>'''
+    url = f'{SITE}/eiland/{g}/'
+    ld = json.dumps({'@context': 'https://schema.org', '@graph': [
+        {'@type': 'CollectionPage', '@id': url, 'url': url, 'name': f'Dorpen in {D.GROEPEN[g]}', 'inLanguage': 'nl', 'isPartOf': {'@id': SITE + '/#site'}},
+        {'@type': 'BreadcrumbList', 'itemListElement': [
+            {'@type': 'ListItem', 'position': 1, 'name': 'Kabar Maluku Live', 'item': SITE + '/'},
+            {'@type': 'ListItem', 'position': 2, 'name': D.GROEPEN[g], 'item': url}]}]}, ensure_ascii=False)
     return pagina(f'Dorpen in {D.GROEPEN[g]}: brand, weer en aardbevingen | Kabar Maluku Live',
                   f'Alle {len(lijst)} dorpen in {D.GROEPEN[g]} ({D.GROEP_SUB[g]}). Zie per dorp of er brand is, wat voor weer het wordt en of de aarde beefde.',
-                  f'/eiland/{g}/', body)
+                  f'/eiland/{g}/', body, f'<script type="application/ld+json">{ld}</script>\n')
 
 
 def start_html(groepen, brandlijst, nu):
@@ -699,10 +721,14 @@ function show(){{var v=n(q.value);if(v.length<2){{res.innerHTML='';return}}load(
 var gs={json.dumps({g: n for g, n in D.GROEPEN.items()}, ensure_ascii=False)},kw={json.dumps(EILAND_WOORDEN, ensure_ascii=False)},gh='';Object.keys(gs).forEach(function(g){{if(kw[g].some(function(w){{return w.indexOf(v)===0||v.indexOf(w)===0}}))gh+='<a class="rij" style="background:#1F3BD1;color:#fff" href="/eiland/'+g+'/"><b>'+esc(gs[g])+'<small style="color:#fff">Alle dorpen in deze eilandgroep</small></b><span aria-hidden="true">→</span></a>'}});
 var a=L.filter(function(x){{return x.k.indexOf(v)===0}}),b=L.filter(function(x){{return x.k.indexOf(v)>0}});var r=a.concat(b).slice(0,12);
 res.innerHTML=gh+r.map(function(x){{return '<a class="rij" href="/'+x.s+'/"><b>'+esc(x.n)+'<small>'+esc(x.c)+' · '+esc(x.g)+'</small></b>'+(x.b?'<span class="badge">BRAND</span>':'<span aria-hidden="true">→</span>')+'</a>'}}).join('')||'<p>Geen dorp gevonden. Probeer een andere schrijfwijze.</p>'}})}}
-q.addEventListener('input',show);if(q.value)show()}})();</script>'''
+q.addEventListener('input',show);try{{var u=new URLSearchParams(location.search).get('q');if(u)q.value=u}}catch(e){{}}if(q.value)show()}})();</script>'''
+    ld = json.dumps({'@context': 'https://schema.org', '@graph': [
+        {'@type': 'WebSite', '@id': SITE + '/#site', 'url': SITE + '/', 'name': 'Kabar Maluku Live', 'inLanguage': 'nl',
+         'publisher': {'@type': 'Organization', 'name': 'MOZA', 'url': 'https://www.moza.nu'},
+         'potentialAction': {'@type': 'SearchAction', 'target': SITE + '/?q={search_term_string}', 'query-input': 'required name=search_term_string'}}]}, ensure_ascii=False)
     return pagina('Kabar Maluku Live: brand, weer en aardbevingen bij jouw dorp op de Molukken',
-                  'Zoek je dorp op de Molukken en zie of er brand is, of de lucht gezond is, wat voor weer het wordt en of de aarde beefde. Voor alle 2.420 dorpen.',
-                  '/', body)
+                  'Zoek je dorp op de Molukken en zie of er brand is, of de lucht gezond is, wat voor weer het wordt en of de aarde beefde. Voor alle 2.420 dorpen, elk uur bijgewerkt.',
+                  '/', body, f'<script type="application/ld+json">{ld}</script>\n')
 
 
 # ---------------------------------------------------------------- hoofdprogramma
@@ -828,7 +854,7 @@ def main():
     (uit / 'CNAME').write_text('live.moza.nu\n')
     (uit / 'robots.txt').write_text(f'User-agent: *\nAllow: /\nSitemap: {SITE}/sitemap.xml\n')
     (uit / '404.html').write_text(pagina('Niet gevonden | Kabar Maluku Live', 'Deze pagina bestaat niet.', '/404.html',
-                                         '<main class="w"><section><h2>Dit dorp vinden we niet</h2><p><a href="/">Zoek je dorp →</a></p></section></main>'))
+                                         '<main class="w"><section><h2>Dit dorp vinden we niet</h2><p><a href="/">Zoek je dorp →</a></p></section></main>', robots='noindex'))
     dag = nu.strftime('%Y-%m-%d')
     urls = [f'{SITE}/'] + [f'{SITE}/eiland/{g}/' for g in D.GROEPEN] + [f'{SITE}/{d["slug"]}/' for d in rows]
     (uit / 'sitemap.xml').write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'

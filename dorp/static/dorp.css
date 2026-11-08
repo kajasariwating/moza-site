@@ -98,3 +98,4 @@ html.moza-dark .merk .kb{border-color:#ECECF1}html.moza-dark .merk .lv{backgroun
 .thema .zon-i{display:none}html.moza-dark .thema .zon-i{display:block}html.moza-dark .thema .maan-i{display:none}
 @media (max-width:420px){.kop .knop .kt{display:none}.kop .knop{width:44px;padding:0;justify-content:center}}
 html.moza-dark .knop{color:var(--inkt)}
+.kruim{display:flex;flex-wrap:wrap;align-items:center;gap:6px}.kruim a{color:#fff;text-decoration:none}.kruim a:hover{text-decoration:underline}.intro{margin:0;font-size:14px;line-height:1.45;opacity:.9}

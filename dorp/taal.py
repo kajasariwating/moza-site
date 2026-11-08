@@ -316,3 +316,13 @@ def oversteek_voorbeeld(d):
     if not eiland:
         return None
     return f'bijvoorbeeld van {eiland} naar Tulehu op Ambon'
+
+
+# ---------- korte plaatsaanduiding voor titels ----------
+GROEP_KORT = {'ambon': 'Ambon', 'seram': 'Seram', 'buru': 'Buru', 'banda': 'Banda'}
+
+
+def plek_kort(d):
+    if d['groep'] == 'lease':
+        return LEASE_EILAND.get(d['kec'].lower(), 'Lease')
+    return GROEP_KORT.get(d['groep']) or d['kec']

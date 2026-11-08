@@ -90,6 +90,7 @@ def dorpen():
     """Alle dorpen met naam, kecamatan, eilandgroep, punt, grens (lijst van ringen) en slug."""
     idx = json.loads((ATLAS / 'index.json').read_text())
     kec = idx['kec']
+    kabnaam = {k['k']: k['n'].replace('Kabupaten ', '').replace('Kota ', 'Kota ') for k in idx['kab']}
     rows = []
     for r in idx['p']:
         code, off, ki, kel, g, la, lo = r[:7]
@@ -97,6 +98,7 @@ def dorpen():
             'code': code, 'officieel': off, 'naam': NAMEN.get(off, off), 'kec': kec[ki],
             'kel': bool(kel), 'groep': g, 'la': la, 'lo': lo, 'kab': code[:5],
             'prov': 'Maluku' if code.startswith('81') else 'Maluku Utara', 'grens': None,
+            'kabnaam': kabnaam.get(code[:5], ''),
         })
     by = {r['code']: r for r in rows}
     kust = {}
