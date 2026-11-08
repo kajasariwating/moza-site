@@ -2913,7 +2913,8 @@ body.header--menu-open #mztabs{display:none}
 #mztabs .mp{padding:6px 16px 10px;border-top:1px solid var(--ln);max-height:calc(100vh - 160px);max-height:calc(100dvh - 160px);overflow-y:auto;-webkit-overflow-scrolling:touch}
 #mztabs .mp[hidden]{display:none}
 #mztabs .mg{display:grid;grid-template-columns:34px minmax(0,1fr);column-gap:14px;padding:10px 0;border-bottom:1px solid var(--ln)}
-#mztabs .mg:last-child{border-bottom:0}
+#mztabs .mk{display:contents}
+#mztabs .mk:last-child .mg:last-child{border-bottom:0}
 #mztabs .ico{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-top:2px}
 #mztabs .ico svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 #mztabs .mg h3{margin:0 0 4px!important;padding:0!important;font-family:inherit!important;font-size:23px!important;line-height:1.15!important;font-weight:900!important;letter-spacing:-.02em!important;text-transform:none!important}
@@ -2941,6 +2942,8 @@ html.moza-dark #mztabs .mg h3 a{color:var(--ink)!important}
 @media (max-width:1199px){#mztabs .tl a{width:84px}#mztabs .tl b{font-size:11px}}
 #mztabs .mp{padding:18px max(24px,calc((100vw - 1120px)/2)) 22px;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:24px}
 #mztabs .mp[hidden]{display:none}
+/* Kolommen: Winkel en steun onder Agenda, Over MOZA onder Doe mee (08-11-2026) */
+#mztabs .mk{display:flex;flex-direction:column;gap:24px;min-width:0}
 #mztabs .mg{display:block;border:0;padding:0}
 #mztabs .mg .ico{margin:0 0 8px}
 #mztabs .mg h3{font-size:20px!important}
@@ -2972,7 +2975,7 @@ function tiles(){return '<div class="tl" aria-label="Snel naar">'+
  '<a href="/begrippen">'+sv('aa')+'<b>Begrippen</b></a>'+
  '<a href="/organisaties"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 4.5a3 3 0 0 1 0 6"/><path d="M21 20a6 6 0 0 0-3.5-5.4"/></svg><b>Organisaties</b></a>'+'<a href="/jaartallen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h18"/><circle cx="6" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="18" cy="12" r="2"/><path d="M6 5v5M12 14v5M18 5v5"/></svg><b>Jaartallen</b></a>'+'<a class="pl" href="/peilingen">'+sv('poll')+'<b>Jouw mening</b><small>2 peilingen</small></a></div>'}
 function html(){return '<div class="row"><nav class="tb" aria-label="Rubrieken"><a href="/"'+cur('/')+'>Voorpagina</a><a href="/lezen"'+cur('/lezen')+'>Net binnen</a><a href="/nieuws/maluku"'+cur('/nieuws/maluku')+'>Maluku</a><button type="button" class="meer" aria-expanded="false" aria-controls="mztabs-mp"><span>Meer</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button></nav>'+tiles()+'</div>'+
- '<div class="mp" id="mztabs-mp" hidden>'+G.map(function(g){var dark=g[3]==='#E9F25A'||g[3]==='#EDDCB8';return '<div class="mg"><span class="ico" style="background:'+g[3]+';color:'+(dark?'#111':'#fff')+'">'+sv(g[4])+'</span><h3><a href="'+g[1]+'" style="color:'+g[2]+'">'+g[0]+'</a></h3><ul>'+g[5].map(function(l){return '<li><a href="'+l[1]+'">'+l[0]+'</a></li>'}).join('')+'</ul></div>'}).join('')+'</div>'}
+ '<div class="mp" id="mztabs-mp" hidden>'+[[0],[1],[2],[3],[4,6],[5,7]].map(function(c){return '<div class="mk">'+c.map(function(k){return G[k]}).filter(Boolean).map(function(g){var dark=g[3]==='#E9F25A'||g[3]==='#EDDCB8';return '<div class="mg"><span class="ico" style="background:'+g[3]+';color:'+(dark?'#111':'#fff')+'">'+sv(g[4])+'</span><h3><a href="'+g[1]+'" style="color:'+g[2]+'">'+g[0]+'</a></h3><ul>'+g[5].map(function(l){return '<li><a href="'+l[1]+'">'+l[0]+'</a></li>'}).join('')+'</ul></div>'}).join('')+'</div>'}).join('')+'</div>'}
 function fill(d){
  try{fetch('https://api.open-meteo.com/v1/forecast?latitude=-3.6954&longitude=128.1814&current=temperature_2m,weather_code&timezone=Asia%2FJayapura').then(function(r){return r.json()}).then(function(j){var c=j.current||{};if(c.temperature_2m==null)return;var e=d.querySelector('[data-wt]');if(e)e.textContent=Math.round(c.temperature_2m)+'°';var W={0:'zonnig',1:'licht bewolkt',2:'half bewolkt',3:'bewolkt',45:'mist',48:'mist',51:'motregen',53:'motregen',55:'motregen',61:'lichte regen',63:'regen',65:'zware regen',80:'buien',81:'buien',82:'zware buien',95:'onweer',96:'onweer',99:'onweer'};var w=d.querySelector('[data-wc]');if(w&&W[c.weather_code])w.textContent=W[c.weather_code]}).catch(function(){})}catch(e){}
  try{fetch('/evenementen?format=json').then(function(r){return r.json()}).then(function(j){var n=(j.upcoming||[]).length;var b=d.querySelector('[data-agn]');if(n&&b){b.textContent=n;b.hidden=false}}).catch(function(){})}catch(e){}}
