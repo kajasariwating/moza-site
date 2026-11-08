@@ -344,6 +344,11 @@ def pagina(titel, omschrijving, pad, body, extra_head=''):
 <meta property="og:description" content="{e(omschrijving)}">
 <meta property="og:url" content="{SITE}{pad}">
 <meta property="og:site_name" content="MOZA">
+<meta property="og:type" content="website">
+<meta property="og:image" content="{SITE}/og.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Wat speelt er bij jouw dorp? Brand, beving, lucht en weer voor alle dorpen op de Molukken. live.moza.nu">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#1F3BD1">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;700;800;900&family=Fraunces:ital,wght@1,600&display=swap" rel="stylesheet">
@@ -789,6 +794,7 @@ def main():
     (uit / 'slugs.json').write_text(json.dumps({d['code']: d['slug'] for d in rows}, separators=(',', ':')))
     shutil.copytree(D.ATLAS, uit / 'atlas')
     shutil.copy(HIER / 'static' / 'dorp.css', uit / 'dorp.css')
+    shutil.copy(HIER / 'static' / 'og.png', uit / 'og.png')
     (uit / 'CNAME').write_text('live.moza.nu\n')
     (uit / 'robots.txt').write_text(f'User-agent: *\nAllow: /\nSitemap: {SITE}/sitemap.xml\n')
     (uit / '404.html').write_text(pagina('Niet gevonden | MOZA', 'Deze pagina bestaat niet.', '/404.html',
