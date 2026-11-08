@@ -1,4 +1,4 @@
-name: dorp.moza.nu vaste gegevens (plek van het dorp, bos)
+name: live.moza.nu vaste gegevens (plek van het dorp, bos)
 
 on:
   workflow_dispatch:

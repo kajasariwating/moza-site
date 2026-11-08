@@ -1,4 +1,4 @@
-# dorp.moza.nu
+# live.moza.nu
 
 Een pagina per dorp op de Molukken (2.420 dorpen): brand, weer, lucht, zee, aardbevingen, bos en nieuws, in gewone taal.
 
@@ -13,7 +13,7 @@ Een pagina per dorp op de Molukken (2.420 dorpen): brand, weer, lucht, zee, aard
 ## Vaste gegevens (`gegevens/`)
 - `plaatsen.json`: waar de huizen van elk dorp staan (OpenStreetMap). Zonder dit meten we vanaf het midden van de dorpsgrond.
 - `bos.json`: bos in 2000 en verlies per jaar per dorp (Global Forest Change, Universiteit van Maryland).
-- Beide maak je met de workflow "dorp.moza.nu vaste gegevens" (handmatig starten in GitHub → Actions).
+- Beide maak je met de workflow "live.moza.nu vaste gegevens" (handmatig starten in GitHub → Actions).
 
 ## Bronnen
 - Grenzen en namen: `kaarten/atlas-maluku` (wilayah_boundaries, MIT).

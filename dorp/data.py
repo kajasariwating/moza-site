@@ -9,7 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 ATLAS = ROOT / 'kaarten' / 'atlas-maluku'
 CACHE = Path(os.environ.get('DORP_CACHE', ROOT / 'dorp' / '.cache'))
-UA = {'User-Agent': 'moza-dorp/1.0 (+https://dorp.moza.nu)'}
+UA = {'User-Agent': 'moza-dorp/1.0 (+https://live.moza.nu)'}
 
 GROEPEN = {
     'ambon': 'Ambon', 'lease': 'Lease-eilanden', 'seram': 'Seram', 'buru': 'Buru',

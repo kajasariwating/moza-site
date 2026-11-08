@@ -1,4 +1,4 @@
-"""Bouwt dorp.moza.nu: een pagina per dorp, per eilandgroep, een zoekpagina en een sitemap.
+"""Bouwt live.moza.nu: een pagina per dorp, per eilandgroep, een zoekpagina en een sitemap.
 
 Gebruik:  python3 dorp/bouw.py [--uit _site] [--alleen slug,slug] [--zonder-live]
 """
@@ -14,7 +14,7 @@ from shapely.geometry import Polygon, MultiPolygon, Point, box  # noqa: E402
 from shapely.strtree import STRtree  # noqa: E402
 from shapely.ops import unary_union  # noqa: E402
 
-SITE = 'https://dorp.moza.nu'
+SITE = 'https://live.moza.nu'
 HIER = Path(__file__).resolve().parent
 WIT, NL = T.WIT, ZoneInfo('Europe/Amsterdam')
 e = html.escape
@@ -723,7 +723,7 @@ def main():
     (uit / 'index.html').write_text(start_html(D.GROEPEN, brandlijst, nu))
     (uit / 'zoek.json').write_text(json.dumps(zoek, ensure_ascii=False, separators=(',', ':')))
     shutil.copy(HIER / 'static' / 'dorp.css', uit / 'dorp.css')
-    (uit / 'CNAME').write_text('dorp.moza.nu\n')
+    (uit / 'CNAME').write_text('live.moza.nu\n')
     (uit / 'robots.txt').write_text(f'User-agent: *\nAllow: /\nSitemap: {SITE}/sitemap.xml\n')
     (uit / '404.html').write_text(pagina('Niet gevonden | MOZA', 'Deze pagina bestaat niet.', '/404.html',
                                          '<main class="w"><section><h2>Dit dorp vinden we niet</h2><p><a href="/">Zoek je dorp →</a></p></section></main>'))

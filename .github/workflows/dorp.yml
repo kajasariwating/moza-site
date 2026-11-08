@@ -1,4 +1,4 @@
-name: dorp.moza.nu bouwen
+name: live.moza.nu bouwen
 
 on:
   schedule:
