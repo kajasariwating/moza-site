@@ -676,10 +676,12 @@ button{font:inherit;color:inherit;cursor:pointer}
 
   var BLOK = {goed:"🟦", plek:"🟨", mis:"⬜"};
   function deelTekst(){
-    var kop = S.modus === "dag" ? "Raad het woord nr. " + S.nr : "Raad het woord (oefenen)";
-    var score = (S.gewonnen ? S.gokken.length : "X") + "/6";
+    var n = S.gokken.length, zin;
+    if (!S.gewonnen) zin = "Ik heb het woord van vandaag niet geraden. Lukt het jou wel?";
+    else if (n === 1) zin = "Ik had het woord van vandaag in \u00e9\u00e9n keer! En jij?";
+    else zin = "Ik had " + n + " pogingen nodig voor het woord van vandaag. Kun jij het sneller?";
     var rijen = S.gokken.map(function(g){ return kleur(g, S.woord).map(function(k){ return BLOK[k]; }).join(""); });
-    return kop + " " + score + "\n\n" + rijen.join("\n") + "\n\n" + (S.gewonnen ? "Kun jij het sneller?" : "Lukt het jou wel?");
+    return zin + "\n\n" + rijen.join("\n");
   }
   var DEEL_URL = "https://www.moza.nu/spellen/raad-het-woord";
   function zetDeelLinks(){}
@@ -768,8 +770,8 @@ function mzKaart(o){
     var rijen = S.gokken.map(function(g){ return kleur(g, S.woord); });
     if (!rijen.length) return;
     mzKaart({label: S.modus === "dag" ? "Woord nr. " + S.nr : "Oefenen", titel: "Raad het", accent: "woord",
-      groot: (S.gewonnen ? S.gokken.length : "X") + "/6", klein: "Thema: " + S.item.t,
-      raster: rijen, vraag: S.gewonnen ? "Kun jij het sneller?" : "Lukt het jou wel?"}).then(function(b){ kaartBlob = b; });
+      groot: (S.gewonnen ? S.gokken.length : "X") + "/6", klein: !S.gewonnen ? "Niet geraden" : S.gokken.length === 1 ? "In \u00e9\u00e9n keer geraden" : "Geraden in " + S.gokken.length + " pogingen",
+      raster: rijen, vraag: !S.gewonnen ? "Lukt het jou wel?" : S.gokken.length === 1 ? "En jij?" : "Kun jij het sneller?"}).then(function(b){ kaartBlob = b; });
   }
   function deel(doel){
     var r = mzDeel(doel, deelTekst(), DEEL_URL, kaartBlob);
