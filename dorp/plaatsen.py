@@ -4,7 +4,7 @@ Bron: OpenStreetMap (via Overpass). We nemen een plaats-punt (place=village, tow
 dat binnen de grens van het dorp ligt en dezelfde naam heeft. Lukt dat niet, dan blijft het midden staan.
 Schrijft dorp/gegevens/plaatsen.json: {code: [lat, lon]}. Draait af en toe, niet elk uur.
 """
-import difflib, json, re, sys, urllib.parse
+import difflib, json, re, sys, time, urllib.parse
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -86,6 +86,7 @@ def main():
         url = ('https://api.open-meteo.com/v1/elevation?latitude=' + ','.join(str(p[1]) for p in deel)
                + '&longitude=' + ','.join(str(p[2]) for p in deel))
         j = D.get_json(url)
+        time.sleep(2)
         if j and 'elevation' in j:
             for p, h in zip(deel, j['elevation']):
                 if h is not None:

@@ -34,4 +34,5 @@ jobs:
           git config user.email "actions@users.noreply.github.com"
           git add dorp/gegevens/
           git diff --cached --quiet || git commit -m "dorp: vaste gegevens bijgewerkt"
+          git pull --rebase origin main
           git push
