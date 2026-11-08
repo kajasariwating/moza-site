@@ -140,8 +140,13 @@ def branden(dagen=8):
                 if not b:
                     continue
                 ok += 1
+                if b[:2] == b'\x1f\x8b':
+                    import gzip
+                    b = gzip.decompress(b)
                 try:
                     t = mapbox_vector_tile.decode(b)
+                    if ok == 1:
+                        print('  tegel', sat, dag, len(b), 'bytes, lagen:', {k: len(v.get('features', [])) for k, v in t.items()})
                 except Exception as ex:
                     print('  mvt fout', sat, dag, ex)
                     continue
