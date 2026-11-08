@@ -375,7 +375,7 @@ function klaarScherm(t,record){
   const ov=document.createElement('div'); ov.className='klaarscherm';
   ov.innerHTML='<div class="kader klaarkaart" role="dialog" aria-label="Puzzel opgelost"><h2>Dangke voor <em>het puzzelen!</em></h2>'+
     '<div class="grote-tijd">'+fmt(t)+'<small>'+esc(P.titel)+(record?' · nieuw record':' · record '+fmt(S.best[P.lv]))+(ST.h.size?' · '+ST.h.size+' hint'+(ST.h.size>1?'s':''):'')+'</small></div>'+
-    '<p style="margin:0">Je leerde vandaag '+P.slots.length+' woorden over de Molukken en Molukkers in Nederland.</p>'+
+    '<p style="margin:0">Je leerde vandaag '+P.slots.length+' begrippen over de Molukken en Molukkers in Nederland.</p>'+
     '<div class="molbox"><b>Wist je dat? · '+esc(x.disp)+'</b><p>'+esc(x.uitleg)+'</p></div>'+
     '<button class="knop blauw" id="deel">Daag je vrienden uit</button>'+
     '<div class="deelrij"><a class="deel wa" target="_blank" rel="noopener" href="https://wa.me/?text='+encodeURIComponent(deel+'\n'+URL)+'">WhatsApp</a>'+
