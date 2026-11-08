@@ -189,6 +189,17 @@ html.moza-dark .mzkop{background:#17181D;color:#ECECF1}
 .mzdon{height:42px;padding:10px 20px;margin-left:20px;font:700 17px/22px "Hanken Grotesk",system-ui,sans-serif}
 html.moza-dark .mzkop{background:#12151F}
 }
+/* Telefoon en tablet: Kabar-logo linksboven in plaats van het MOZA-logo, zonder tweede kop eronder */
+.mzkb{display:none}
+@media (max-width:1024px){
+.mzlogo{display:none}
+.mzkb{flex:none;display:flex;align-items:center;height:44px;text-decoration:none}
+.mzkb .kb{position:relative;display:flex;flex-direction:column;align-items:flex-start;padding:3px 7px 4px;background:var(--geel,#E9F25A);border:2px solid #111;box-shadow:3px 3px 0 var(--blauw,#1F3BD1);font-size:18px;line-height:1;font-weight:900;letter-spacing:-.04em;color:#111}
+.mzkb .kb small{align-self:stretch;display:flex;justify-content:space-between;font-size:9px;line-height:1;font-weight:900;letter-spacing:0;margin-top:2px}
+.mzkb .kb i{position:absolute;top:-6px;right:-6px;width:10px;height:10px;border-radius:50%;background:var(--rood,#FF4D2E);border:2px solid #111}
+html.moza-dark .mzkb .kb{border-color:#ECECF1}
+header.kop{display:none}
+}
 html.mzk-groot body{font-size:20px}
 html.mzk-groot .w p,html.mzk-groot .w li{font-size:1.1em}
 

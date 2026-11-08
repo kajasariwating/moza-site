@@ -406,7 +406,8 @@ _MAAN = '<svg class="maan-i" viewBox="0 0 24 24" fill="none" stroke="currentColo
 _ZON = '<svg class="zon-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>'
 _TAS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M6 8h12l-1 13H7z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>'
 _U = 'utm_source=kabar&utm_medium=kop'
-MOZAKOP = ('<div class="mzkop"><a class="mzlogo" href="https://www.moza.nu/?' + _U + '" aria-label="MOZA, naar de voorpagina">MOZA</a>'
+MOZAKOP = ('<div class="mzkop"><a class="mzkb" href="/" aria-label="Kabar Maluku Live, naar de startpagina"><span class="kb">KABAR<small aria-hidden="true"><span>M</span><span>A</span><span>L</span><span>U</span><span>K</span><span>U</span></small><i></i></span></a>'
+           '<a class="mzlogo" href="https://www.moza.nu/?' + _U + '" aria-label="MOZA, naar de voorpagina">MOZA</a>'
            '<nav class="mznav" aria-label="Menu van MOZA">' + ''.join(
                f'<a href="https://www.moza.nu{u}?{_U}">{n}</a>' for u, n in
                [('/lezen', 'Lezen'), ('/weten', 'Kennis'), ('/podium', 'Podium'), ('/evenementen', 'Agenda'), ('/boekenplank', 'Boekenplank'), ('/store', 'Toko Buku')]) + '</nav>'
