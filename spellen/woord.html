@@ -179,6 +179,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .deelrij .deel{flex:1 1 auto;text-align:center;border:2px solid var(--rand);background:var(--vlak);color:var(--inkt);font:inherit;font-weight:800;font-size:14px;padding:9px 10px;text-decoration:none;cursor:pointer;box-shadow:2px 2px 0 var(--rand)}
 .deelrij .wa{background:#25D366;color:#111;border-color:#111}
 .deelrij .fb{background:#1877F2;color:#fff;border-color:#111}
+.deelrij .ig{background:linear-gradient(45deg,#F58529,#DD2A7B,#8134AF);color:#fff;border-color:#111}
 </style>
 
 <div class="app">
@@ -258,9 +259,9 @@ button{font:inherit;color:inherit;cursor:pointer}
       <button class="knop hoofd" type="button" id="knopDeel">Daag je vrienden uit</button>
     </div>
     <div class="deelrij">
-      <a class="deel wa" id="deelWa" target="_blank" rel="noopener">WhatsApp</a>
-      <a class="deel fb" id="deelFb" target="_blank" rel="noopener">Facebook</a>
-      <button class="deel" type="button" id="deelKopie">Kopieer voor Instagram</button>
+      <button class="deel wa" type="button" data-doel="whatsapp">WhatsApp</button>
+      <button class="deel fb" type="button" data-doel="facebook">Facebook</button>
+      <button class="deel ig" type="button" data-doel="instagram">Instagram</button>
     </div>
     <div class="knoppen eind-knoppen"><button class="knop" type="button" data-sluit>Afsluiten</button></div>
     <p class="eind-oefen" hidden><button class="linkknop" type="button" id="knopNogEen">Of oefen met een ander woord</button></p>
@@ -679,30 +680,34 @@ button{font:inherit;color:inherit;cursor:pointer}
     return kop + " " + score + "\n\n" + rijen.join("\n") + "\n\n" + (S.gewonnen ? "Kun jij het sneller?" : "Lukt het jou wel?");
   }
   var DEEL_URL = "https://www.moza.nu/spellen/raad-het-woord";
-  function zetDeelLinks(){
-    var t = deelTekst();
-    $("deelWa").href = "https://wa.me/?text=" + encodeURIComponent(t + "\n" + DEEL_URL);
-    $("deelFb").href = "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(DEEL_URL) + "&quote=" + encodeURIComponent(t);
+  function zetDeelLinks(){}
+/* Delen: liefst via de pagina eromheen (moza.nu), want daar opent het deelmenu en de app het best. */
+function mzDeelLokaal(doel, t, u){
+  var mobiel = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  var tekst = t + "\n" + u;
+  function kopie(){ try { navigator.clipboard.writeText(tekst); return "gekopieerd"; } catch (e){ return false; } }
+  if (doel === "whatsapp"){
+    if (mobiel){ try { window.top.location.href = "whatsapp://send?text=" + encodeURIComponent(tekst); } catch (e){ location.href = "whatsapp://send?text=" + encodeURIComponent(tekst); } return "ok"; }
+    window.open("https://wa.me/?text=" + encodeURIComponent(tekst), "_blank", "noopener"); return "ok";
   }
-  function deelFallback(t){
-    var bak = $("deelbak"), ta = $("deeltekst");
-    ta.value = t; bak.hidden = false;
-    try { ta.focus(); ta.select(); } catch (e){}
+  if (doel === "facebook" && !(mobiel && navigator.share)){
+    window.open("https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(u), "_blank", "noopener"); return "ok";
   }
-  $("deelKopie").addEventListener("click", function(){
-    var t = deelTekst() + "\n" + DEEL_URL;
-    try { navigator.clipboard.writeText(t).then(function(){ meld("Gekopieerd. Plak het in je Instagram-story of bericht."); }, function(){ deelFallback(t); }); } catch (e){ deelFallback(t); }
-  });
-  $("knopDeel").addEventListener("click", function(){
-    var t = deelTekst();
-    if (navigator.share){ navigator.share({text: t, url: DEEL_URL}).catch(function(){}); return; }
-    t = t + "\n" + DEEL_URL;
-    try {
-      if (navigator.clipboard && navigator.clipboard.writeText){
-        navigator.clipboard.writeText(t).then(function(){ meld("Gekopieerd. Plak je uitslag waar je wilt."); }, function(){ deelFallback(t); });
-      } else deelFallback(t);
-    } catch (e){ deelFallback(t); }
-  });
+  if (mobiel && navigator.share){ navigator.share({text: t, url: u}).catch(function(){}); return "ok"; }
+  return kopie();
+}
+function mzDeel(doel, t, u){
+  try { if (window.parent !== window && window.parent.mzDeel){ var r = window.parent.mzDeel(doel, t, u); if (r) return r; } } catch (e){}
+  return mzDeelLokaal(doel, t, u);
+}
+
+  function deel(doel){
+    var r = mzDeel(doel, deelTekst(), DEEL_URL);
+    if (r === "gekopieerd") meld(doel === "instagram" ? "Gekopieerd. Plak het in je Instagram-story of bericht." : "Gekopieerd. Plak je uitslag waar je wilt.");
+    else if (!r) deelFallback(deelTekst() + "\n" + DEEL_URL);
+  }
+  [].forEach.call(document.querySelectorAll(".deelrij [data-doel]"), function(b){ b.addEventListener("click", function(){ deel(b.getAttribute("data-doel")); }); });
+  $("knopDeel").addEventListener("click", function(){ deel("native"); });
   $("knopNogEen").addEventListener("click", function(){ sluitVenster($("vensterEinde")); startOefen(); });
   $("knopOefen").addEventListener("click", function(){ startOefen(); });
   $("knopDag").addEventListener("click", function(){ startDag(); });

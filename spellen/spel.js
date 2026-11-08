@@ -68,6 +68,21 @@
     '.mzsp-start p{margin:0;font-size:16px}' +
     '.mzsp-start button{font:inherit;font-weight:900;font-size:18px;padding:14px 18px;background:#1F3BD1;color:#fff;border:3px solid #111;box-shadow:4px 4px 0 #111;cursor:pointer}' +
     'html.moza-dark .mzsp-start button{border-color:#F4F2EC;box-shadow:4px 4px 0 #FF7AB6}';
+  /* Delen vanuit de pagina zelf: hier werken het deelmenu en de app-links het best. */
+  window.mzDeel = function(doel, t, u){
+    var mobiel = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    var tekst = t + '\n' + u;
+    if (doel === 'whatsapp'){
+      if (mobiel){ location.href = 'whatsapp://send?text=' + encodeURIComponent(tekst); return 'ok'; }
+      window.open('https://wa.me/?text=' + encodeURIComponent(tekst), '_blank', 'noopener'); return 'ok';
+    }
+    if (doel === 'facebook' && !(mobiel && navigator.share)){
+      window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(u), '_blank', 'noopener'); return 'ok';
+    }
+    if (mobiel && navigator.share){ navigator.share({text: t, url: u}).catch(function(){}); return 'ok'; }
+    try { navigator.clipboard.writeText(tekst); return 'gekopieerd'; } catch(e){ return false; }
+  };
+
   function isTelefoon(){ return window.matchMedia('(max-width: 760px)').matches; }
 
   function launcher(el, html, naam){

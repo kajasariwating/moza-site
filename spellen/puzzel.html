@@ -162,6 +162,7 @@ button:focus-visible,.cel:focus-visible{outline:3px solid var(--roze);outline-of
 .deelrij .deel{flex:1 1 auto;text-align:center;border:2px solid var(--rand);background:var(--vlak);color:var(--ink);font:inherit;font-weight:800;font-size:14px;padding:9px 10px;text-decoration:none;cursor:pointer;box-shadow:2px 2px 0 var(--rand)}
 .deelrij .wa{background:#25D366;color:#111;border-color:#111}
 .deelrij .fb{background:#1877F2;color:#fff;border-color:#111}
+.deelrij .ig{background:linear-gradient(45deg,#F58529,#DD2A7B,#8134AF);color:#fff;border-color:#111}
 </style>
 <div class="wrap" id="app"></div>
 <div class="melding" id="melding" hidden></div>
@@ -367,6 +368,26 @@ function kijkKlaar(){
   S.done[P.id]={t}; delete S.prog[P.id]; bewaar();
   setTimeout(()=>klaarScherm(t,record),400);
 }
+/* Delen: liefst via de pagina eromheen (moza.nu), want daar opent het deelmenu en de app het best. */
+function mzDeelLokaal(doel, t, u){
+  var mobiel = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  var tekst = t + "\n" + u;
+  function kopie(){ try { navigator.clipboard.writeText(tekst); return "gekopieerd"; } catch (e){ return false; } }
+  if (doel === "whatsapp"){
+    if (mobiel){ try { window.top.location.href = "whatsapp://send?text=" + encodeURIComponent(tekst); } catch (e){ location.href = "whatsapp://send?text=" + encodeURIComponent(tekst); } return "ok"; }
+    window.open("https://wa.me/?text=" + encodeURIComponent(tekst), "_blank", "noopener"); return "ok";
+  }
+  if (doel === "facebook" && !(mobiel && navigator.share)){
+    window.open("https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(u), "_blank", "noopener"); return "ok";
+  }
+  if (mobiel && navigator.share){ navigator.share({text: t, url: u}).catch(function(){}); return "ok"; }
+  return kopie();
+}
+function mzDeel(doel, t, u){
+  try { if (window.parent !== window && window.parent.mzDeel){ var r = window.parent.mzDeel(doel, t, u); if (r) return r; } } catch (e){}
+  return mzDeelLokaal(doel, t, u);
+}
+
 function klaarScherm(t,record){
   const ander=NIVEAUS.find(n=>n.id!==P.lv), anderKlaar=S.done[ander.id+'-d'+DAG];
   const URL='https://www.moza.nu/spellen/kruiswoordpuzzel';
@@ -378,9 +399,7 @@ function klaarScherm(t,record){
     '<p style="margin:0">Je leerde vandaag '+P.slots.length+' begrippen over de Molukken en Molukkers in Nederland.</p>'+
     '<div class="molbox"><b>Wist je dat? · '+esc(x.disp)+'</b><p>'+esc(x.uitleg)+'</p></div>'+
     '<button class="knop blauw" id="deel">Daag je vrienden uit</button>'+
-    '<div class="deelrij"><a class="deel wa" target="_blank" rel="noopener" href="https://wa.me/?text='+encodeURIComponent(deel+'\n'+URL)+'">WhatsApp</a>'+
-    '<a class="deel fb" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(URL)+'&quote='+encodeURIComponent(deel)+'">Facebook</a>'+
-    '<button class="deel" id="kopie">Kopieer voor Instagram</button></div>'+
+    '<div class="deelrij"><button class="deel wa" data-doel="whatsapp">WhatsApp</button><button class="deel fb" data-doel="facebook">Facebook</button><button class="deel ig" data-doel="instagram">Instagram</button></div>'+
     '<p style="margin:0">Over <em class="aftel">'+tot6()+'</em> staan er nieuwe puzzels klaar.</p>'+
     '<div class="rij">'+(anderKlaar?'':'<button class="knop" id="ander">Speel ook '+ander.naam.toLowerCase()+'</button>')+'<button class="knop" id="sluit">Lees alle weetjes</button><button class="knop" id="naarOv">Overzicht</button></div></div>';
   document.body.appendChild(ov); startAftel();
@@ -389,8 +408,9 @@ function klaarScherm(t,record){
   const a=ov.querySelector('#ander'); if(a) a.onclick=()=>{weg(); spel(vanDag(ander.id));};
   ov.querySelector('#sluit').onclick=()=>{weg(); teken(); document.querySelector('.lijsten').scrollIntoView({behavior:'smooth'});};
   ov.querySelector('#naarOv').onclick=()=>{weg(); overzicht();};
-  ov.querySelector('#kopie').onclick=kopieer;
-  ov.querySelector('#deel').onclick=()=>{ if(navigator.share){ navigator.share({text:deel,url:URL}).catch(()=>{}); } else kopieer(); };
+  const doeDeel=(doel)=>{ const r=mzDeel(doel,deel,URL); if(r==='gekopieerd') melding(doel==='instagram'?'Gekopieerd. Plak het in je Instagram-story of bericht.':'Gekopieerd. Plak het waar je wilt.'); else if(!r) kopieer(); };
+  ov.querySelectorAll('.deelrij [data-doel]').forEach(b=>b.onclick=()=>doeDeel(b.dataset.doel));
+  ov.querySelector('#deel').onclick=()=>doeDeel('native');
   ov.querySelector('#deel').focus();
 }
 function toonTijd(){const el=document.getElementById('tijd'); if(el) el.textContent=fmt(ST.t);}
