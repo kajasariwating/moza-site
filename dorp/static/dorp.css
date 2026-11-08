@@ -192,3 +192,48 @@ html.moza-dark .mzib,html.moza-dark .mznav a{color:#ECECF1}
 html.moza-dark .mztas{border-color:#ECECF1;color:#ECECF1!important}
 html.mzk-groot body{font-size:20px}
 html.mzk-groot .w p,html.mzk-groot .w li{font-size:1.1em}
+
+/* ---------- Meer-menu: 1-op-1 zoals moza.nu ---------- */
+@media (max-width:1024px){.mzkop{position:sticky;top:0;z-index:9991}}
+#mzk-meer{position:fixed;left:0;right:0;top:var(--mt,0px);bottom:calc(62px + env(safe-area-inset-bottom,0px));z-index:9989;background:#fff;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+#mzk-meer[hidden]{display:none}
+html.moza-dark #mzk-meer{background:#17181D}
+html.mzk-menu body{overflow:hidden}
+.mz-mm{display:flex;flex-direction:column;gap:22px;padding:8px 22px 28px;text-align:left;font-family:"Hanken Grotesk",system-ui,sans-serif;color:#111;width:100%;box-sizing:border-box;font-size:17px;line-height:1.5}
+.mz-mm a{text-decoration:none!important;color:inherit}
+.mz-mm .mm-kabar{display:flex;align-items:center;gap:12px;margin:0 0 6px;padding:10px 12px;background:#E9F25A;color:#111!important;border:2px solid #111;box-shadow:4px 4px 0 #FF7AB6}
+.mz-mm .mm-kabar .kt{display:flex;flex-direction:column;line-height:1.25;color:#111}
+.mz-mm .mm-kabar .kt b{font-size:18px;font-weight:900}
+.mz-mm .mm-kabar .kt span{font-size:14px;font-weight:700}
+.mz-mm .mm-main{display:flex;flex-direction:column}
+.mz-mm .mm-main a{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid #E4E2DD}
+.mz-mm .mm-main b{font-size:24px;font-weight:800;letter-spacing:-.01em}
+.mz-mm .mm-main span{font-size:14px;color:#5c5a55;text-align:right}
+.mz-mm .mm-l{display:block;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#5c5a55;margin-bottom:8px}
+.mz-mm a.mm-acct{display:flex;align-items:center;gap:12px;background:#111;color:#E9F25A;padding:14px 16px;border:2px solid #111}
+.mz-mm a.mm-acct svg{width:24px;height:24px;flex-shrink:0;stroke:#E9F25A}
+.mz-mm a.mm-acct b{white-space:nowrap;font-weight:900;font-size:18px;color:#E9F25A}
+.mz-mm a.mm-acct span{white-space:nowrap;margin-left:auto;font-weight:700;font-size:13px;color:#fff}
+html.moza-dark .mz-mm a.mm-acct{background:#262934;border-color:#fff}
+.mz-mm .mm-lees{display:flex;align-items:center;gap:12px;width:100%;border:2px solid currentColor;background:transparent;color:inherit;padding:12px 14px;text-align:left;font:inherit;cursor:pointer}
+.mz-mm .mm-lees svg{width:26px;height:26px;flex:0 0 auto}
+.mz-mm .mm-lees b{display:block;font-size:18px;font-weight:800}
+.mz-mm .mm-lees small{display:block;font-size:14px;opacity:.8}
+.mz-mm .mm-don{background:#1F3BD1;color:#fff;padding:18px;display:flex;flex-direction:column;gap:12px}
+.mz-mm .mm-don p{margin:0;font-size:16px;line-height:1.45;color:#fff}
+.mz-mm .mm-btn{display:flex;align-items:center;justify-content:center;min-height:50px;border-radius:999px;background:#FF7AB6;color:#111!important;border:2px solid #111;font-size:17px;font-weight:800}
+html.moza-dark .mz-mm .mm-btn{background:#E9F25A;border-color:#E9F25A}
+.mz-mm .mm-over p{margin:0 0 10px;font-size:16px;line-height:1.5}
+.mz-mm .mm-links{display:flex;flex-wrap:wrap;gap:8px 18px;font-weight:700;font-size:15px}
+.mz-mm .mm-links a{text-decoration:underline!important;text-underline-offset:3px}
+.mz-mm .mm-wa{display:flex;align-items:center;gap:12px;border:1px solid #E4E2DD;padding:14px 16px;font-size:16px}
+.mz-mm .mm-wa svg{width:24px;height:24px;flex:0 0 auto}
+.mz-mm .mm-beeld{display:flex;flex-direction:column;gap:4px;border-top:2px solid #111;padding-top:14px}
+.mz-mm .mm-beeld b{font-size:20px;font-weight:800}
+.mz-mm .mm-beeld span{font-size:14px;color:#5c5a55}
+html.moza-dark .mz-mm{color:#ECECF1}
+html.moza-dark .mz-mm .mm-main a{border-bottom-color:#2e2e36}
+html.moza-dark .mz-mm .mm-main span,html.moza-dark .mz-mm .mm-l,html.moza-dark .mz-mm .mm-beeld span{color:#a9a9b3}
+html.moza-dark .mz-mm .mm-wa{border-color:#2e2e36}
+html.moza-dark .mz-mm .mm-beeld{border-top-color:#ECECF1}
+html.moza-dark .mz-mm a:not(.mm-acct):not(.mm-btn):not(.mm-kabar){color:#ECECF1}

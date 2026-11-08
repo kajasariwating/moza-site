@@ -373,7 +373,7 @@ def onder_html(deel):
             f'<a href="{MZ}/evenementen?{UTM}"><span class="ag">{ic("agenda")}</span>Agenda</a>'
             f'<button type="button" class="deel" data-deel aria-label="Deel deze pagina"><span class="dl">{ic("deel")}</span>Deel</button>'
             f'<a href="{MZ}/kaarten?{UTM}">{ic("kaart")}<span class="ld" aria-hidden="true"></span>Kaarten</a>'
-            f'<button type="button" data-meer aria-label="Meer: menu van MOZA">{ic("meer")}Meer</button></nav>')
+            f'<button type="button" data-meer aria-label="Meer: menu van MOZA" aria-expanded="false" aria-controls="mzk-meer">{ic("meer")}Meer</button></nav>')
     sluit = f'<button type="button" class="x" data-x aria-label="Sluiten">{ic("x", "2.4")}</button>'
     deelvel = (f'<div id="mzk-deel" class="vel"><div class="dk" data-x></div><section role="dialog" aria-modal="true" aria-labelledby="mzk-deel-h">'
                f'<div class="vkop"><h2 id="mzk-deel-h">Deel deze pagina</h2>{sluit}</div>'
@@ -381,12 +381,19 @@ def onder_html(deel):
                f'<a class="wa" target="_blank" rel="noopener">{ic("wa")}Stuur via WhatsApp</a>'
                f'<div class="twee"><a class="fb" target="_blank" rel="noopener">Facebook</a><button type="button" class="kp">Kopieer link</button></div>'
                f'<button type="button" class="ander">Andere app kiezen</button></section></div>')
-    rijen = ''.join(f'<a href="{MZ}{u}?{UTM}"><b>{n}</b><span>{o}</span></a>' for u, n, o in MEER_LINKS)
-    meervel = (f'<div id="mzk-meer" class="vel"><div class="dk" data-x></div><section role="dialog" aria-modal="true" aria-labelledby="mzk-meer-h">'
-               f'<div class="vkop"><h2 id="mzk-meer-h">Menu</h2>{sluit}</div>'
-               f'<a class="kab" href="/"><span class="kb-mini" aria-hidden="true">KABAR<small><span>M</span><span>A</span><span>L</span><span>U</span><span>K</span><span>U</span></small></span><span><b>Kabar Maluku</b><span>Ander dorp zoeken</span></span></a>'
-               f'<nav class="mzl" aria-label="MOZA">{rijen}</nav>'
-               f'<a class="don" href="{MZ}/doneer?{UTM}">Doneer aan MOZA</a></section></div>')
+    def u(pad):
+        return f'{MZ}{pad}?{UTM}'
+    rijen = ''.join(f'<a href="{u(pad)}"><b>{n}</b><span>{o}</span></a>' for pad, n, o in MEER_LINKS)
+    meervel = ('<div id="mzk-meer" aria-label="Menu" hidden><div class="mz-mm">'
+               '<a class="mm-kabar" href="/"><span class="kb-mini" aria-hidden="true">KABAR<small><span>M</span><span>A</span><span>L</span><span>U</span><span>K</span><span>U</span></small></span><span class="kt"><b>Kabar Maluku</b><span>Check jouw dorp →</span></span></a>'
+               f'<nav class="mm-main" aria-label="Menu">{rijen}</nav>'
+               f'<a class="mm-acct" href="{u("/account")}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg><b>Mijn MOZA</b><span>Inloggen en bestellingen</span></a>'
+               f'<button type="button" class="mm-lees" onclick="mzGroot()">{_AA}<span><b>Leeshulp</b><small>Grotere letters aan of uit</small></span></button>'
+               f'<div class="mm-don"><p>Onze verhalen zijn gratis te lezen. Dat kan dankzij donaties.</p><a class="mm-btn" href="{u("/doneer")}">Doneer</a></div>'
+               f'<div class="mm-over"><span class="mm-l">Over MOZA</span><p>Informatie over Molukkers in Nederland, voor en door Molukkers.</p><div class="mm-links"><a href="{u("/over-moza")}">Over MOZA</a><a href="{u("/team")}">Team</a><a href="{u("/verantwoording")}">Verantwoording</a></div></div>'
+               '<a class="mm-wa" href="https://whatsapp.com/channel/0029VaA4StPIt5rs5FadnH1d" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="#1f8f4e" stroke-width="1.9" aria-hidden="true"><path d="M4 20l1.3-4A8 8 0 1 1 8 18.7z"></path></svg><span><b>Volg MOZA op WhatsApp.</b> Het laatste Molukse nieuws op je telefoon.</span></a>'
+               f'<a class="mm-beeld" href="{u("/beeldbank")}"><b>Beeldbank</b><span>Foto’s van Molukkers in Nederland door de jaren heen</span></a>'
+               '</div></div>')
     data = json.dumps({'t': t, 'e': x}, ensure_ascii=False).replace('</', '<\\/')
     return balk + deelvel + meervel + f'<script>window.MZK_DEEL={data}</script><script src="/onder.js?v={VERSIE}" defer></script>'
 

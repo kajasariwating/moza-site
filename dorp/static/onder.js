@@ -8,9 +8,11 @@
   function open(z){z.classList.add('on');H.classList.add('mzk-vel');var f=z.querySelector('a,button.x');if(f)setTimeout(function(){f.focus()},50)}
   function dicht(z){z.classList.remove('on');H.classList.remove('mzk-vel')}
   function plausible(n){try{if(window.plausible)window.plausible(n)}catch(e){}}
-  var deel=vel('mzk-deel'),meer=vel('mzk-meer');
+  var deel=vel('mzk-deel'),meer=document.getElementById('mzk-meer'),mk=document.querySelector('[data-meer]');
+  function meerDicht(){if(!meer||meer.hidden)return;meer.hidden=true;H.classList.remove('mzk-menu');if(mk)mk.setAttribute('aria-expanded','false')}
+  function meerOpen(){var k=document.querySelector('.mzkop'),t=k?Math.max(0,Math.round(k.getBoundingClientRect().bottom)):0;meer.style.setProperty('--mt',t+'px');meer.hidden=false;meer.scrollTop=0;H.classList.add('mzk-menu');if(mk)mk.setAttribute('aria-expanded','true')}
   function deelOpen(){
-    if(!deel)return;
+    if(!deel)return;meerDicht();
     var m=deel.querySelector('.msg');m.innerHTML='';var b=document.createElement('b');b.textContent=D.t||document.title;m.appendChild(b);
     if(D.e){m.appendChild(document.createElement('br'));m.appendChild(document.createTextNode(D.e))}
     m.appendChild(document.createElement('br'));var l=document.createElement('span');l.className='u';l.textContent=url('whatsapp').replace(/^https?:\/\//,'').split('?')[0];m.appendChild(l);
@@ -28,6 +30,6 @@
     deel.querySelector('.fb').addEventListener('click',function(){setTimeout(function(){dicht(deel)},300)});
   }
   [].forEach.call(document.querySelectorAll('[data-deel]'),function(b){b.addEventListener('click',function(ev){ev.preventDefault();deelOpen()})});
-  [].forEach.call(document.querySelectorAll('[data-meer]'),function(b){b.addEventListener('click',function(){if(meer)open(meer)})});
-  document.addEventListener('keydown',function(e){if(e.key==='Escape'){if(deel)dicht(deel);if(meer)dicht(meer)}});
+  [].forEach.call(document.querySelectorAll('[data-meer]'),function(b){b.addEventListener('click',function(){if(!meer)return;if(meer.hidden)meerOpen();else meerDicht()})});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'){if(deel)dicht(deel);meerDicht()}});
 })();
