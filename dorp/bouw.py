@@ -368,6 +368,7 @@ window.mzThema=function(){{var dk=!d.classList.contains('moza-dark');d.classList
 {extra_head}{PLAUSIBLE}
 </head>
 <body>
+<div class="mozabalk"><a href="https://www.moza.nu" class="terug">← moza.nu</a><nav aria-label="MOZA"><a href="https://www.moza.nu/lezen">Nieuws</a><a href="https://www.moza.nu/kaarten">Kaarten</a><a href="https://www.moza.nu/weten">Kennisbank</a></nav></div>
 <header class="kop"><a class="merk" href="/" aria-label="Kabar Maluku Live, naar de startpagina"><span class="kb">KABAR<small aria-hidden="true"><span>M</span><span>A</span><span>L</span><span>U</span><span>K</span><span>U</span></small><span class="sr">Maluku</span><i></i></span><span class="lv">LIVE</span></a><span class="rechts"><button class="thema" type="button" aria-label="Nachtmodus aan of uit" onclick="mzThema()"><svg class="maan-i" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M20 14.5A8 8 0 019.5 4 8 8 0 1020 14.5z"/></svg><svg class="zon-i" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg></button><a class="knop" href="/" aria-label="Ander dorp zoeken">{ICON_ZOEK}<span class="kt">Ander dorp</span></a></span></header>
 {body}
 <footer class="voet"><div class="w"><p class="pw">Kabar Maluku Live, powered by <a class="mz" href="https://www.moza.nu" aria-label="MOZA">MOZA</a></p><p>Voor, door en met Molukkers. Bekijk ook <a href="https://www.moza.nu/kaarten">alle kaarten</a> en <a href="https://www.moza.nu/lezen">het laatste nieuws</a> op moza.nu.</p>
@@ -625,6 +626,13 @@ def dorp_html(d, ctx, nu):
         kaartjes = ''.join(f'<a class="nieuws" href="{e(x["url"])}"><span>{x["t"].astimezone(WIT).day} {T.MAANDEN[x["t"].astimezone(WIT).month - 1]} {x["t"].astimezone(WIT).year}</span><b>{e(x["titel"])}</b></a>' for x in nw)
         m.append(f'<section aria-labelledby="h-nieuws"><h2 id="h-nieuws">Nieuws over {e(naam)}</h2>{kaartjes}</section>')
 
+    # ---- meer op MOZA
+    laatst = [x for x in (ctx.get('laatst') or []) if x['url'] not in {y['url'] for y in (nw or [])}][:3]
+    if laatst:
+        kaartjes = ''.join(f'<a class="nieuws" href="{e(x["url"])}?utm_source=kabar"><span>{x["t"].astimezone(WIT).day} {T.MAANDEN[x["t"].astimezone(WIT).month - 1]}</span><b>{e(x["titel"])}</b></a>' for x in laatst)
+        m.append(f'<section aria-labelledby="h-moza"><p class="label"><span class="tag" style="background:#111;color:#fff">MOZA</span></p><h2 id="h-moza">Nieuw op MOZA</h2>{kaartjes}'
+                 f'<a href="https://www.moza.nu/lezen?utm_source=kabar">Meer verhalen op moza.nu →</a></section>')
+
     # ---- buurdorpen
     if ctx['buurlinks']:
         rijen = ''.join(f'<a class="rij" href="/{b["slug"]}/"><b>{e(b["naam"])}<small>{e(b["kec"])}</small></b>{"<span class=badge>BRAND</span>" if b.get("brand") else "<span aria-hidden=true>→</span>"}</a>' for b in ctx['buurlinks'])
@@ -830,6 +838,7 @@ def main():
             'lu': lucht_bij(lcel.get(per_l[d['code']]) if lcel else None, nu),
             'zz': zee_bij(zcel.get(per_w[d['code']]) if zcel else None, wr, nu),
             'nw': nieuws_bij(d, items),
+            'laatst': sorted(items or [], key=lambda x: x['t'], reverse=True)[:5],
             'bos': bosdata.get(d['code']), 'bosjaar': int(str(bosdata.get('_versie', 'GFC-2001')).split('-')[1]),
             'buren': buren, 'kust': kust.get(d['kab'], []), 'buurlinks': buurlinks,
             'kust_dorp': aan_kust(d, kust, g),

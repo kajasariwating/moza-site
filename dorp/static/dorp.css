@@ -99,3 +99,4 @@ html.moza-dark .merk .kb{border-color:#ECECF1}html.moza-dark .merk .lv{backgroun
 @media (max-width:420px){.kop .knop .kt{display:none}.kop .knop{width:44px;padding:0;justify-content:center}}
 html.moza-dark .knop{color:var(--inkt)}
 .kruim{display:flex;flex-wrap:wrap;align-items:center;gap:6px}.kruim a{color:#fff;text-decoration:none}.kruim a:hover{text-decoration:underline}.intro{margin:0;font-size:14px;line-height:1.45;opacity:.9}
+.mozabalk{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 16px;background:#111;color:#fff;font-size:13px;font-weight:800}.mozabalk a{color:#fff;text-decoration:none;min-height:32px;display:inline-flex;align-items:center}.mozabalk a:hover{text-decoration:underline}.mozabalk nav{display:flex;gap:14px}.mozabalk .terug{color:var(--geel)}
