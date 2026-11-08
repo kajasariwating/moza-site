@@ -851,6 +851,8 @@ def main():
     shutil.copy(HIER / 'static' / 'dorp.css', uit / 'dorp.css')
     shutil.copy(HIER / 'static' / 'og.png', uit / 'og.png')
     shutil.copy(HIER / 'static' / 'favicon.svg', uit / 'favicon.svg')
+    for f in (HIER / 'static').glob('google*.html'):  # verificatie Google Search Console
+        shutil.copy(f, uit / f.name)
     (uit / 'CNAME').write_text('live.moza.nu\n')
     (uit / 'robots.txt').write_text(f'User-agent: *\nAllow: /\nSitemap: {SITE}/sitemap.xml\n')
     (uit / '404.html').write_text(pagina('Niet gevonden | Kabar Maluku Live', 'Deze pagina bestaat niet.', '/404.html',
