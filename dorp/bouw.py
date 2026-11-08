@@ -137,8 +137,14 @@ def weer_bij(r, nu):
         start = next((t for t, v in vooruit if (v or 0) >= 0.3), None)
         regenzin = f'Regen vanaf ongeveer {start.hour}:00' if start else 'Droog de komende uren'
     dagen = []
-    for t, tmax, code in zip(dag.get('time') or [], dag.get('temperature_2m_max') or [], dag.get('weather_code') or []):
-        dagen.append({'t': datetime.fromisoformat(t).replace(tzinfo=WIT), 'tmax': tmax, 'code': code})
+    op = dag.get('sunrise') or []
+    onder = dag.get('sunset') or []
+    for i, (t, tmax, code) in enumerate(zip(dag.get('time') or [], dag.get('temperature_2m_max') or [], dag.get('weather_code') or [])):
+        x = {'t': datetime.fromisoformat(t).replace(tzinfo=WIT), 'tmax': tmax, 'code': code}
+        if i < len(op) and op[i] and i < len(onder) and onder[i]:
+            x['op'] = datetime.fromisoformat(op[i]).replace(tzinfo=WIT)
+            x['onder'] = datetime.fromisoformat(onder[i]).replace(tzinfo=WIT)
+        dagen.append(x)
     wind = uren(r, 'wind_speed_10m')
     wrichting = cur.get('wind_direction_10m')
     return {'temp': cur.get('temperature_2m'), 'code': cur.get('weather_code'), 'regenzin': regenzin,
@@ -432,12 +438,20 @@ def dorp_html(d, ctx, nu):
         chips.append(f'<div class="chip"><span class="label">Weer nu</span><b>{round(wr["temp"])}°</b>'
                      f'<small>{e(klein)}</small></div>')
     sub = f'{e(d["kec"])} · {e(groep)}'
+    zon = ''
+    if wr and wr['dagen'] and wr['dagen'][0].get('op'):
+        z0 = wr['dagen'][0]
+        nl = lambda t: t.astimezone(NL).strftime('%H:%M')
+        zon = (f'<div class="zon"><span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 18h18M7 18a5 5 0 0110 0M12 4v4M5.6 9.6l1.8 1.8M18.4 9.6l-1.8 1.8M9 6l3-3 3 3"/></svg>'
+               f'<b>Zon op {z0["op"]:%H:%M}</b><small>in Nederland {nl(z0["op"])}</small></span>'
+               f'<span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 18h18M7 18a5 5 0 0110 0M12 3v5M5.6 9.6l1.8 1.8M18.4 9.6l-1.8 1.8M9 5l3 3 3-3"/></svg>'
+               f'<b>Zon onder {z0["onder"]:%H:%M}</b><small>in Nederland {nl(z0["onder"])}</small></span></div>')
     samen = samenvatting(d, br, bv, wr, lu, nu)
     delen.append(f'''<section class="hero" aria-labelledby="h1"><div class="w">
 <p class="label live"><i></i>Kabar Live</p>
 <h1 id="h1">{e(naam)}</h1>
 <p class="sub">{sub}</p>
-<div class="chips">{''.join(chips)}</div>
+<div class="chips">{''.join(chips)}</div>{zon}
 <p class="samen">{samen}</p>
 <p class="accent">zo staat het er nu voor</p>
 </div></section>
@@ -731,7 +745,7 @@ def main():
         print('  bevingen:', None if bev is None else len(bev))
         cw, _ = D.raster(rows, 0.25)
         cl, _ = D.raster(rows, 0.5)
-        print('weer…', len(cw)); wcel = D.cached('weer', 2.9, lambda: D.weer(cw))
+        print('weer…', len(cw)); wcel = D.cached('weer-v2', 2.9, lambda: D.weer(cw))
         print('lucht…', len(cl)); lcel = D.cached('lucht', 2.9, lambda: D.lucht(cl))
         print('zee…'); zcel = D.cached('zee', 2.9, lambda: D.zee(cw))
         print('nieuws…'); items = D.cached('nieuws', 5.9, D.nieuws)

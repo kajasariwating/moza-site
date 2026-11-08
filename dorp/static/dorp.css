@@ -90,3 +90,4 @@ h2{margin:0;font-size:26px;line-height:1.15;font-weight:900;letter-spacing:-.02e
 @media (prefers-color-scheme:dark){.merk .kb{border-color:#ECECF1}.merk .lv{background:#ECECF1;color:#111}}
 .voet .pw{display:flex;align-items:center;gap:10px;font-weight:800}
 .voet .mz{width:40px;height:40px;border-radius:50%;background:#fff;color:#111!important;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;text-decoration:none;letter-spacing:-.02em}
+.zon{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.zon span{display:grid;grid-template-columns:auto 1fr;column-gap:8px;align-items:center;padding:8px 12px;border:2px solid rgba(255,255,255,.55);color:#fff}.zon svg{grid-row:span 2;color:var(--geel)}.zon b{font-size:16px;line-height:1.2}.zon small{font-size:13px;opacity:.85}
