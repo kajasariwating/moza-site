@@ -938,7 +938,8 @@ html.mzoa-on #page #page-regions{display:none!important}
 
 @media (max-width:767px){#siteWrapper #page .blog-item-meta-wrapper{display:flex!important;flex-wrap:wrap!important;gap:8px 10px!important;max-width:100%!important;min-width:0!important}#siteWrapper #page .blog-item-meta-wrapper .blog-meta-item--categorie{white-space:normal!important;max-width:100%!important}#siteWrapper #page .blog-item-meta-wrapper .mz-upd{flex-basis:100%!important}}
 
-@media (min-width:768px){#mz-ks .ks-row{grid-template-columns:repeat(4,minmax(0,1fr))!important}}
+@media (min-width:768px){#mz-ks .ks-row{grid-template-columns:repeat(5,minmax(0,1fr))!important}}
+#mz-ks .ks-t.z .ks-k::before{background:#EDDCB8!important}
 #mz-ks .ks-t.p .ks-k::before{background:#FF7AB6!important}
 .mzorg-cta{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;border:2px solid #111;box-shadow:6px 6px 0 #FF7AB6;padding:16px 18px;margin:28px 0;font-family:'Hanken Grotesk',system-ui,sans-serif;background:#fff;color:#111}
 .mzorg-cta b{font-weight:900;font-size:18px;flex-basis:100%}
@@ -1160,8 +1161,10 @@ html.moza-dark #mzwk{--bg:#14151B;--fg:#ECECF1;--soft:#1E2029;--mute:#C9CBD3;--l
 <script id="mzwk-js">
 (function(){
 var WK='/welkom-bij-moza';
-var NB_URL='https://www.moza.nu/campaigns/view-campaign/TmDWQSScnP5sM9c7IvCF_Qk547BHo_aikvoVdOgG8qomBRrafsgzOHZBcnTXs2NzVCnm5P8UoMc-bWKB6D-dyPUu4mNv40XG';
-var NB_TITLE='Nieuwsbrief oktober 2026';
+/* Laatste nieuwsbrief: komt uit data/nieuwsbrief.json in GitHub (wordt automatisch bijgewerkt). Dit is de reserve. */
+var NB_URL='https://www.moza.nu/campaigns/view-campaign/7IqclJBAqOlkO0lsuDBVhGWrk08su75JR-CsjE_WR562BJXn52RHQatFtGkrmWyYRverJXkFnXYuLdFHCXve1hKgPs1IGqx0';
+var NB_TITLE='MOZA-nieuwsbrief van 5 november 2026';
+var NB_JSON='https://raw.githubusercontent.com/kajasariwating/moza-site/main/data/nieuwsbrief.json';
 var HOURS=48;
 var KEY='mz-nb-signup';
 var P=location.pathname.replace(/\/+$/,'')||'/';
@@ -1189,6 +1192,7 @@ var ICON={
  book:'<path d="M4 4h6a3 3 0 0 1 3 3v13a2 2 0 0 0-2-2H4z"/><path d="M20 4h-4a3 3 0 0 0-3 3v13a2 2 0 0 1 2-2h5z"/>',
  aa:'<path d="M3 19 8 5l5 14M4.8 14h6.4"/><path d="M15 19l3.5-9 3.5 9M16 16.5h5"/>',
  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+ tijd:'<path d="M3 12h18"/><circle cx="6" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="18" cy="12" r="2"/><path d="M6 5v5M12 14v5M18 5v5"/>',
  doc:'<path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4M9 12h7M9 16h7"/>',
  people:'<circle cx="8" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M2 20c0-3.3 2.7-6 6-6s6 2.7 6 6M14 20c0-2.6 1.4-4.6 3.5-4.6S21 17.4 21 20"/>',
  shelf:'<path d="M4 20h16M6 20V6M10 20V4M14 20V8M17 20l2.5-11"/>',
@@ -1215,6 +1219,7 @@ var S=[
   ['/weten','book','Kennisbank','Antwoorden op je vragen, in gewone taal. Over geschiedenis, wijken, taal, geloof en rechten.',1],
   ['/begrippen','aa','Begrippen','Molukse woorden en begrippen uitgelegd.'],
   ['/sejarah-maluku','clock','Sejarah Maluku','De geschiedenis van de Molukken.'],
+  ['/jaartallen','tijd','Jaartallen','Molukse geschiedenis in jaartallen, van 1512 tot nu.'],
   ['/onderzoek','doc','Onderzoek','Scripties en proefschriften, samengevat.'],
   ['/organisaties','people','Organisaties','Van kumpulan tot landelijke stichting.'],
   ['/boekenplank','shelf','Boekenplank','Boeken over Molukkers en de Molukken.'],
@@ -1250,6 +1255,7 @@ function build(){
  body+='<section class="sec" id="mzwk-nieuwsbrief"><div class="in"><div class="sh" style="--acc:#1F3BD1"><h2><i aria-hidden="true"></i>De laatste nieuwsbrief</h2><p>Zo ziet de MOZA-nieuwsbrief eruit. Scroll erdoorheen.</p></div><div class="nb"><div class="nb-h"><b>'+esc(NB_TITLE)+'</b><a href="'+esc(NB_URL)+'" target="_blank" rel="noopener">Open in nieuw tabblad ↗</a></div><iframe src="'+esc(NB_URL)+'" title="'+esc(NB_TITLE)+'" loading="lazy"></iframe></div></div></section>';
  body+='<section class="end"><div class="in"><div class="box"><b>Begin waar je wilt.</b><a href="/">Naar de voorpagina →</a></div></div></section>';
  w.insertAdjacentHTML('beforeend',body);
+ try{fetch(NB_JSON,{cache:'no-cache'}).then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(j){if(!j||!/^https:\/\/www\.moza\.nu\/campaigns\/view-campaign\//.test(j.url||'')||j.url===NB_URL)return;var nb=w.querySelector('#mzwk-nieuwsbrief');if(!nb)return;var t=String(j.titel||'De laatste nieuwsbrief');nb.querySelector('.nb-h b').textContent=t;var a=nb.querySelector('.nb-h a');a.href=j.url;var f=nb.querySelector('iframe');f.title=t;f.src=j.url}).catch(function(){})}catch(e){}
  sw.insertBefore(w,page);
  document.documentElement.classList.add('mzwk-on');
  document.title='Welkom bij MOZA — bevestig je inschrijving';

@@ -1666,7 +1666,7 @@ return intro('Lezen','Nieuws, agenda en verhalen','Wat er speelt onder Molukkers
 '<div class="mg-ks"><a class="mg-kh" href="/weten"><span class="mg-kt y">Uitleg van MOZA</span><b>Kennisbank</b></a><span class="mg-l">'+(wk?'Veel gelezen deze week':'Veel gelezen')+'</span><ol class="mg-top">'+top.slice(0,4).map(function(t){return '<li><a href="'+esc(t[0])+'"><span>'+esc(t[1])+'</span></a></li>';}).join('')+'</ol></div>'+
 '<div class="mg-ks"><a class="mg-kh" href="/onderzoek"><span class="mg-kt b">Studies van anderen</span><b>Onderzoek</b></a><p class="mg-kd">Scripties en proefschriften over Molukkers in Nederland en de Molukken. MOZA vat ze samen en linkt naar de bron.</p><a class="mg-kgo" href="/onderzoek">Alle studies →</a></div>'+
 '<div class="mg-ks"><a class="mg-kh" href="/kaarten"><span class="mg-kt r"><i class="mg-live"></i>Live data</span><b>Kaarten</b></a><p class="mg-kd">Kaarten met open data die zichzelf bijwerken.</p><ul class="mg-klist">'+KA.map(function(k){return '<li><a href="'+esc(k.u)+'">'+(k.live?'<i class="mg-live"></i>':'')+esc(k.t)+'</a></li>';}).join('')+'</ul><a class="mg-kgo" href="/kaarten">Alle kaarten →</a></div>'+
-'</div><div class="mg-kfoot"><span class="mg-l">Kennisbank: kies een thema</span>'+chips+'<div class="mg-more"><a href="/begrippen">Begrippenlijst →</a><a href="/sejarah-maluku">Sejarah Maluku →</a></div></div></div>';});},
+'</div><div class="mg-kfoot"><span class="mg-l">Kennisbank: kies een thema</span>'+chips+'<div class="mg-more"><a href="/begrippen">Begrippenlijst →</a><a href="/sejarah-maluku">Sejarah Maluku →</a><a href="/jaartallen">Jaartallen →</a></div></div></div>';});},
     '/evenementen':function(){return j('/evenementen'+Q).then(function(r){var now=Date.now();var L=(r.upcoming||[]).filter(function(e){return (e.endDate||e.startDate)>=now}).sort(function(a,b){var ra=a.startDate<now?1:0,rb=b.startDate<now?1:0;return ra-rb||a.startDate-b.startDate}).slice(0,3);
 var F=function(o,ms){return new Intl.DateTimeFormat('nl-NL',Object.assign({timeZone:'Europe/Amsterdam'},o)).format(new Date(ms)).replace(/\./g,'')};
 var dec=function(s){var x=document.createElement('textarea');x.innerHTML=s||'';return x.value};
@@ -2581,7 +2581,8 @@ var T=[
  {u:'/weten',c:'y',k:'Uitleg van MOZA',t:'Kennisbank',d:'Antwoorden op je vragen, in gewone taal.'},
  {u:'/onderzoek',c:'b',k:'Studies van anderen',t:'Onderzoek',d:'Scripties en proefschriften, samengevat met link naar de bron.'},
  {u:'/kaarten',c:'r',k:'<i></i>Live data',t:'Kaarten',d:'Kaarten met open data die zichzelf bijwerken.'},
- {u:'/organisaties',c:'p',k:'Zoeken',t:'Organisaties',d:'Molukse organisaties op naam, plaats, thema en niveau.'}
+ {u:'/organisaties',c:'p',k:'Zoeken',t:'Organisaties',d:'Molukse organisaties op naam, plaats, thema en niveau.'},
+ {u:'/jaartallen',c:'z',k:'Tijdlijn',t:'Jaartallen',d:'Molukse geschiedenis in jaartallen, van 1512 tot nu.'}
 ];
 var p=location.pathname.replace(/\/+$/,'')||'/';
 var kaart=MZK.kaarten.filter(function(k){return k.u===p})[0];
@@ -2954,7 +2955,7 @@ function sv(k){return '<svg viewBox="0 0 24 24" aria-hidden="true">'+IC[k]+'</sv
 function cs(n){return '/lezen#categorie-'+n.toLowerCase().replace(/\s+/g,'-')}
 var G=[['Lezen','/lezen','#1F3BD1','#1F3BD1','krant',[['Net binnen','/lezen'],['Nieuws uit Maluku','/nieuws/maluku'],['Van de redactie',cs('van de redactie')],['Erkenning',cs('erkenning')],['Molukse wijk',cs('Molukse wijk')],['Erfgoed',cs('erfgoed')],['Cultuur',cs('Cultuur')]]],
 ['Rubrieken','/lezen/tag/rubriek','#111','#E9F25A','kal',[['Alle rubrieken','/lezen/tag/rubriek'],['Kaart van de week','/lezen/tag/Kaart+van+de+week'],['Achter de foto','/lezen/tag/Achter+de+foto'],['Leeswijzer','/lezen/tag/Leeswijzer'],['Woord van de week','/lezen/tag/Woord+van+de+week'],['Dit weekend','/lezen/tag/Dit+weekend'],['Deze week toen','/lezen/tag/Deze+week+toen'],['Jullie zeiden','/lezen/tag/Jullie+zeiden'],['MOZA deze maand','/lezen/tag/MOZA+deze+maand']]],
-['Kennis','/weten','#D9468A','#FF7AB6','boek',[['Kennisbank','/weten'],['Begrippenlijst','/begrippen'],['Sejarah Maluku','/sejarah-maluku'],['Onderzoek','/onderzoek'],['Organisaties','/organisaties']]],
+['Kennis','/weten','#D9468A','#FF7AB6','boek',[['Kennisbank','/weten'],['Begrippenlijst','/begrippen'],['Sejarah Maluku','/sejarah-maluku'],['Jaartallen','/jaartallen'],['Onderzoek','/onderzoek'],['Organisaties','/organisaties']]],
 ['Kaarten','/kaarten','#D7381A','#FF4D2E','kaart',[['Bosbranden','/kaarten/bosbranden'],['Weer en zee','/kaarten/weer-en-zee'],['Aardbevingen','/kaarten/aardbevingen'],['Luchtkwaliteit','/kaarten/luchtkwaliteit'],['Bos en ontbossing','/kaarten/bos-en-ontbossing'],['Rampen','/kaarten/rampen'],['Zeewater','/kaarten/zeewater'],['Satellietbeeld','/kaarten/satelliet'],['Vulkanen','/kaarten/vulkanen'],['Regen','/kaarten/regen'],['Eb en vloed','/kaarten/getij'],['Koraalriffen','/kaarten/koraal'],['Forten en specerijen','/kaarten/forten'],['Talen van de Molukken','/kaarten/talen-molukken'],['Overtochten 1951','/kaarten/overtochten-1951'],['Vluchten','/kaarten/vluchten'],['Molukse wijken','/kaarten/molukse-wijken'],['Grafstatus','/kaarten/grafstatus']]],
 ['Agenda','/evenementen','#D7381A','#FF4D2E','kal',[['Alle evenementen','/evenementen'],['Evenement aanmelden','/uploaden']]],
 ['Doe mee','/podium','#111','#E9F25A','kal',[['Agenda','/evenementen'],['Podium','/podium'],['Insturen','/uploaden'],['Beeldbank','/beeldbank']]],
@@ -3075,7 +3076,7 @@ if(!build()){var n=0,iv=setInterval(function(){if(build()||++n>80)clearInterval(
 var WA='https://whatsapp.com/channel/0029VaA4StPIt5rs5FadnH1d';
 var NAV=[['Lezen','/lezen'],['Kennisbank','/weten'],['Agenda','/evenementen'],['Podium','/podium'],['Boekenplank','/boekenplank'],['Toko Buku','/store'],['Over MOZA','/over-moza']];
 var COLS=[
- ['Lees &amp; leer',[['Lezen','/lezen'],['Nieuws uit Maluku','/nieuws/maluku'],['Kennisbank','/weten'],['Begrippenlijst','/begrippen'],['Sejarah Maluku','/sejarah-maluku'],['Molukse organisaties','/organisaties'],['Boekenplank','/boekenplank'],['Podium','/podium'],['Agenda','/evenementen']]],
+ ['Lees &amp; leer',[['Lezen','/lezen'],['Nieuws uit Maluku','/nieuws/maluku'],['Kennisbank','/weten'],['Begrippenlijst','/begrippen'],['Sejarah Maluku','/sejarah-maluku'],['Jaartallen','/jaartallen'],['Molukse organisaties','/organisaties'],['Boekenplank','/boekenplank'],['Podium','/podium'],['Agenda','/evenementen']]],
  ['Over ons',[['Over MOZA','/over-moza'],['Team','/team'],['Verantwoording','/verantwoording'],['Contact','/contact'],['Stuur iets in','/uploaden'],['Organisatie aanmelden','/organisatie-aanmelden'],['Inloggen','/account']]],
  ['Ook interessant',[['Tanda Mata','/tanda-mata'],['Tahuri Festival','/tahuri-festival'],['Expositie MENA','/mena'],['Oral history scholenproject','/oral-history-scholenproject'],['Beeldbank','/beeldbank'],['Toko Buku','/store']]]
 ];
@@ -3455,7 +3456,7 @@ html.mzkop-on :is(#moza-lz .lz-hero,#mzmal>.hero,#mzag>.hero,#mzoh>.hero,#moza-k
 <script id="mzkop-js">
 (function(){
 var L=["Lezen bij MOZA",["/lezen","Actueel","Al het nieuws en de achtergrond, van nu en uit het archief.","e9f25a"],["/nieuws/maluku","Nieuws uit Maluku","Nieuws, foto's en verhalen van Ambon en de andere eilanden.","1f3bd1"],["/evenementen","Agenda","Concerten, exposities, herdenkingen en festivals.","ff4d2e"],["/oral-history-scholenproject","Verhalen","Leerlingen interviewden Molukse ouderen over hun leven.","ff7ab6"],["/lezen/tag/rubriek","Rubrieken","Elke dag een vaste rubriek: kaart, foto, boeken, woord, weekend.","111"]],
-W=["Kennis bij MOZA",["/weten","Kennisbank","Antwoorden op je vragen, in gewone taal.","e9f25a"],["/onderzoek","Onderzoek","Scripties en proefschriften, samengevat met link naar de bron.","1f3bd1"],["/kaarten","Kaarten","Kaarten met open data die zichzelf bijwerken.","ff4d2e",1],["/organisaties","Organisaties","Molukse organisaties op naam, plaats, thema en niveau.","ff7ab6"]],
+W=["Kennis bij MOZA",["/weten","Kennisbank","Antwoorden op je vragen, in gewone taal.","e9f25a"],["/onderzoek","Onderzoek","Scripties en proefschriften, samengevat met link naar de bron.","1f3bd1"],["/kaarten","Kaarten","Kaarten met open data die zichzelf bijwerken.","ff4d2e",1],["/organisaties","Organisaties","Molukse organisaties op naam, plaats, thema en niveau.","ff7ab6"],["/jaartallen","Jaartallen","Molukse geschiedenis in jaartallen, van 1512 tot nu.","eddcb8"]],
 P={"/lezen":[L,"#moza-lz .lz-hero"],"/nieuws/maluku":[L,"#mzmal>.hero"],"/events":[L,"#mzag>.hero"],"/evenementen":[L,"#mzag>.hero"],"/oral-history-scholenproject":[L,"#mzoh>.hero"],"/weten":[W,"#moza-kb .kb-hero"],"/onderzoek":[W,"#mzo>.hero"],"/kaarten":[W,"#mzk>.k-hero"],"/organisaties":[W,"#mzorg>.hero"]};
 var D=document.documentElement;
 function pad(){return location.pathname.toLowerCase().replace(/\/+$/,"")}
