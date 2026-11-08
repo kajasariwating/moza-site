@@ -365,7 +365,7 @@ def pagina(titel, omschrijving, pad, body, extra_head=''):
 {extra_head}{PLAUSIBLE}
 </head>
 <body>
-<header class="kop"><a class="merk" href="/" aria-label="Kabar Maluku Live, naar de startpagina"><span class="kb">KABAR<small>MALUKU</small><i></i></span><span class="lv">LIVE</span></a><a class="knop" href="/">{ICON_ZOEK}Ander dorp</a></header>
+<header class="kop"><a class="merk" href="/" aria-label="Kabar Maluku Live, naar de startpagina"><span class="kb">KABAR<small aria-hidden="true"><span>M</span><span>A</span><span>L</span><span>U</span><span>K</span><span>U</span></small><span class="sr">Maluku</span><i></i></span><span class="lv">LIVE</span></a><a class="knop" href="/">{ICON_ZOEK}Ander dorp</a></header>
 {body}
 <footer class="voet"><div class="w"><p class="pw">Kabar Maluku Live, powered by <a class="mz" href="https://www.moza.nu" aria-label="MOZA">MOZA</a></p><p>Voor, door en met Molukkers. Bekijk ook <a href="https://www.moza.nu/kaarten">alle kaarten</a> en <a href="https://www.moza.nu/lezen">het laatste nieuws</a> op moza.nu.</p>
 <p>Klopt er iets niet? <a href="https://www.moza.nu/contact">Laat het ons weten</a>.</p></div></footer>
