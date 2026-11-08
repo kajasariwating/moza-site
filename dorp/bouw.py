@@ -436,7 +436,7 @@ _IC_BOEK = '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"
 _IC_TAS = '<path d="M6 8h12l-1 12H7z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/>'
 _IC_INFO = '<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/>'
 _IC_AA = '<path d="M3 19 8 5l5 14M4.8 14h6.4"/><path d="M15 19l3.5-9 3.5 9M16 16.5h5"/>'
-# Meer-menu zoals op moza.nu. Bij Kaarten staat bovenaan geen Kabar-link (je bent er al), maar Terug naar MOZA.
+# Meer-menu zoals op moza.nu. Bij Kaarten staat geen Kabar-link, want je bent er al.
 MEER_G = [
     ('Lezen', '/lezen', '#1F3BD1', '#1F3BD1', _IC_KRANT, [('Net binnen', '/lezen'), ('Nieuws uit Maluku', '/nieuws/maluku'), ('Van de redactie', '/lezen#categorie-van-de-redactie'), ('Erkenning', '/lezen#categorie-erkenning'), ('Molukse wijk', '/lezen#categorie-molukse-wijk'), ('Erfgoed', '/lezen#categorie-erfgoed'), ('Cultuur', '/lezen#categorie-cultuur')]),
     ('Rubrieken', '/lezen/tag/rubriek', '#111', '#E9F25A', _IC_KAL, [('Alle rubrieken', '/lezen/tag/rubriek'), ('Kabar Maluku Live', '/lezen/tag/Kabar+Maluku+Live'), ('Achter de foto', '/lezen/tag/Achter+de+foto'), ('Leeswijzer', '/lezen/tag/Leeswijzer'), ('Woord van de week', '/lezen/tag/Woord+van+de+week'), ('Dit weekend', '/lezen/tag/Dit+weekend'), ('Deze week toen', '/lezen/tag/Deze+week+toen'), ('Jullie zeiden', '/lezen/tag/Jullie+zeiden'), ('MOZA deze maand', '/lezen/tag/MOZA+deze+maand')]),
@@ -465,8 +465,6 @@ def mozakop_desktop():
     def groep(naam, pad, kl, bg, ico, items):
         donker = bg in ('#E9F25A', '#EDDCB8')
         lijst = ''.join(f'<li><a href="{_mz(u)}">{n}</a></li>' for n, u in items)
-        if naam == 'Kaarten':
-            lijst = f'<li><a class="terug" href="{_mz("/")}">Terug naar MOZA <span aria-hidden="true">→</span></a></li>' + lijst
         return (f'<div class="mg"><span class="ico" style="background:{bg};color:{"#111" if donker else "#fff"}">{_sv(ico)}</span>'
                 f'<h3><a href="{_mz(pad)}" style="color:{kl}">{naam}</a></h3><ul>{lijst}</ul></div>')
     # Zes kolommen; Winkel en steun onder Agenda en Over MOZA onder Doe mee, zodat ze niet ver naar beneden staan
