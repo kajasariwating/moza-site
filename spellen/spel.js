@@ -256,6 +256,7 @@
       '<div class="plek"></div>' +
       '<ul class="feit">' + (info.feiten || []).map(function(f){ return '<li>' + f + '</li>'; }).join('') + '</ul></div>';
     plek.insertBefore(held, plek.firstChild);
+    var maat = function(){ held.classList.toggle('breed', held.offsetWidth >= 640); }; maat(); window.addEventListener('resize', maat);
     if (isTelefoon()) { div.style.cssText = ''; held.querySelector('.plek').appendChild(div); }
     else { held.querySelector('.plek').innerHTML = '<a class="mzsp-speel" href="#mzsp-spel">' + (info.knop || 'Speel') + ' <span aria-hidden="true">\u2193</span></a>'; div.id = 'mzsp-spel'; held.parentNode.insertBefore(div, held.nextSibling); }
   }
@@ -274,7 +275,8 @@
     '@media (max-width:760px){html.mzsp-post section.content-collection{padding-top:12px!important}html.mzsp-post article.entry{padding-top:0!important}}' +
     '@media (min-width:761px){html.mzsp-post article.entry{padding-top:32px!important}}' +
     'html.mzsp-post .blog-item-top-wrapper{display:none!important}' +
-    '.mzsp-held{margin:0 0 28px;border:3px solid #111;background:#fff;color:#111;box-shadow:8px 8px 0 #1F3BD1;font-family:"Hanken Grotesk",system-ui,sans-serif;display:grid;grid-template-columns:1fr}' +
+    '.mzsp-held{margin:0 0 28px;border:3px solid #111;background:#fff;color:#111;box-shadow:8px 8px 0 #1F3BD1;font-family:"Hanken Grotesk",system-ui,sans-serif;display:grid;grid-template-columns:1fr;container-type:inline-size}' +
+    '@supports (font-size:1cqi){.mzsp-held h1{font-size:clamp(26px,8.5cqi,56px)!important}.mzsp-held.breed h1{font-size:clamp(28px,5.5cqi,56px)!important}}' +
     '.mzsp-held .beeld{border-bottom:3px solid #111;background:#1F3BD1;display:flex;align-items:center;justify-content:center;padding:14px}.mzsp-held .beeld.b-woord{background:#F4F2EC}' +
     '.mzsp-held .tg{display:grid;gap:4px}.mzsp-held .tg-p{grid-template-columns:repeat(6,22px);grid-auto-rows:22px;gap:3px}.mzsp-held .tg-p i{font-size:13px}.mzsp-held .tg-w{grid-template-columns:repeat(4,34px);grid-auto-rows:34px;gap:5px}' +
     '.mzsp-held .tg i{display:flex;align-items:center;justify-content:center;font-style:normal;font-weight:900;font-size:15px;border:2px solid #111;color:#111}' +
@@ -293,9 +295,8 @@
     '.mzsp-held .mzsp-speel:focus-visible{outline:3px solid #FF7AB6;outline-offset:3px}' +
     '.mzsp-held .feit{list-style:none;margin:2px 0 0!important;padding:0!important;display:flex;flex-wrap:wrap;gap:6px 16px;font-size:14px;font-weight:700;color:#5B5A55}' +
     '.mzsp-held .feit li{margin:0!important;padding:0!important}.mzsp-held .feit li::before{content:"";display:inline-block;width:8px;height:8px;background:#FF7AB6;margin-right:7px;vertical-align:1px}' +
-    '@media (min-width:761px){.mzsp-held{grid-template-columns:minmax(0,7fr) minmax(0,5fr)}.mzsp-held .beeld{order:2;border-bottom:0;border-left:3px solid #111}.mzsp-held .tekst{padding:28px 30px;justify-content:center}.mzsp-held .mzsp-speel{width:auto;align-self:flex-start}}' +
-    '@media (min-width:761px) and (max-width:1099px){.mzsp-held h1{font-size:clamp(28px,3.5vw,40px)!important}}' +
-    '@media (min-width:1100px){.mzsp-held .tg-p{grid-template-columns:repeat(6,40px);grid-auto-rows:40px;gap:5px}.mzsp-held .tg-p i{font-size:22px}.mzsp-held .tg-w{grid-template-columns:repeat(4,56px);grid-auto-rows:56px;gap:8px}.mzsp-held .tg-w i{font-size:28px}}' +
+    '.mzsp-held.breed{grid-template-columns:minmax(0,7fr) minmax(0,5fr)}.mzsp-held.breed .beeld{order:2;border-bottom:0;border-left:3px solid #111}.mzsp-held.breed .tekst{padding:28px 30px;justify-content:center}.mzsp-held.breed .mzsp-speel{width:auto;align-self:flex-start}' +
+    '@media (min-width:1100px){.mzsp-held.breed .tg-p{grid-template-columns:repeat(6,40px);grid-auto-rows:40px;gap:5px}.mzsp-held.breed .tg-p i{font-size:22px}.mzsp-held.breed .tg-w{grid-template-columns:repeat(4,56px);grid-auto-rows:56px;gap:8px}.mzsp-held.breed .tg-w i{font-size:28px}}' +
     'html.moza-dark .mzsp-held{background:#1b1b1b;color:#F4F2EC;border-color:#F4F2EC;box-shadow:8px 8px 0 #FF7AB6}' +
     'html.moza-dark .mzsp-held h1{color:#F4F2EC!important}html.moza-dark .mzsp-held h1 em{color:#8FA0FF}' +
     'html.moza-dark .mzsp-held .belofte{color:#CFCDC5!important}html.moza-dark .mzsp-held .feit{color:#B4B2AA}' +
