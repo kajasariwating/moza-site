@@ -1,0 +1,6 @@
+{
+  "datum": "2026-11-08",
+  "uitleg": "Code-injectie voor de wijziging van 8 november 2026. Alleen de commit in de bundel-links is veranderd. Terugzetten: vervang 3ee026d7e7f84087c22627600bb086418fcacd8c door deze commits.",
+  "header": "moza-site@563814842abe76a38856f637bb56a5c34b496b30/dist/header.js",
+  "footer": "moza-site@dd675be0fb5c5d1e5ea6786a94429ffdd53edae0/dist/footer.js"
+}
