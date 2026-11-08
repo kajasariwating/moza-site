@@ -100,3 +100,68 @@ html.moza-dark .merk .kb{border-color:#ECECF1}html.moza-dark .merk .lv{backgroun
 html.moza-dark .knop{color:var(--inkt)}
 .kruim{display:flex;flex-wrap:wrap;align-items:center;gap:6px}.kruim a{color:#fff;text-decoration:none}.kruim a:hover{text-decoration:underline}.intro{margin:0;font-size:14px;line-height:1.45;opacity:.9}
 .mozabalk{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 16px;background:#111;color:#fff;font-size:13px;font-weight:800}.mozabalk a{color:#fff;text-decoration:none;min-height:32px;display:inline-flex;align-items:center}.mozabalk a:hover{text-decoration:underline}.mozabalk nav{display:flex;gap:14px}.mozabalk .terug{color:var(--geel)}
+/* ---------- Menubalk onderin, zoals op moza.nu (telefoon en tablet) ---------- */
+#mz-onder{display:none}
+@media (max-width:1024px){
+body{padding-bottom:calc(62px + env(safe-area-inset-bottom,0px))}
+#mz-onder{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:9990;background:#fff;border-top:3px solid #111;padding:0 0 env(safe-area-inset-bottom,0px)}
+}
+#mz-onder a,#mz-onder button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 0 6px;min-height:56px;color:#111;text-decoration:none;font:800 11px/1.1 "Hanken Grotesk",system-ui,sans-serif;background:none;border:0;cursor:pointer;position:relative;-webkit-tap-highlight-color:transparent}
+#mz-onder svg{width:24px;height:24px;flex:none}
+#mz-onder .ag{display:flex;background:#FF7AB6;color:#111;padding:0 6px}
+#mz-onder .dl{display:flex;background:#1F3BD1;color:#fff;padding:0 6px}
+#mz-onder button.deel{color:#1F3BD1;font-weight:900}
+#mz-onder .ld{position:absolute;top:7px;left:calc(50% + 8px);width:8px;height:8px;border-radius:50%;background:#FF4D2E}
+html.moza-dark #mz-onder{background:#17181D;border-top-color:#ECECF1}
+html.moza-dark #mz-onder a,html.moza-dark #mz-onder button{color:#ECECF1}
+html.moza-dark #mz-onder .ag{background:#E06FA3;color:#111}
+html.moza-dark #mz-onder button.deel{color:#AEB9F2}
+/* ---------- Vellen: delen en Meer ---------- */
+.vel{display:none;position:fixed;inset:0;z-index:9995;font-family:"Hanken Grotesk",system-ui,sans-serif}
+.vel.on{display:block}
+html.mzk-vel body{overflow:hidden}
+.vel .dk{position:absolute;inset:0;background:rgba(17,17,17,.55)}
+.vel section{position:absolute;left:0;right:0;bottom:0;margin:0 auto;max-width:560px;background:#fff;color:#111;border-top:3px solid #111;padding:14px 16px calc(24px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:12px;max-height:90vh;overflow-y:auto}
+@media (min-width:600px){.vel section{border:3px solid #111;bottom:auto;top:50%;transform:translateY(-50%);box-shadow:8px 8px 0 #1F3BD1}}
+.vel .vkop{display:flex;align-items:center;justify-content:space-between}
+.vel h2{margin:0;font:900 22px/1.2 "Hanken Grotesk",system-ui,sans-serif;letter-spacing:-.02em;color:inherit}
+.vel .x{width:44px;height:44px;display:flex;align-items:center;justify-content:center;border:0;background:none;color:inherit;padding:0;cursor:pointer}
+.vel .x svg{width:22px;height:22px}
+.vel .lbl{font:800 11px/1 "Hanken Grotesk",system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#555}
+.vel .msg{background:#F4F2EC;border:2px solid #111;padding:12px;font:400 15px/1.45 "Hanken Grotesk",system-ui,sans-serif;color:#111;word-break:break-word}
+.vel .msg b{font-weight:900}
+.vel .msg .u{color:#1F3BD1;font-weight:800}
+.vel .wa{height:52px;display:flex;align-items:center;justify-content:center;gap:8px;background:#1F3BD1;color:#fff!important;text-decoration:none;font:900 17px/1 "Hanken Grotesk",system-ui,sans-serif}
+.vel .wa svg{width:22px;height:22px}
+.vel .twee{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.vel .fb,.vel .kp{height:48px;display:flex;align-items:center;justify-content:center;border:2px solid #111;background:#fff;color:#111!important;text-decoration:none;font:900 15px/1 "Hanken Grotesk",system-ui,sans-serif;cursor:pointer;padding:0}
+.vel .ander{height:44px;border:0;background:none;color:#111;font:800 15px/1 "Hanken Grotesk",system-ui,sans-serif;text-decoration:underline;cursor:pointer}
+.vel .kab{display:flex;align-items:center;gap:12px;padding:10px 12px;background:#E9F25A;color:#111!important;border:2px solid #111;box-shadow:4px 4px 0 #FF7AB6;text-decoration:none}
+.vel .kab>span:last-child{display:flex;flex-direction:column;line-height:1.25;font-size:14px}
+.vel .kab b{font-size:17px;font-weight:900}
+.kb-mini{flex:none;display:flex;flex-direction:column;padding:3px 7px 4px;background:#fff;border:2px solid #111;font-size:15px;line-height:1;font-weight:900;letter-spacing:-.03em;color:#111}
+.kb-mini small{display:flex;justify-content:space-between;margin-top:2px;font-size:7.5px;font-weight:900}
+.vel .mzl{display:flex;flex-direction:column}
+.vel .mzl a{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #E4E1D8;color:#111;text-decoration:none}
+.vel .mzl b{font-size:22px;font-weight:900;letter-spacing:-.02em}
+.vel .mzl span{font-size:14px;font-weight:700;color:#5A5850;text-align:right}
+.vel .don{height:50px;display:flex;align-items:center;justify-content:center;background:#FF7AB6;border:2px solid #111;color:#111!important;text-decoration:none;font:900 17px/1 "Hanken Grotesk",system-ui,sans-serif}
+html.moza-dark .vel section{background:#17181D;color:#ECECF1;border-color:#ECECF1}
+html.moza-dark .vel .lbl{color:#B5B5BD}
+html.moza-dark .vel .msg{background:#24262D;border-color:#ECECF1;color:#ECECF1}
+html.moza-dark .vel .msg .u{color:#AEB9F2}
+html.moza-dark .vel .fb,html.moza-dark .vel .kp{background:#17181D;border-color:#ECECF1;color:#ECECF1!important}
+html.moza-dark .vel .ander,html.moza-dark .vel .mzl a{color:#ECECF1}
+html.moza-dark .vel .mzl a{border-bottom-color:#2C2F3A}
+html.moza-dark .vel .mzl span{color:#B9BCC6}
+/* ---------- Deelblok op de dorpspagina ---------- */
+.deelblok{background:var(--geel);color:#111;border:2px solid #111;box-shadow:5px 5px 0 var(--blauw);padding:18px 16px;margin:28px 0}
+.deelblok h2{margin:0 0 6px;font-size:22px;font-weight:900;letter-spacing:-.02em;color:#111}
+.deelblok p{margin:0 0 14px;color:#111}
+.deelblok .dknop{display:flex;flex-wrap:wrap;gap:8px}
+.deelblok .wa,.deelblok .nog{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 16px;font:900 16px/1 "Hanken Grotesk",system-ui,sans-serif;text-decoration:none;cursor:pointer}
+.deelblok .wa{flex:1 1 200px;background:#1F3BD1;color:#fff!important;border:2px solid #111}
+.deelblok .nog{flex:1 1 140px;background:#fff;color:#111;border:2px solid #111}
+.deelblok svg{width:20px;height:20px;flex:none}
+html.moza-dark .deelblok{border-color:#ECECF1}
+.knop.deelk{cursor:pointer;font-family:inherit}.knop.deelk svg{width:18px;height:18px}

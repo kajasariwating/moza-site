@@ -3,6 +3,7 @@
 Gebruik:  python3 dorp/bouw.py [--uit _site] [--alleen slug,slug] [--zonder-live]
 """
 import argparse, html, json, math, shutil, sys
+from urllib.parse import quote
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -339,7 +340,61 @@ PLAUSIBLE = ('<script>(function(){if(!/(^|\\.)moza\\.nu$/.test(location.hostname
              's.src="https://plausible.io/js/script.js";document.head.appendChild(s)})();</script>')
 
 
-def pagina(titel, omschrijving, pad, body, extra_head='', robots='index,follow'):
+# ---------------------------------------------------------------- menubalk onderin, delen en Meer (zoals op moza.nu)
+
+_IC = {
+    'home': '<path d="M3 11l9-7 9 7v10h-6v-6H9v6H3z"/>',
+    'agenda': '<rect x="4" y="5" width="16" height="15"/><path d="M4 10h16M8 3v4M16 3v4"/>',
+    'kaart': '<path d="M9 4L3 7v13l6-3 6 3 6-3V4l-6 3zM9 4v13M15 7v13"/>',
+    'meer': '<path d="M4 6h16M4 12h16M4 18h16"/>',
+    'deel': '<circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.8l7.6-4.4M8.2 13.2l7.6 4.4"/>',
+    'wa': '<path d="M4 20l1.4-4.2A8 8 0 1 1 8.4 19z"/>',
+    'x': '<path d="M6 6l12 12M18 6L6 18"/>',
+}
+
+
+def ic(n, w='2.2'):
+    return f'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{w}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{_IC[n]}</svg>'
+
+
+MZ = 'https://www.moza.nu'
+UTM = 'utm_source=kabar&utm_medium=balk'
+MEER_LINKS = [('/lezen', 'Lezen', 'Nieuws en verhalen'), ('/weten', 'Kennisbank', 'Uitleg van MOZA'),
+              ('/onderzoek', 'Onderzoek', 'Studies van anderen'), ('/organisaties', 'Organisaties', 'Zoek een organisatie'),
+              ('/jaartallen', 'Jaartallen', 'Molukse geschiedenis tot nu'), ('/podium', 'Podium', 'Deel jouw verhaal'),
+              ('/uploaden', 'Insturen', 'Tip de redactie'), ('/boekenplank', 'Boekenplank', 'Boekentips'),
+              ('/store', 'Toko Buku', 'Boeken en prints')]
+
+
+def onder_html(deel):
+    t, x = deel
+    balk = (f'<nav id="mz-onder" aria-label="Menu van MOZA">'
+            f'<a href="{MZ}/?{UTM}">{ic("home")}Voorpagina</a>'
+            f'<a href="{MZ}/evenementen?{UTM}"><span class="ag">{ic("agenda")}</span>Agenda</a>'
+            f'<button type="button" class="deel" data-deel aria-label="Deel deze pagina"><span class="dl">{ic("deel")}</span>Deel</button>'
+            f'<a href="{MZ}/kaarten?{UTM}">{ic("kaart")}<span class="ld" aria-hidden="true"></span>Kaarten</a>'
+            f'<button type="button" data-meer aria-label="Meer: menu van MOZA">{ic("meer")}Meer</button></nav>')
+    sluit = f'<button type="button" class="x" data-x aria-label="Sluiten">{ic("x", "2.4")}</button>'
+    deelvel = (f'<div id="mzk-deel" class="vel"><div class="dk" data-x></div><section role="dialog" aria-modal="true" aria-labelledby="mzk-deel-h">'
+               f'<div class="vkop"><h2 id="mzk-deel-h">Deel deze pagina</h2>{sluit}</div>'
+               f'<span class="lbl">Dit bericht staat al klaar</span><div class="msg"></div>'
+               f'<a class="wa" target="_blank" rel="noopener">{ic("wa")}Stuur via WhatsApp</a>'
+               f'<div class="twee"><a class="fb" target="_blank" rel="noopener">Facebook</a><button type="button" class="kp">Kopieer link</button></div>'
+               f'<button type="button" class="ander">Andere app kiezen</button></section></div>')
+    rijen = ''.join(f'<a href="{MZ}{u}?{UTM}"><b>{n}</b><span>{o}</span></a>' for u, n, o in MEER_LINKS)
+    meervel = (f'<div id="mzk-meer" class="vel"><div class="dk" data-x></div><section role="dialog" aria-modal="true" aria-labelledby="mzk-meer-h">'
+               f'<div class="vkop"><h2 id="mzk-meer-h">Menu</h2>{sluit}</div>'
+               f'<a class="kab" href="/"><span class="kb-mini" aria-hidden="true">KABAR<small><span>M</span><span>A</span><span>L</span><span>U</span><span>K</span><span>U</span></small></span><span><b>Kabar Maluku</b><span>Ander dorp zoeken</span></span></a>'
+               f'<nav class="mzl" aria-label="MOZA">{rijen}</nav>'
+               f'<a class="don" href="{MZ}/doneer?{UTM}">Doneer aan MOZA</a></section></div>')
+    data = json.dumps({'t': t, 'e': x}, ensure_ascii=False).replace('</', '<\\/')
+    return balk + deelvel + meervel + f'<script>window.MZK_DEEL={data}</script><script src="/onder.js?v={VERSIE}" defer></script>'
+
+
+DEEL_STANDAARD = ('Kabar Maluku Live', 'Check wat er speelt in jouw dorp in de Molukken: brand, weer, zee en aardbevingen. Ieder uur bijgewerkt.')
+
+
+def pagina(titel, omschrijving, pad, body, extra_head='', robots='index,follow', deel=DEEL_STANDAARD):
     return f'''<!doctype html>
 <html lang="nl">
 <head>
@@ -369,10 +424,11 @@ window.mzThema=function(){{var dk=!d.classList.contains('moza-dark');d.classList
 </head>
 <body>
 <div class="mozabalk"><a href="https://www.moza.nu" class="terug">← moza.nu</a><nav aria-label="MOZA"><a href="https://www.moza.nu/lezen">Nieuws</a><a href="https://www.moza.nu/kaarten">Kaarten</a><a href="https://www.moza.nu/weten">Kennisbank</a></nav></div>
-<header class="kop"><a class="merk" href="/" aria-label="Kabar Maluku Live, naar de startpagina"><span class="kb">KABAR<small aria-hidden="true"><span>M</span><span>A</span><span>L</span><span>U</span><span>K</span><span>U</span></small><span class="sr">Maluku</span><i></i></span><span class="lv">LIVE</span></a><span class="rechts"><button class="thema" type="button" aria-label="Nachtmodus aan of uit" onclick="mzThema()"><svg class="maan-i" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M20 14.5A8 8 0 019.5 4 8 8 0 1020 14.5z"/></svg><svg class="zon-i" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg></button><a class="knop" href="/" aria-label="Ander dorp zoeken">{ICON_ZOEK}<span class="kt">Ander dorp</span></a></span></header>
+<header class="kop"><a class="merk" href="/" aria-label="Kabar Maluku Live, naar de startpagina"><span class="kb">KABAR<small aria-hidden="true"><span>M</span><span>A</span><span>L</span><span>U</span><span>K</span><span>U</span></small><span class="sr">Maluku</span><i></i></span><span class="lv">LIVE</span></a><span class="rechts"><button class="thema" type="button" aria-label="Nachtmodus aan of uit" onclick="mzThema()"><svg class="maan-i" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M20 14.5A8 8 0 019.5 4 8 8 0 1020 14.5z"/></svg><svg class="zon-i" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg></button><button class="knop deelk" type="button" data-deel aria-label="Deel deze pagina">{ic("deel")}<span class="kt">Delen</span></button><a class="knop" href="/" aria-label="Ander dorp zoeken">{ICON_ZOEK}<span class="kt">Ander dorp</span></a></span></header>
 {body}
 <footer class="voet"><div class="w"><p class="pw">Kabar Maluku Live, powered by <a class="mz" href="https://www.moza.nu" aria-label="MOZA">MOZA</a></p><p>Voor, door en met Molukkers. Bekijk ook <a href="https://www.moza.nu/kaarten">alle kaarten</a> en <a href="https://www.moza.nu/lezen">het laatste nieuws</a> op moza.nu.</p>
 <p>Klopt er iets niet? <a href="https://www.moza.nu/contact">Laat het ons weten</a>.</p></div></footer>
+{onder_html(deel)}
 </body>
 </html>'''
 
@@ -639,6 +695,10 @@ def dorp_html(d, ctx, nu):
         m.append(f'<section aria-labelledby="h-buren"><h2 id="h-buren">Dorpen in de buurt</h2><div class="verder">{rijen}</div>'
                  f'<a href="/eiland/{d["groep"]}/">Alle dorpen in {e(groep)} →</a></section>')
 
+    wa_tekst = f'Hoe is het nu in {d["naam"]}? Brand, weer, zee en aardbevingen, ieder uur bijgewerkt.\n{SITE}/{d["slug"]}/?utm_source=whatsapp&utm_medium=deel'
+    m.append(f'<section class="deelblok"><h2>Familie in {e(naam)}?</h2><p>Stuur deze pagina door. Dan weet iedereen waar je kunt kijken als er iets gebeurt.</p>'
+             f'<div class="dknop"><a class="wa" href="https://wa.me/?text={quote(wa_tekst)}" target="_blank" rel="noopener">{ic("wa")}Deel via WhatsApp</a>'
+             f'<button type="button" class="nog" data-deel>{ic("deel")}Andere manier</button></div></section>')
     m.append(f'''<section class="weten" aria-labelledby="h-weten">
 <p class="label" id="h-weten">Goed om te weten</p>
 <p>De satelliet ziet van bovenaf waar het heet is. Meestal is dat brand, maar niet altijd. Twijfel je? Bel of app je familie.</p>
@@ -668,7 +728,8 @@ def dorp_html(d, ctx, nu):
     ]}
     ld = json.dumps(graaf, ensure_ascii=False)
     return pagina(titel, omschrijving, f'/{d["slug"]}/', ''.join(delen) + klok_js(verschil),
-                  f'<script type="application/ld+json">{ld}</script>\n')
+                  f'<script type="application/ld+json">{ld}</script>\n',
+                  deel=(f'Hoe is het nu in {d["naam"]}?', f'Brand, weer, zee en aardbevingen in {d["naam"]} op {plek}. Ieder uur bijgewerkt.'))
 
 
 # ---------------------------------------------------------------- eiland en start
@@ -767,7 +828,7 @@ def main():
     uit.mkdir(parents=True)
     nu = datetime.now(WIT).replace(second=0, microsecond=0)
     import hashlib
-    VERSIE = hashlib.md5((HIER / 'static' / 'dorp.css').read_bytes() + (D.ATLAS / 'atlas-maluku.js').read_bytes()).hexdigest()[:10]
+    VERSIE = hashlib.md5((HIER / 'static' / 'dorp.css').read_bytes() + (HIER / 'static' / 'onder.js').read_bytes() + (D.ATLAS / 'atlas-maluku.js').read_bytes()).hexdigest()[:10]
 
     rows, kust = D.dorpen()
     pf = HIER / 'gegevens' / 'plaatsen.json'
@@ -858,6 +919,7 @@ def main():
     (uit / 'slugs.json').write_text(json.dumps({d['code']: d['slug'] for d in rows}, separators=(',', ':')))
     shutil.copytree(D.ATLAS, uit / 'atlas')
     shutil.copy(HIER / 'static' / 'dorp.css', uit / 'dorp.css')
+    shutil.copy(HIER / 'static' / 'onder.js', uit / 'onder.js')
     shutil.copy(HIER / 'static' / 'og.png', uit / 'og.png')
     shutil.copy(HIER / 'static' / 'favicon.svg', uit / 'favicon.svg')
     for f in (HIER / 'static').glob('google*.html'):  # verificatie Google Search Console
