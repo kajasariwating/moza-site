@@ -4,7 +4,7 @@ Bron: OpenStreetMap (via Overpass). We nemen een plaats-punt (place=village, tow
 dat binnen de grens van het dorp ligt en dezelfde naam heeft. Lukt dat niet, dan blijft het midden staan.
 Schrijft dorp/gegevens/plaatsen.json: {code: [lat, lon]}. Draait af en toe, niet elk uur.
 """
-import json, re, sys, urllib.parse
+import difflib, json, re, sys, urllib.parse
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -60,6 +60,19 @@ def main():
                 r = rang.get(tags.get('place'), 5)
                 if beste is None or r < beste[0]:
                     beste = (r, n)
+        if not beste:
+            # bijna dezelfde naam (andere schrijfwijze, zoals Ulath en Ullath)
+            for n in ns:
+                nm = norm(n['tags'].get('name', ''))
+                if nm and max(difflib.SequenceMatcher(None, nm, a).ratio() for a in namen) >= 0.8:
+                    r = rang.get(n['tags'].get('place'), 5)
+                    if beste is None or r < beste[0]:
+                        beste = (r, n)
+        if not beste:
+            # precies één dorp of stad binnen de grens: dat is vrijwel zeker het dorp zelf
+            dorpen_in = [n for n in ns if n['tags'].get('place') in ('village', 'town', 'city')]
+            if len(dorpen_in) == 1:
+                beste = (9, dorpen_in[0])
         if beste:
             gevonden[d['code']] = [round(beste[1]['lat'], 5), round(beste[1]['lon'], 5)]
     UIT.parent.mkdir(parents=True, exist_ok=True)
