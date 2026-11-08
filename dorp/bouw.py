@@ -343,7 +343,7 @@ def pagina(titel, omschrijving, pad, body, extra_head=''):
 <meta property="og:title" content="{e(titel)}">
 <meta property="og:description" content="{e(omschrijving)}">
 <meta property="og:url" content="{SITE}{pad}">
-<meta property="og:site_name" content="MOZA">
+<meta property="og:site_name" content="Kabar Live">
 <meta property="og:type" content="website">
 <meta property="og:image" content="{SITE}/og.png">
 <meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
@@ -353,13 +353,13 @@ def pagina(titel, omschrijving, pad, body, extra_head=''):
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;700;800;900&family=Fraunces:ital,wght@1,600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/dorp.css?v={VERSIE}">
-<link rel="icon" href="https://www.moza.nu/favicon.ico">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
 {extra_head}{PLAUSIBLE}
 </head>
 <body>
-<header class="kop"><a class="logo" href="https://www.moza.nu" aria-label="Naar moza.nu">MOZA</a><a class="knop" href="/">{ICON_ZOEK}Ander dorp</a></header>
+<header class="kop"><a class="merk" href="/" aria-label="Kabar Live, naar de startpagina"><span class="kb">KABAR<i></i></span><span class="lv">LIVE</span></a><a class="knop" href="/">{ICON_ZOEK}Ander dorp</a></header>
 {body}
-<footer class="voet"><div class="w"><p>Een dienst van <a href="https://www.moza.nu">MOZA</a>, voor, door en met Molukkers. Bekijk ook <a href="https://www.moza.nu/kaarten">alle kaarten</a>.</p>
+<footer class="voet"><div class="w"><p class="pw">Kabar Live, powered by <a class="mz" href="https://www.moza.nu" aria-label="MOZA">MOZA</a></p><p>Voor, door en met Molukkers. Bekijk ook <a href="https://www.moza.nu/kaarten">alle kaarten</a> en <a href="https://www.moza.nu/lezen">het laatste nieuws</a> op moza.nu.</p>
 <p>Klopt er iets niet? <a href="https://www.moza.nu/contact">Laat het ons weten</a>.</p></div></footer>
 </body>
 </html>'''
@@ -434,7 +434,7 @@ def dorp_html(d, ctx, nu):
     sub = f'{e(d["kec"])} · {e(groep)}'
     samen = samenvatting(d, br, bv, wr, lu, nu)
     delen.append(f'''<section class="hero" aria-labelledby="h1"><div class="w">
-<p class="label live"><i></i>Mijn dorp · live</p>
+<p class="label live"><i></i>Kabar Live</p>
 <h1 id="h1">{e(naam)}</h1>
 <p class="sub">{sub}</p>
 <div class="chips">{''.join(chips)}</div>
@@ -609,7 +609,7 @@ def dorp_html(d, ctx, nu):
 </section>''')
     delen.append('<main class="w">' + ''.join(m) + '</main>')
 
-    titel = f'{naam}: brand, weer en aardbevingen bij het dorp | MOZA'
+    titel = f'{naam}: brand, weer en aardbevingen bij het dorp | Kabar Live'
     import re
     omschrijving = re.sub(r'<[^>]+>', '', samen)[:155]
     ld = json.dumps({'@context': 'https://schema.org', '@type': 'Place', 'name': naam,
@@ -635,7 +635,7 @@ def eiland_html(g, lijst, nu, brandset):
 <p class="samen">{f'Deze week zag de satelliet brand bij <b>{nbrand} {"dorp" if nbrand == 1 else "dorpen"}</b>. Die zijn gemarkeerd met een rode stip.' if nbrand else 'Deze week zag de satelliet <b>geen brand</b> bij de dorpen hier.'}</p></div></section>
 <div class="streep"><span></span><span></span><span></span></div>
 <main class="w"><section><h2>Kies je dorp</h2>{blokken}</section></main>'''
-    return pagina(f'Dorpen in {D.GROEPEN[g]}: brand, weer en aardbevingen | MOZA',
+    return pagina(f'Dorpen in {D.GROEPEN[g]}: brand, weer en aardbevingen | Kabar Live',
                   f'Alle {len(lijst)} dorpen in {D.GROEPEN[g]} ({D.GROEP_SUB[g]}). Zie per dorp of er brand is, wat voor weer het wordt en of de aarde beefde.',
                   f'/eiland/{g}/', body)
 
@@ -648,7 +648,7 @@ def start_html(groepen, brandlijst, nu):
                  + ''.join(f'<a class="rij" href="/{d["slug"]}/"><b>{e(d["naam"])}<small>{e(d["kec"])} · {e(D.GROEPEN[d["groep"]])}</small></b><span class="badge">BRAND</span></a>' for d in brandlijst[:12])
                  + '</div></section>')
     body = f'''<section class="hero"><div class="w">
-<p class="label">Mijn dorp</p><h1>Wat speelt er bij jouw dorp?</h1>
+<p class="label">Kabar Live · powered by MOZA</p><h1>Wat speelt er bij jouw dorp?</h1>
 <p class="accent">brand, beving, lucht en weer</p>
 <label for="q" style="margin-top:8px;font-size:14px;font-weight:800">Zoek je dorp of eiland</label>
 <div class="zoek">{ICON_ZOEK}<input id="q" type="search" autocomplete="off" placeholder="Bijvoorbeeld Ullath of Seram" aria-controls="res"></div>
@@ -672,7 +672,7 @@ var gs={json.dumps({g: n for g, n in D.GROEPEN.items()}, ensure_ascii=False)},kw
 var a=L.filter(function(x){{return x.k.indexOf(v)===0}}),b=L.filter(function(x){{return x.k.indexOf(v)>0}});var r=a.concat(b).slice(0,12);
 res.innerHTML=gh+r.map(function(x){{return '<a class="rij" href="/'+x.s+'/"><b>'+esc(x.n)+'<small>'+esc(x.c)+' · '+esc(x.g)+'</small></b>'+(x.b?'<span class="badge">BRAND</span>':'<span aria-hidden="true">→</span>')+'</a>'}}).join('')||'<p>Geen dorp gevonden. Probeer een andere schrijfwijze.</p>'}})}}
 q.addEventListener('input',show);if(q.value)show()}})();</script>'''
-    return pagina('Mijn dorp: brand, weer en aardbevingen bij jouw dorp op de Molukken | MOZA',
+    return pagina('Kabar Live: brand, weer en aardbevingen bij jouw dorp op de Molukken',
                   'Zoek je dorp op de Molukken en zie of er brand is, of de lucht gezond is, wat voor weer het wordt en of de aarde beefde. Voor alle 2.420 dorpen.',
                   '/', body)
 
@@ -795,9 +795,10 @@ def main():
     shutil.copytree(D.ATLAS, uit / 'atlas')
     shutil.copy(HIER / 'static' / 'dorp.css', uit / 'dorp.css')
     shutil.copy(HIER / 'static' / 'og.png', uit / 'og.png')
+    shutil.copy(HIER / 'static' / 'favicon.svg', uit / 'favicon.svg')
     (uit / 'CNAME').write_text('live.moza.nu\n')
     (uit / 'robots.txt').write_text(f'User-agent: *\nAllow: /\nSitemap: {SITE}/sitemap.xml\n')
-    (uit / '404.html').write_text(pagina('Niet gevonden | MOZA', 'Deze pagina bestaat niet.', '/404.html',
+    (uit / '404.html').write_text(pagina('Niet gevonden | Kabar Live', 'Deze pagina bestaat niet.', '/404.html',
                                          '<main class="w"><section><h2>Dit dorp vinden we niet</h2><p><a href="/">Zoek je dorp →</a></p></section></main>'))
     dag = nu.strftime('%Y-%m-%d')
     urls = [f'{SITE}/'] + [f'{SITE}/eiland/{g}/' for g in D.GROEPEN] + [f'{SITE}/{d["slug"]}/' for d in rows]
