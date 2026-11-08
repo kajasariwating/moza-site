@@ -286,17 +286,39 @@ html.moza-dark #mzd .d1{background:#12151F;color:#ECECF1}
 html.moza-dark #mzd .dlh{border-color:#ECECF1;color:#ECECF1}
 html.moza-dark #mzd .dth{background:#E9F25A;border-color:#E9F25A;color:#111}
 html.moza-dark #mzd .dth .i-moon{display:none}html.moza-dark #mzd .dth .i-sun{display:block}
-/* Tegels in de bovenbalk: Delen, Ander dorp en Homepage MOZA */
+/* Rechts: leesbaarheid en nachtmodus */
 #mzd .dr{margin-left:auto;display:flex;align-items:center;gap:12px}
 #mzd .dtg{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:100px;height:58px;padding:0 12px;margin-right:4px;background:#fff;color:#111;border:2px solid #111;box-shadow:4px 4px 0 #FF7AB6;font:900 13px/1.1 "Hanken Grotesk",system-ui,sans-serif;white-space:nowrap;cursor:pointer;text-decoration:none}
 #mzd .dtg svg{width:22px;height:22px;flex:none}
 #mzd .dtg.ander{background:#E9F25A;box-shadow:4px 4px 0 #111}
-#mzd .dtg.home{background:#1F3BD1;color:#fff;box-shadow:4px 4px 0 #E9F25A}
 #mzd .dtg:hover{transform:translate(-1px,-1px)}
-#mzd .dtg+.dlh{margin-left:10px}
 html.moza-dark #mzd .dtg{background:#17181D;color:#ECECF1;border-color:#ECECF1}
 html.moza-dark #mzd .dtg.ander{background:#E9F25A;color:#111;border-color:#111;box-shadow:4px 4px 0 #ECECF1}
-html.moza-dark #mzd .dtg.home{background:#1F3BD1;color:#fff;border-color:#ECECF1}
+/* Tabs van moza.nu op de plek van het hoofdmenu */
+#mzd .tb{display:flex;align-items:stretch;align-self:stretch;gap:22px;font-size:16px;font-weight:700;white-space:nowrap}
+#mzd .tb a{display:flex;align-items:center;color:#5A5850;border-bottom:4px solid transparent;padding-top:4px}
+#mzd .tb a:hover{color:#111}
+#mzd .meer{display:flex;align-items:center;gap:4px;border:0;border-bottom:4px solid transparent;background:none;padding:4px 0 0;margin:0;font:inherit;font-weight:900;font-size:16px;color:#111;cursor:pointer}
+#mzd .meer svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s}
+#mzd .meer[aria-expanded="true"] svg{transform:rotate(180deg)}
+html.moza-dark #mzd .tb a{color:#B9BCC6}html.moza-dark #mzd .tb a:hover,html.moza-dark #mzd .meer{color:#ECECF1}
+/* Delen en Ander dorp naast de tabs */
+#mzd .dtgs{display:flex;align-items:center;gap:12px;margin-left:32px}
+@media (max-width:1199px){#mzd .dlogo{margin-right:24px}#mzd .dlogo .lv{display:none}#mzd .tb{gap:16px}#mzd .dtgs{margin-left:20px}}
+/* Meer: uitklapmenu zoals op moza.nu */
+#mzd .mp{--ln:#E4E1D8;padding:18px max(24px,calc((100vw - 1120px)/2)) 22px;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:24px;background:#fff;color:#111;border-top:1px solid var(--ln);border-bottom:1px solid var(--ln);max-height:calc(100vh - 84px);max-height:calc(100dvh - 84px);overflow-y:auto}
+#mzd .mp[hidden]{display:none}
+html.moza-dark #mzd .mp{--ln:#2C2F3A;background:#17181D;color:#ECECF1}
+#mzd .ico{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 0 8px}
+#mzd .ico svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#mzd .mg h3{margin:0 0 4px;padding:0;font-size:20px;line-height:1.15;font-weight:900;letter-spacing:-.02em}
+html.moza-dark #mzd .mg h3 a{color:#ECECF1!important}
+#mzd .mg ul{list-style:none;margin:0;padding:0}
+#mzd .mg li{margin:0;padding:0}
+#mzd .mg li a{display:block;padding:3px 0;font-size:15px;line-height:1.3;font-weight:700;color:inherit}
+#mzd .mg li a:hover{color:#1F3BD1}
+#mzd .mg li a.terug{display:inline-flex;align-items:center;gap:6px;margin:2px 0 6px;padding:5px 9px;white-space:nowrap;font-size:14px;background:#1F3BD1;color:#fff!important;border:2px solid #111;box-shadow:3px 3px 0 #E9F25A;font-weight:900}
+#mzd .mg li a.terug:hover{background:#1830B0}
 /* De oude Kabar-kop is op de computer niet meer nodig */
 header.kop{display:none}
 }

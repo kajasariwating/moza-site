@@ -425,19 +425,53 @@ def _mz(pad):
     return f'{MZ}{pad}?{_ZU}'
 
 
+def _sv(d, extra=''):
+    return f'<svg viewBox="0 0 24 24" aria-hidden="true"{extra}>{d}</svg>'
+
+
+_IC_KAL = '<rect x="4" y="5" width="16" height="15" rx="1"/><path d="M4 10h16M9 3v4M15 3v4"/>'
+_IC_KAART = '<path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/>'
+_IC_KRANT = '<path d="M4 5h13v14H6a2 2 0 0 1-2-2z"/><path d="M17 9h3v8a2 2 0 0 1-2 2"/><path d="M7 9h7M7 13h7"/>'
+_IC_BOEK = '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20"/>'
+_IC_TAS = '<path d="M6 8h12l-1 12H7z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/>'
+_IC_INFO = '<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/>'
 _IC_AA = '<path d="M3 19 8 5l5 14M4.8 14h6.4"/><path d="M15 19l3.5-9 3.5 9M16 16.5h5"/>'
+# Meer-menu zoals op moza.nu. Bij Kaarten staat bovenaan geen Kabar-link (je bent er al), maar Terug naar MOZA.
+MEER_G = [
+    ('Lezen', '/lezen', '#1F3BD1', '#1F3BD1', _IC_KRANT, [('Net binnen', '/lezen'), ('Nieuws uit Maluku', '/nieuws/maluku'), ('Van de redactie', '/lezen#categorie-van-de-redactie'), ('Erkenning', '/lezen#categorie-erkenning'), ('Molukse wijk', '/lezen#categorie-molukse-wijk'), ('Erfgoed', '/lezen#categorie-erfgoed'), ('Cultuur', '/lezen#categorie-cultuur')]),
+    ('Rubrieken', '/lezen/tag/rubriek', '#111', '#E9F25A', _IC_KAL, [('Alle rubrieken', '/lezen/tag/rubriek'), ('Kabar Maluku Live', '/lezen/tag/Kabar+Maluku+Live'), ('Achter de foto', '/lezen/tag/Achter+de+foto'), ('Leeswijzer', '/lezen/tag/Leeswijzer'), ('Woord van de week', '/lezen/tag/Woord+van+de+week'), ('Dit weekend', '/lezen/tag/Dit+weekend'), ('Deze week toen', '/lezen/tag/Deze+week+toen'), ('Jullie zeiden', '/lezen/tag/Jullie+zeiden'), ('MOZA deze maand', '/lezen/tag/MOZA+deze+maand')]),
+    ('Kennis', '/weten', '#D9468A', '#FF7AB6', _IC_BOEK, [('Kennisbank', '/weten'), ('Begrippenlijst', '/begrippen'), ('Sejarah Maluku', '/sejarah-maluku'), ('Jaartallen', '/jaartallen'), ('Onderzoek', '/onderzoek'), ('Organisaties', '/organisaties')]),
+    ('Kaarten', '/kaarten', '#D7381A', '#FF4D2E', _IC_KAART, [('Bosbranden', '/kaarten/bosbranden'), ('Weer en zee', '/kaarten/weer-en-zee'), ('Aardbevingen', '/kaarten/aardbevingen'), ('Luchtkwaliteit', '/kaarten/luchtkwaliteit'), ('Bos en ontbossing', '/kaarten/bos-en-ontbossing'), ('Rampen', '/kaarten/rampen'), ('Zeewater', '/kaarten/zeewater'), ('Satellietbeeld', '/kaarten/satelliet'), ('Vulkanen', '/kaarten/vulkanen'), ('Regen', '/kaarten/regen'), ('Eb en vloed', '/kaarten/getij'), ('Koraalriffen', '/kaarten/koraal'), ('Forten en specerijen', '/kaarten/forten'), ('Talen van de Molukken', '/kaarten/talen'), ('Overtochten 1951', '/kaarten/overtochten-1951'), ('Vluchten', '/kaarten/vluchten'), ('Molukse wijken', '/kaarten/molukse-wijken'), ('Grafstatus', '/kaarten/grafstatus')]),
+    ('Agenda', '/evenementen', '#D7381A', '#FF4D2E', _IC_KAL, [('Alle evenementen', '/evenementen'), ('Evenement aanmelden', '/uploaden')]),
+    ('Doe mee', '/podium', '#111', '#E9F25A', _IC_KAL, [('Agenda', '/evenementen'), ('Podium', '/podium'), ('Insturen', '/uploaden'), ('Beeldbank', '/beeldbank')]),
+    ('Winkel en steun', '/store', '#111', '#111', _IC_TAS, [('Toko Buku', '/store'), ('Boekenplank', '/boekenplank'), ('Doneer', '/doneer'), ('Maandelijks doneren', '/maandelijks-doneren')]),
+    ('Over MOZA', '/over-moza', '#111', '#EDDCB8', _IC_INFO, [('Over MOZA', '/over-moza'), ('Team', '/team'), ('Verantwoording', '/verantwoording')]),
+]
+
+
 def mozakop_desktop():
     logo = ('<a class="dlogo" href="/" aria-label="Kabar Maluku Live, naar de startpagina"><span class="kb">KABAR<small aria-hidden="true">'
             '<span>M</span><span>A</span><span>L</span><span>U</span><span>K</span><span>U</span></small><span class="sr">Maluku</span><i></i></span><span class="lv">LIVE</span></a>')
-    # Rechts in de bovenbalk: de tegels Delen, Ander dorp en Homepage MOZA, met leesbaarheid en nachtmodus ernaast
-    rechts = ('<nav class="dr" aria-label="Menu">'
+    # Naast het logo: de tabs van moza.nu met Meer en de tegels Delen en Ander dorp. Rechts leesbaarheid en nachtmodus.
+    tabs = (f'<nav class="tb" aria-label="Menu van MOZA"><a href="{_mz("/")}">Voorpagina</a><a href="{_mz("/lezen")}">Net binnen</a><a href="{_mz("/nieuws/maluku")}">Maluku</a>'
+            '<button type="button" class="meer" aria-expanded="false" aria-controls="mzd-mp"><span>Meer</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button></nav>')
+    tegels = ('<span class="dtgs">'
               f'<button type="button" class="dtg deel" data-deel aria-label="Deel deze pagina">{ic("deel")}<span>Delen</span></button>'
-              f'<a class="dtg ander" href="/" aria-label="Ander dorp zoeken">{ICON_ZOEK}<span>Ander dorp</span></a>'
-              f'<a class="dtg home" href="{_mz("/")}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7v10h-6v-6H9v6H3z"/></svg><span>Homepage MOZA</span></a>'
+              f'<a class="dtg ander" href="/" aria-label="Ander dorp zoeken">{ICON_ZOEK}<span>Ander dorp</span></a></span>')
+    rechts = ('<span class="dr">'
               '<button type="button" class="dlh" onclick="mzGroot()" aria-label="Grotere letters aan of uit" title="Leeshulp: grotere letters"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + _IC_AA + '</svg></button>'
               '<button type="button" class="dth" onclick="mzThema()" aria-label="Nachtmodus aan of uit" title="Nachtmodus"><svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>'
-              '</nav>')
-    r1 = f'<div class="d1">{logo}{rechts}</div>'
+              '</span>')
+    groepen = ''
+    for naam, pad, kl, bg, ico, items in MEER_G:
+        donker = bg in ('#E9F25A', '#EDDCB8')
+        lijst = ''.join(f'<li><a href="{_mz(u)}">{n}</a></li>' for n, u in items)
+        if naam == 'Kaarten':
+            lijst = f'<li><a class="terug" href="{_mz("/")}">Terug naar MOZA <span aria-hidden="true">→</span></a></li>' + lijst
+        groepen += (f'<div class="mg"><span class="ico" style="background:{bg};color:{"#111" if donker else "#fff"}">{_sv(ico)}</span>'
+                    f'<h3><a href="{_mz(pad)}" style="color:{kl}">{naam}</a></h3><ul>{lijst}</ul></div>')
+    mp = f'<div class="mp" id="mzd-mp" hidden>{groepen}</div>'
+    r1 = f'<div class="d1">{logo}{tabs}{tegels}{rechts}</div>{mp}'
     return f'<div id="mzd" data-nosnippet>{r1}</div>'
 
 
