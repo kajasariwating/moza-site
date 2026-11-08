@@ -175,6 +175,10 @@ button{font:inherit;color:inherit;cursor:pointer}
 .linkknop{background:none;border:0;padding:4px;font:inherit;font-weight:800;color:inherit;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 .reset-vraag{border:2px solid var(--rand);padding:12px;margin-top:8px}
 .reset-vraag p{margin:0 0 10px}
+.deelrij{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 4px}
+.deelrij .deel{flex:1 1 auto;text-align:center;border:2px solid var(--rand);background:var(--vlak);color:var(--inkt);font:inherit;font-weight:800;font-size:14px;padding:9px 10px;text-decoration:none;cursor:pointer;box-shadow:2px 2px 0 var(--rand)}
+.deelrij .wa{background:#25D366;color:#111;border-color:#111}
+.deelrij .fb{background:#1877F2;color:#fff;border-color:#111}
 </style>
 
 <div class="app">
@@ -251,9 +255,14 @@ button{font:inherit;color:inherit;cursor:pointer}
     <p class="eind-aftel" id="eindeMorgen">Over <em id="aftel">--</em> kun je een nieuw woord raden.</p>
     <div id="eindeStats"></div>
     <div class="knoppen eind-knoppen">
-      <button class="knop hoofd" type="button" id="knopDeel">Delen</button>
-      <button class="knop" type="button" data-sluit>Afsluiten</button>
+      <button class="knop hoofd" type="button" id="knopDeel">Daag je vrienden uit</button>
     </div>
+    <div class="deelrij">
+      <a class="deel wa" id="deelWa" target="_blank" rel="noopener">WhatsApp</a>
+      <a class="deel fb" id="deelFb" target="_blank" rel="noopener">Facebook</a>
+      <button class="deel" type="button" id="deelKopie">Kopieer voor Instagram</button>
+    </div>
+    <div class="knoppen eind-knoppen"><button class="knop" type="button" data-sluit>Afsluiten</button></div>
     <p class="eind-oefen" hidden><button class="linkknop" type="button" id="knopNogEen">Of oefen met een ander woord</button></p>
     <div class="deelbak" id="deelbak" hidden>
       <p class="klein">Kopiëren lukte niet. Selecteer de tekst hieronder en kopieer hem zelf.</p>
@@ -658,6 +667,7 @@ button{font:inherit;color:inherit;cursor:pointer}
     $("eindeMorgen").hidden = !dag;
     clearInterval(aftelTimer); if (dag){ aftel(); aftelTimer = setInterval(aftel, 1000); }
     $("deelbak").hidden = true;
+    zetDeelLinks();
     toonVenster($("vensterEinde"));
   }
 
@@ -666,15 +676,27 @@ button{font:inherit;color:inherit;cursor:pointer}
     var kop = S.modus === "dag" ? "Raad het woord nr. " + S.nr : "Raad het woord (oefenen)";
     var score = (S.gewonnen ? S.gokken.length : "X") + "/6";
     var rijen = S.gokken.map(function(g){ return kleur(g, S.woord).map(function(k){ return BLOK[k]; }).join(""); });
-    return kop + " " + score + "\n\n" + rijen.join("\n") + "\n\nmoza.nu";
+    return kop + " " + score + "\n\n" + rijen.join("\n") + "\n\n" + (S.gewonnen ? "Kun jij het sneller?" : "Lukt het jou wel?");
+  }
+  var DEEL_URL = "https://www.moza.nu/spellen/raad-het-woord";
+  function zetDeelLinks(){
+    var t = deelTekst();
+    $("deelWa").href = "https://wa.me/?text=" + encodeURIComponent(t + "\n" + DEEL_URL);
+    $("deelFb").href = "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(DEEL_URL) + "&quote=" + encodeURIComponent(t);
   }
   function deelFallback(t){
     var bak = $("deelbak"), ta = $("deeltekst");
     ta.value = t; bak.hidden = false;
     try { ta.focus(); ta.select(); } catch (e){}
   }
+  $("deelKopie").addEventListener("click", function(){
+    var t = deelTekst() + "\n" + DEEL_URL;
+    try { navigator.clipboard.writeText(t).then(function(){ meld("Gekopieerd. Plak het in je Instagram-story of bericht."); }, function(){ deelFallback(t); }); } catch (e){ deelFallback(t); }
+  });
   $("knopDeel").addEventListener("click", function(){
     var t = deelTekst();
+    if (navigator.share){ navigator.share({text: t, url: DEEL_URL}).catch(function(){}); return; }
+    t = t + "\n" + DEEL_URL;
     try {
       if (navigator.clipboard && navigator.clipboard.writeText){
         navigator.clipboard.writeText(t).then(function(){ meld("Gekopieerd. Plak je uitslag waar je wilt."); }, function(){ deelFallback(t); });

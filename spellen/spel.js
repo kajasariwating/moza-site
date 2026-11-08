@@ -40,6 +40,7 @@
     var f = document.createElement('iframe');
     f.title = 'MOZA spel';
     f.setAttribute('scrolling', 'no');
+    f.setAttribute('allow', 'web-share; clipboard-write');
     f.style.cssText = 'display:block;width:100%;border:0;height:700px;overflow:hidden;background:transparent';
     f.srcdoc = '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
       '<style>[hidden]{display:none!important}' + SHIM_CSS + (DUBBEL[naam] || '') + '</style></head><body>' + html + '</body></html>';
@@ -133,7 +134,7 @@
   /* Overzicht op /spellen: vervangt de standaard bloglijst door kaarten met cover. */
   var INFO = {
     'raad-het-woord': {cover:'cover/cover-woord.png', tekst:'Raad in zes pogingen het woord van de dag. Elk woord heeft een Molukse knipoog.', knop:'Raad het woord'},
-    'kruiswoordpuzzel': {cover:'cover/cover-puzzel.png', tekst:'Elke dag een makkelijke en een moeilijke puzzel over de Molukken en Molukkers in Nederland.', knop:'Start de puzzel'}
+    'kruiswoordpuzzel': {cover:'cover/cover-puzzel.png', tekst:'Test je kennis van de Molukken en Molukkers in Nederland. Elke dag een makkelijke en een moeilijke puzzel, met bij elk woord een weetje.', knop:'Test je kennis'}
   };
   var OV_CSS =
     '.mzsp-ov{max-width:1100px;margin:40px auto 64px;padding:0 max(16px,env(safe-area-inset-left,0px));font-family:"Hanken Grotesk",system-ui,sans-serif;color:#111}' +
