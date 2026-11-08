@@ -394,6 +394,20 @@ def onder_html(deel):
 DEEL_STANDAARD = ('Kabar Maluku Live', 'Check wat er speelt in jouw dorp in de Molukken: brand, weer, zee en aardbevingen. Ieder uur bijgewerkt.')
 
 
+_AA = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 19 8 5l5 14M4.8 14h6.4"/><path d="M15 19l3.5-9 3.5 9M16 16.5h5"/></svg>'
+_MAAN = '<svg class="maan-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>'
+_ZON = '<svg class="zon-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>'
+_TAS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M6 8h12l-1 13H7z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>'
+_U = 'utm_source=kabar&utm_medium=kop'
+MOZAKOP = ('<div class="mzkop"><a class="mzlogo" href="https://www.moza.nu/?' + _U + '" aria-label="MOZA, naar de voorpagina">MOZA</a>'
+           '<nav class="mznav" aria-label="Menu van MOZA">' + ''.join(
+               f'<a href="https://www.moza.nu{u}?{_U}">{n}</a>' for u, n in
+               [('/lezen', 'Lezen'), ('/weten', 'Kennis'), ('/podium', 'Podium'), ('/evenementen', 'Agenda'), ('/boekenplank', 'Boekenplank'), ('/store', 'Toko Buku')]) + '</nav>'
+           '<span class="mzik"><button type="button" class="mzib" aria-label="Grotere letters aan of uit" onclick="mzGroot()">' + _AA + '</button>'
+           '<button type="button" class="mzib" aria-label="Nachtmodus aan of uit" onclick="mzThema()">' + _MAAN + _ZON + '</button>'
+           '<a class="mztas" href="https://www.moza.nu/cart?' + _U + '" aria-label="Winkelmandje op moza.nu">' + _TAS + '</a></span>'
+           '<a class="mzdon" href="https://www.moza.nu/doneer?' + _U + '">Doneer</a></div>')
+
 def pagina(titel, omschrijving, pad, body, extra_head='', robots='index,follow', deel=DEEL_STANDAARD):
     return f'''<!doctype html>
 <html lang="nl">
@@ -401,6 +415,8 @@ def pagina(titel, omschrijving, pad, body, extra_head='', robots='index,follow',
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <script>(function(){{var d=document.documentElement,t=null;try{{t=localStorage.getItem('moza-theme')}}catch(e){{}}if(t==='dark'||(!t&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches))d.classList.add('moza-dark');
+try{{if(localStorage.getItem('mzk-groot')==='1')d.classList.add('mzk-groot')}}catch(e){{}}
+window.mzGroot=function(){{var g=d.classList.toggle('mzk-groot');try{{localStorage.setItem('mzk-groot',g?'1':'0')}}catch(e){{}}}};
 window.mzThema=function(){{var dk=!d.classList.contains('moza-dark');d.classList.toggle('moza-dark',dk);try{{localStorage.setItem('moza-theme',dk?'dark':'light')}}catch(e){{}};var m=document.querySelector('meta[name=theme-color]');if(m)m.content=dk?'#17181D':'#1F3BD1'}}}})();</script>
 <title>{e(titel)}</title>
 <meta name="description" content="{e(omschrijving)}">
@@ -423,8 +439,8 @@ window.mzThema=function(){{var dk=!d.classList.contains('moza-dark');d.classList
 {extra_head}{PLAUSIBLE}
 </head>
 <body>
-<div class="mozabalk"><a href="https://www.moza.nu" class="terug">← moza.nu</a><nav aria-label="MOZA"><a href="https://www.moza.nu/lezen">Nieuws</a><a href="https://www.moza.nu/kaarten">Kaarten</a><a href="https://www.moza.nu/weten">Kennisbank</a></nav></div>
-<header class="kop"><a class="merk" href="/" aria-label="Kabar Maluku Live, naar de startpagina"><span class="kb">KABAR<small aria-hidden="true"><span>M</span><span>A</span><span>L</span><span>U</span><span>K</span><span>U</span></small><span class="sr">Maluku</span><i></i></span><span class="lv">LIVE</span></a><span class="rechts"><button class="thema" type="button" aria-label="Nachtmodus aan of uit" onclick="mzThema()"><svg class="maan-i" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M20 14.5A8 8 0 019.5 4 8 8 0 1020 14.5z"/></svg><svg class="zon-i" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg></button><button class="knop deelk" type="button" data-deel aria-label="Deel deze pagina">{ic("deel")}<span class="kt">Delen</span></button><a class="knop" href="/" aria-label="Ander dorp zoeken">{ICON_ZOEK}<span class="kt">Ander dorp</span></a></span></header>
+{MOZAKOP}
+<header class="kop"><a class="merk" href="/" aria-label="Kabar Maluku Live, naar de startpagina"><span class="kb">KABAR<small aria-hidden="true"><span>M</span><span>A</span><span>L</span><span>U</span><span>K</span><span>U</span></small><span class="sr">Maluku</span><i></i></span><span class="lv">LIVE</span></a><span class="rechts"><button class="knop deelk" type="button" data-deel aria-label="Deel deze pagina">{ic("deel")}<span class="kt">Delen</span></button><a class="knop" href="/" aria-label="Ander dorp zoeken">{ICON_ZOEK}<span class="kt">Ander dorp</span></a></span></header>
 {body}
 <footer class="voet"><div class="w"><p class="pw">Kabar Maluku Live, powered by <a class="mz" href="https://www.moza.nu" aria-label="MOZA">MOZA</a></p><p>Voor, door en met Molukkers. Bekijk ook <a href="https://www.moza.nu/kaarten">alle kaarten</a> en <a href="https://www.moza.nu/lezen">het laatste nieuws</a> op moza.nu.</p>
 <p>Klopt er iets niet? <a href="https://www.moza.nu/contact">Laat het ons weten</a>.</p></div></footer>

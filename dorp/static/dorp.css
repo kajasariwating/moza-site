@@ -165,3 +165,30 @@ html.moza-dark .vel .mzl span{color:#B9BCC6}
 .deelblok svg{width:20px;height:20px;flex:none}
 html.moza-dark .deelblok{border-color:#ECECF1}
 .knop.deelk{cursor:pointer;font-family:inherit}.knop.deelk svg{width:18px;height:18px}
+/* ---------- Bovenbalk zoals moza.nu ---------- */
+.mozabalk{display:none}
+.mzkop{display:flex;align-items:center;gap:12px;padding:10px 16px;background:#fff;color:#111;border-bottom:1px solid #E4E1D8}
+.mzlogo{flex:none;width:52px;height:52px;border-radius:50%;background:#1F3BD1;color:#fff!important;display:flex;align-items:center;justify-content:center;font:900 13px/1 "Hanken Grotesk",system-ui,sans-serif;letter-spacing:-.02em;text-decoration:none}
+.mznav{display:none}
+.mzik{margin-left:auto;display:flex;align-items:center;gap:6px}
+.mzib{width:44px;height:44px;display:flex;align-items:center;justify-content:center;border:0;background:none;color:#111;padding:0;cursor:pointer}
+.mzib svg{width:26px;height:26px}
+.mzib .zon-i{display:none}html.moza-dark .mzib .zon-i{display:block}html.moza-dark .mzib .maan-i{display:none}
+.mztas{display:flex;align-items:center;justify-content:center;width:64px;height:44px;border:2px solid #111;border-radius:999px;color:#111!important}
+.mztas svg{width:20px;height:20px}
+.mzdon{flex:none;display:flex;align-items:center;height:48px;padding:0 20px;border-radius:999px;background:#1F3BD1;color:#fff!important;font:900 18px/1 "Hanken Grotesk",system-ui,sans-serif;text-decoration:none}
+@media (max-width:380px){.mzkop{gap:6px;padding:10px 12px}.mzlogo{width:46px;height:46px;font-size:11.5px}.mztas{width:52px}.mzdon{padding:0 14px;font-size:16px}.mzik{gap:2px}}
+@media (min-width:1025px){
+.mzkop{padding:14px max(24px,calc((100vw - 1120px)/2));gap:40px}
+.mzlogo{width:60px;height:60px;font-size:15px;transform:rotate(-8deg)}
+.mznav{display:flex;gap:32px}
+.mznav a{color:#111;text-decoration:none;font:400 18px/1 "Hanken Grotesk",system-ui,sans-serif}
+.mznav a:hover{color:#1F3BD1;text-decoration:underline}
+.mzik{display:none}
+.mzdon{margin-left:0}
+}
+html.moza-dark .mzkop{background:#17181D;color:#ECECF1;border-bottom-color:#2C2F3A}
+html.moza-dark .mzib,html.moza-dark .mznav a{color:#ECECF1}
+html.moza-dark .mztas{border-color:#ECECF1;color:#ECECF1!important}
+html.mzk-groot body{font-size:20px}
+html.mzk-groot .w p,html.mzk-groot .w li{font-size:1.1em}
