@@ -787,7 +787,13 @@ def recente_bevingen(rows, lijst, nu, op_land=None, dagen=7, max_n=5):
     if lijst is None:
         return None
     grens = nu - timedelta(days=dagen)
-    jaar = sum(1 for q in lijst if q['mag'] >= 4.0)
+    import numpy as np
+    dla = np.radians(np.array([d['la'] for d in rows])); dlo = np.radians(np.array([d['lo'] for d in rows]))
+    def dichtbij(q, km=100):
+        p1, l1 = math.radians(q['la']), math.radians(q['lo'])
+        h = np.sin((dla - p1) / 2) ** 2 + np.cos(p1) * np.cos(dla) * np.sin((dlo - l1) / 2) ** 2
+        return 2 * 6371 * np.arcsin(np.sqrt(h.min())) <= km
+    jaar = sum(1 for q in lijst if q['mag'] >= 4.0 and dichtbij(q))
     uit, stil = [], 0
     for q in lijst:
         if q['t'].astimezone(WIT) < grens:
