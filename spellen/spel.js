@@ -276,7 +276,6 @@
     '@media (min-width:761px){html.mzsp-post article.entry{padding-top:32px!important}}' +
     'html.mzsp-post .blog-item-top-wrapper{display:none!important}' +
     '.mzsp-held{margin:0 0 28px;border:3px solid #111;background:#fff;color:#111;box-shadow:8px 8px 0 #1F3BD1;font-family:"Hanken Grotesk",system-ui,sans-serif;display:grid;grid-template-columns:1fr;container-type:inline-size}' +
-    '@supports (font-size:1cqi){.mzsp-held h1{font-size:clamp(26px,8.5cqi,56px)!important}.mzsp-held.breed h1{font-size:clamp(28px,5.5cqi,56px)!important}}' +
     '.mzsp-held .beeld{border-bottom:3px solid #111;background:#1F3BD1;display:flex;align-items:center;justify-content:center;padding:14px}.mzsp-held .beeld.b-woord{background:#F4F2EC}' +
     '.mzsp-held .tg{display:grid;gap:4px}.mzsp-held .tg-p{grid-template-columns:repeat(6,22px);grid-auto-rows:22px;gap:3px}.mzsp-held .tg-p i{font-size:13px}.mzsp-held .tg-w{grid-template-columns:repeat(4,34px);grid-auto-rows:34px;gap:5px}' +
     '.mzsp-held .tg i{display:flex;align-items:center;justify-content:center;font-style:normal;font-weight:900;font-size:15px;border:2px solid #111;color:#111}' +
@@ -300,7 +299,8 @@
     'html.moza-dark .mzsp-held{background:#1b1b1b;color:#F4F2EC;border-color:#F4F2EC;box-shadow:8px 8px 0 #FF7AB6}' +
     'html.moza-dark .mzsp-held h1{color:#F4F2EC!important}html.moza-dark .mzsp-held h1 em{color:#8FA0FF}' +
     'html.moza-dark .mzsp-held .belofte{color:#CFCDC5!important}html.moza-dark .mzsp-held .feit{color:#B4B2AA}' +
-    'html.moza-dark .mzsp-held .beeld{border-color:#F4F2EC}html.moza-dark .mzsp-held .lbl b{background:#F4F2EC;color:#111}';
+    'html.moza-dark .mzsp-held .beeld{border-color:#F4F2EC}html.moza-dark .mzsp-held .lbl b{background:#F4F2EC;color:#111}' +
+    '@supports (font-size:1cqi){.mzsp-held h1{font-size:clamp(26px,8.5cqi,56px)!important}.mzsp-held.breed h1{font-size:clamp(28px,5.5cqi,56px)!important}}';
   var OV_CSS =
     '.mzsp-ov{max-width:1100px;margin:40px auto 64px;padding:0 max(16px,env(safe-area-inset-left,0px));font-family:"Hanken Grotesk",system-ui,sans-serif;color:#111}' +
     '.mzsp-ov h1{font-weight:900;font-size:clamp(40px,7vw,64px);letter-spacing:-.02em;line-height:1;margin:0 0 12px}' +
