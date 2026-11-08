@@ -357,7 +357,7 @@ window.mzThema=function(){{var dk=!d.classList.contains('moza-dark');d.classList
 <meta property="og:type" content="website">
 <meta property="og:image" content="{SITE}/og.png">
 <meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Wat speelt er bij jouw dorp? Brand, beving, lucht en weer voor alle dorpen op de Molukken. live.moza.nu">
+<meta property="og:image:alt" content="Kabar Maluku Live, powered by MOZA. Wat speelt er bij jouw dorp?">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#1F3BD1">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
