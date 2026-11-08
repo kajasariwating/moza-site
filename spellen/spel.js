@@ -294,6 +294,7 @@
     '.mzsp-held .feit{list-style:none;margin:2px 0 0!important;padding:0!important;display:flex;flex-wrap:wrap;gap:6px 16px;font-size:14px;font-weight:700;color:#5B5A55}' +
     '.mzsp-held .feit li{margin:0!important;padding:0!important}.mzsp-held .feit li::before{content:"";display:inline-block;width:8px;height:8px;background:#FF7AB6;margin-right:7px;vertical-align:1px}' +
     '@media (min-width:761px){.mzsp-held{grid-template-columns:minmax(0,7fr) minmax(0,5fr)}.mzsp-held .beeld{order:2;border-bottom:0;border-left:3px solid #111}.mzsp-held .tekst{padding:28px 30px;justify-content:center}.mzsp-held .mzsp-speel{width:auto;align-self:flex-start}}' +
+    '@media (min-width:761px) and (max-width:1099px){.mzsp-held h1{font-size:clamp(28px,3.5vw,40px)!important}}' +
     '@media (min-width:1100px){.mzsp-held .tg-p{grid-template-columns:repeat(6,40px);grid-auto-rows:40px;gap:5px}.mzsp-held .tg-p i{font-size:22px}.mzsp-held .tg-w{grid-template-columns:repeat(4,56px);grid-auto-rows:56px;gap:8px}.mzsp-held .tg-w i{font-size:28px}}' +
     'html.moza-dark .mzsp-held{background:#1b1b1b;color:#F4F2EC;border-color:#F4F2EC;box-shadow:8px 8px 0 #FF7AB6}' +
     'html.moza-dark .mzsp-held h1{color:#F4F2EC!important}html.moza-dark .mzsp-held h1 em{color:#8FA0FF}' +
