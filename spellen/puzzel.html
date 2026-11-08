@@ -379,10 +379,10 @@ function mzDeelLokaal(doel, t, u, blob){
     window.open("https://wa.me/?text=" + encodeURIComponent(tekst), "_blank", "noopener"); return "ok";
   }
   if (mobiel && navigator.share){
-    if (file && navigator.canShare && navigator.canShare({files: [file]})){ navigator.share({files: [file], text: tekst}).catch(function(){}); return "ok"; }
-    if (doel !== "facebook"){ navigator.share({text: t, url: u}).catch(function(){}); return "ok"; }
+    if (file && navigator.canShare && navigator.canShare({files: [file]})){ try { navigator.clipboard.writeText(tekst); } catch (e){} navigator.share({files: [file], text: tekst}).catch(function(){}); return "ok"; }
+    navigator.share({text: t, url: u}).catch(function(){}); return "ok";
   }
-  if (doel === "facebook"){ window.open("https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(u), "_blank", "noopener"); return "ok"; }
+  if (doel === "facebook"){ try { navigator.clipboard.writeText(tekst); } catch (e){} window.open("https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(u), "_blank", "noopener"); return "fb"; }
   try { navigator.clipboard.writeText(tekst); return "gekopieerd"; } catch (e){ return false; }
 }
 function mzDeel(doel, t, u, blob){
@@ -450,7 +450,7 @@ function mzKaart(o){
 function klaarScherm(t,record){
   const ander=NIVEAUS.find(n=>n.id!==P.lv), anderKlaar=S.done[ander.id+'-d'+DAG];
   const URL='https://www.moza.nu/spellen/kruiswoordpuzzel';
-  const deel='Ik loste de MOZA Kruiswoordpuzzel ('+P.titel.toLowerCase()+') op in '+fmt(t)+(ST.h.size?' met '+ST.h.size+' hint'+(ST.h.size>1?'s':''):' zonder hints')+'. Hoeveel weet jij van de Molukken? Kun jij het sneller?';
+  const deel='\u23F1\uFE0F Mijn tijd: '+fmt(t)+'\nIk loste de '+(P.lv==='moeilijk'?'moeilijke':'makkelijke')+' MOZA Kruiswoordpuzzel van vandaag op in '+fmt(t)+(ST.h.size?' met '+ST.h.size+' hint'+(ST.h.size>1?'s':''):' zonder hints')+'. Hoeveel weet jij van de Molukken? Kun jij het sneller?';
   const x=P.slots.slice().sort((a,b)=>b.uitleg.length-a.uitleg.length)[Math.floor(Math.random()*Math.min(3,P.slots.length))];
   const ov=document.createElement('div'); ov.className='klaarscherm';
   ov.innerHTML='<div class="kader klaarkaart" role="dialog" aria-label="Puzzel opgelost"><h2>Dangke voor <em>het puzzelen!</em></h2>'+
@@ -471,7 +471,7 @@ function klaarScherm(t,record){
   mzKaart({label:'Puzzel van vandaag', titel:'Kruiswoord', accent:'puzzel', spatie:false, groot:fmt(t),
     klein:P.titel+' · '+P.slots.length+' begrippen'+(ST.h.size?' · '+ST.h.size+' hint'+(ST.h.size>1?'s':''):' · zonder hints'),
     raster:P.g.map(r=>r.split('').map(ch=>ch==='#'?'leeg':'vol')), gap:0, sticker:'Test je\nkennis', vraag:'Hoeveel weet jij van de Molukken?'}).then(b=>kaartBlob=b);
-  const doeDeel=(doel)=>{ const r=mzDeel(doel,deel,URL,kaartBlob); if(r==='opgeslagen'){ melding('De afbeelding is opgeslagen.'); return; } if(r==='gekopieerd') melding(doel==='instagram'?'Gekopieerd. Plak het in je Instagram-story of bericht.':'Gekopieerd. Plak het waar je wilt.'); else if(!r) kopieer(); };
+  const doeDeel=(doel)=>{ const r=mzDeel(doel,deel,URL,kaartBlob); if(r==='opgeslagen'){ melding('De afbeelding is opgeslagen.'); return; } if(r==='fb'){ melding('Je tijd is gekopieerd. Plak hem in je Facebook-bericht.'); return; } if(r==='gekopieerd') melding(doel==='instagram'?'Gekopieerd. Plak het in je Instagram-story of bericht.':'Gekopieerd. Plak het waar je wilt.'); else if(!r) kopieer(); };
   ov.querySelectorAll('.deelrij [data-doel]').forEach(b=>b.onclick=()=>doeDeel(b.dataset.doel));
   ov.querySelector('#deel').onclick=()=>doeDeel('native');
   ov.querySelector('#deel').focus();

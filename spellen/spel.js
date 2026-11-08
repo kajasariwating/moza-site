@@ -52,8 +52,13 @@
       'html.mz-app .raster{width:min(100%, calc((100dvh - 400px) * var(--n) / var(--r)))!important;margin:0 auto!important}' +
       'html.mz-app .gereedschap .knop{padding:7px 10px!important;font-size:14px!important}' +
       'html.mz-app .toets{display:flex!important;margin-top:auto!important;position:sticky;bottom:0;z-index:4;background:var(--bg);padding:6px 0 calc(6px + env(safe-area-inset-bottom,0px))}' +
-      'html.mz-app .toets button{height:42px!important}',
-    woord: ''
+      'html.mz-app .wrap{padding-left:max(8px,env(safe-area-inset-left,0px))!important;padding-right:max(8px,env(safe-area-inset-right,0px))!important}' +
+      'html.mz-app .toets{gap:6px!important}html.mz-app .toets div{gap:4px!important}' +
+      'html.mz-app .toets button{height:54px!important;max-width:none!important;font-size:20px!important}html.mz-app .toets button.wis{max-width:none!important;font-size:15px!important}',
+    woord:
+      'html.mz-app .toetsenbord{gap:7px!important}html.mz-app .toetsrij{gap:4px!important}' +
+      'html.mz-app .toets{max-width:none!important;height:clamp(50px,7.5dvh,60px)!important;font-size:19px!important}' +
+      'html.mz-app .toets.breed{max-width:none!important;font-size:13px!important}'
   };
   var APP_KADER =
     '.mzsp-app{position:fixed;inset:0;z-index:2147483000;display:flex;flex-direction:column;background:#F4F2EC;color:#111}' +
@@ -79,10 +84,10 @@
       window.open('https://wa.me/?text=' + encodeURIComponent(tekst), '_blank', 'noopener'); return 'ok';
     }
     if (mobiel && navigator.share){
-      if (file && navigator.canShare && navigator.canShare({files: [file]})){ navigator.share({files: [file], text: tekst}).catch(function(){}); return 'ok'; }
-      if (doel !== 'facebook'){ navigator.share({text: t, url: u}).catch(function(){}); return 'ok'; }
+      if (file && navigator.canShare && navigator.canShare({files: [file]})){ try { navigator.clipboard.writeText(tekst); } catch (e){} navigator.share({files: [file], text: tekst}).catch(function(){}); return 'ok'; }
+      navigator.share({text: t, url: u}).catch(function(){}); return 'ok';
     }
-    if (doel === 'facebook'){ window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(u), '_blank', 'noopener'); return 'ok'; }
+    if (doel === 'facebook'){ try { navigator.clipboard.writeText(tekst); } catch (e){} window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(u), '_blank', 'noopener'); return 'fb'; }
     try { navigator.clipboard.writeText(tekst); return 'gekopieerd'; } catch(e){ return false; }
   };
 

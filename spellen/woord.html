@@ -694,10 +694,10 @@ function mzDeelLokaal(doel, t, u, blob){
     window.open("https://wa.me/?text=" + encodeURIComponent(tekst), "_blank", "noopener"); return "ok";
   }
   if (mobiel && navigator.share){
-    if (file && navigator.canShare && navigator.canShare({files: [file]})){ navigator.share({files: [file], text: tekst}).catch(function(){}); return "ok"; }
-    if (doel !== "facebook"){ navigator.share({text: t, url: u}).catch(function(){}); return "ok"; }
+    if (file && navigator.canShare && navigator.canShare({files: [file]})){ try { navigator.clipboard.writeText(tekst); } catch (e){} navigator.share({files: [file], text: tekst}).catch(function(){}); return "ok"; }
+    navigator.share({text: t, url: u}).catch(function(){}); return "ok";
   }
-  if (doel === "facebook"){ window.open("https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(u), "_blank", "noopener"); return "ok"; }
+  if (doel === "facebook"){ try { navigator.clipboard.writeText(tekst); } catch (e){} window.open("https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(u), "_blank", "noopener"); return "fb"; }
   try { navigator.clipboard.writeText(tekst); return "gekopieerd"; } catch (e){ return false; }
 }
 function mzDeel(doel, t, u, blob){
@@ -774,6 +774,7 @@ function mzKaart(o){
   function deel(doel){
     var r = mzDeel(doel, deelTekst(), DEEL_URL, kaartBlob);
     if (r === "opgeslagen"){ meld("De afbeelding is opgeslagen."); return; }
+    if (r === "fb"){ meld("Je uitslag is gekopieerd. Plak hem in je Facebook-bericht.", 6000); return; }
     if (r === "gekopieerd") meld(doel === "instagram" ? "Gekopieerd. Plak het in je Instagram-story of bericht." : "Gekopieerd. Plak je uitslag waar je wilt.");
     else if (!r) deelFallback(deelTekst() + "\n" + DEEL_URL);
   }
