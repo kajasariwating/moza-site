@@ -142,11 +142,15 @@ def branden(dagen=8):
                 ok += 1
                 try:
                     t = mapbox_vector_tile.decode(b)
-                except Exception:
+                except Exception as ex:
+                    print('  mvt fout', sat, dag, ex)
                     continue
-                for layer in t.values():
+                for lnaam, layer in t.items():
                     for f in layer.get('features', []):
                         p = f.get('properties', {})
+                        if not pts and not getattr(branden, '_getoond', False):
+                            branden._getoond = True
+                            print('  voorbeeld', sat, lnaam, dict(list(p.items())[:20]))
                         try:
                             la, lo = float(p['LATITUDE']), float(p['LONGITUDE'])
                         except Exception:
