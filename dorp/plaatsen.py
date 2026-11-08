@@ -78,6 +78,20 @@ def main():
     UIT.parent.mkdir(parents=True, exist_ok=True)
     UIT.write_text(json.dumps(gevonden, separators=(',', ':')))
     print(f'dorp gevonden voor {len(gevonden)} van {len(rows)} dorpen')
+    # hoogte boven zee van elk dorp (Open-Meteo, Copernicus-hoogtekaart van 90 m)
+    hoogte = {}
+    punten = [(d['code'], *(gevonden.get(d['code']) or (d['la'], d['lo']))) for d in rows]
+    for i in range(0, len(punten), 100):
+        deel = punten[i:i + 100]
+        url = ('https://api.open-meteo.com/v1/elevation?latitude=' + ','.join(str(p[1]) for p in deel)
+               + '&longitude=' + ','.join(str(p[2]) for p in deel))
+        j = D.get_json(url)
+        if j and 'elevation' in j:
+            for p, h in zip(deel, j['elevation']):
+                if h is not None:
+                    hoogte[p[0]] = round(h)
+    (UIT.parent / 'hoogte.json').write_text(json.dumps(hoogte, separators=(',', ':')))
+    print('hoogte bekend voor', len(hoogte), 'dorpen')
     return 0
 
 

@@ -263,3 +263,48 @@ def voetbalvelden(ha):
     if n < 100:
         return f'{int(round(n, -1))} voetbalvelden'
     return f'{int(round(n, -2))} voetbalvelden'
+
+
+# ---------- zee: wat het betekent ----------
+# Niveau 0 rustig, 1 wat golven, 2 hoge golven, 3 zeer hoog of storm. Golven en wind tellen allebei mee.
+
+def zee_niveau(m, kmh):
+    g = 0 if m is None or m < 0.5 else 1 if m < 1.25 else 2 if m < 2.5 else 3
+    w = 0 if kmh is None or kmh < 12 else 1 if kmh < 29 else 2 if kmh < 50 else 3
+    return max(g, w)
+
+
+def golf_lichaam(m):
+    """Golfhoogte vergeleken met een mens die in het water staat."""
+    if m is None:
+        return ''
+    if m < 0.3:
+        return 'bijna vlak'
+    if m < 0.6:
+        return 'tot je knieën'
+    if m < 1.1:
+        return 'tot je heupen'
+    if m < 1.6:
+        return 'tot je schouders'
+    if m < 2.1:
+        return 'zo hoog als een mens'
+    return 'hoger dan een mens'
+
+
+VISSER = [
+    'Goed weer om met een kleine boot de zee op te gaan.',
+    'Te doen met een kleine boot, maar het schommelt. Blijf dicht bij de kust.',
+    'Niet verstandig met een kleine boot. Blijf aan wal of vaar alleen als het rustig is.',
+    'Gevaarlijk voor kleine boten. Blijf aan wal.',
+]
+
+OVERSTEEK = [
+    'Een rustige overtocht. Ook prima met kinderen en ouderen.',
+    'De boot vaart, maar het kan hobbelig zijn. Word je snel zeeziek? Neem iets mee of kies de ferry.',
+    'Een flinke schommeltocht. Speedboten varen soms later of niet. Met kinderen of ouderen kies je beter een rustiger moment of de ferry. Vraag bij de haven of er gevaren wordt.',
+    'Grote kans dat speedboten niet varen. Ook de ferry kan uitvallen. Vraag bij de haven en stel je reis zo nodig uit.',
+]
+
+OVERSTEEK_VOORBEELD = {
+    'lease': 'bijvoorbeeld van Tulehu naar Haruku, Saparua of Nusalaut',
+}

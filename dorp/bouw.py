@@ -196,6 +196,52 @@ def nieuws_bij(d, items):
     return uit[:2]
 
 
+
+# ---------------------------------------------------------------- ligt het dorp aan zee?
+
+_LAND = {}
+
+
+def land(kust_alle):
+    """Alle eilanden als één geheel, zodat grenzen tussen kabupaten niet als kust tellen."""
+    if 'eilanden' not in _LAND:
+        ps = []
+        for polys in kust_alle.values():
+            for poly in polys:
+                if poly and len(poly[0]) >= 3:
+                    try:
+                        p = Polygon([(b, a) for a, b in poly[0]])
+                        p = p if p.is_valid else p.buffer(0)
+                        if not p.is_empty:
+                            ps.append(p)
+                    except Exception:
+                        pass
+        u = unary_union(ps).buffer(0.003).buffer(-0.003)
+        eil = list(u.geoms) if hasattr(u, 'geoms') else [u]
+        _LAND['eilanden'] = (eil, STRtree(eil))
+    return _LAND['eilanden']
+
+
+def aan_kust(d, kust_alle, geo):
+    """Dorp ligt aan zee als de huizen binnen 1,5 km van de kust staan
+    (of, zonder plek van de huizen, als de grond van het dorp tot aan zee loopt)."""
+    eil, boom = land(kust_alle)
+    km = 1 / 111.0
+    pt = Point(d['lo'], d['la'])
+    h = d.get('hoogte')
+    if h is not None and h > 60:  # dorp in de bergen
+        return False
+    if d.get('echt') or geo is None:
+        bevat = [eil[i] for i in boom.query(pt) if eil[i].contains(pt)]
+        if not bevat:
+            return True
+        return bevat[0].exterior.distance(pt) <= 1.5 * km
+    rond = [eil[i] for i in boom.query(geo) if eil[i].intersects(geo)]
+    if not rond:
+        return True
+    return any(geo.distance(p.exterior) <= 0.3 * km for p in rond)
+
+
 # ---------------------------------------------------------------- kaart (svg)
 
 def kaart_svg(d, geo, buren, kust, brandpunten, wrichting):
@@ -459,28 +505,38 @@ def dorp_html(d, ctx, nu):
 <div class="leg"><span><i class="c-gezond"></i>Gezond</span><span><i class="c-rook"></i>Wat rook</span><span><i class="c-ongezond"></i>Ongezond</span></div>
 </div></section>''')
 
-    # ---- zee
-    if zz:
-        cellen, onrust = '', []
-        for x in zz['delen']:
-            gw, ww = T.golven(x['golf']), T.wind(x['wind'])
-            o = T.zee_onrustig(x['golf'], x['wind'])
-            onrust.append(o)
-            cellen += f'<span class="{"hoog" if o else ""}">{x["naam"]}<b>{gw}</b>{(ww or "").capitalize()}</span>'
+    # ---- zee (alleen voor dorpen aan de kust)
+    if zz and ctx.get('kust_dorp'):
         z = zz['delen']
-        if all(onrust):
-            kop, advies = 'Morgen is het de hele dag onrustig op zee.', 'Ga je met de boot? Kijk dan goed uit en vraag ter plekke of er gevaren wordt.'
-        elif not any(onrust):
-            kop, advies = f'Morgen de hele dag {T.golven(max(x["golf"] for x in z)).lower()} en {T.wind(max((x["wind"] or 0) for x in z))}.', 'Rustig op zee.'
+        niv = [T.zee_niveau(x['golf'], x['wind']) for x in z]
+        cellen = ''
+        for x, n in zip(z, niv):
+            ww = T.wind(x['wind'])
+            cellen += (f'<span class="{"hoog" if n >= 2 else ""}">{x["naam"]}<b>{T.golven(x["golf"])}</b>'
+                       f'{T.golf_lichaam(x["golf"])}<br>{ww or ""}</span>')
+        slechtst, best = max(niv), min(niv)
+        deel = lambda n: [x['naam'].lower() for x, v in zip(z, niv) if v == n]
+        if slechtst == best:
+            kop = {0: 'Morgen is het de hele dag rustig op zee.', 1: 'Morgen staan er de hele dag wat golven.',
+                   2: 'Morgen is het de hele dag onrustig op zee.', 3: 'Morgen is het de hele dag zwaar weer op zee.'}[best]
         else:
-            rustig = [x['naam'].lower() for x, o in zip(z, onrust) if not o]
-            woelig = [x['naam'].lower() for x, o in zip(z, onrust) if o]
-            kop = f"Morgen is het 's {rustig[0]}s rustig op zee. 's {woelig[0].capitalize()}s wordt het onrustig."
-            advies = f"Wie met de boot gaat, kan het beste 's {rustig[0]}s gaan."
+            rustig, woelig = deel(best)[0], deel(slechtst)[0]
+            kop = f"Morgen is de zee ’s {rustig}s het rustigst. ’s {woelig.capitalize()}s wordt het {'onrustig' if slechtst >= 2 else 'wat woeliger'}."
+        vb = T.OVERSTEEK_VOORBEELD.get(d['groep'])
+        if slechtst == best:
+            vis, over = e(T.VISSER[best]), e(T.OVERSTEEK[best])
+        else:
+            r, w = deel(best)[0], deel(slechtst)[0]
+            vis = f"<br>’s {r.capitalize()}s: {e(T.VISSER[best])}<br>’s {w.capitalize()}s: {e(T.VISSER[slechtst])}"
+            over = f"<br>’s {r.capitalize()}s: {e(T.OVERSTEEK[best])}<br>’s {w.capitalize()}s: {e(T.OVERSTEEK[slechtst])}"
         m.append(f'''<section aria-labelledby="h-zee">
 <p class="label"><span class="tag" style="background:var(--blauw);color:#fff">Zee</span></p>
-<h2 id="h-zee">Kan de boot morgen varen?</h2>
-<div class="blok"><p class="groot">{e(kop)}</p><p>{e(advies)}</p><div class="drie">{cellen}</div></div></section>''')
+<h2 id="h-zee">Hoe is de zee morgen?</h2>
+<div class="blok"><p class="groot">{e(kop)}</p>
+<div class="drie">{cellen}</div>
+<p><b>Ga je vissen met een kleine boot?</b> {vis}</p>
+<p><b>Steek je over met de speedboot of ferry{', ' + e(vb) if vb else ''}?</b> {over}</p>
+</div></section>''')
 
     # ---- bevingen
     if bv is not None:
@@ -597,7 +653,11 @@ def start_html(groepen, brandlijst, nu):
 <main class="w">
 <section><h2>Of kies een eilandgroep</h2><div class="knoppen">{knoppen}</div></section>
 {brand}
+<section aria-labelledby="h-kaart"><h2 id="h-kaart">Of kies op de kaart</h2><p>Zoom in, tik op een dorp en kies <b>Wat speelt er nu</b>.</p></section>
 </main>
+<div id="mzn-plek"></div>
+<script>window.MZN_SLUG={{}};fetch('/slugs.json').then(function(r){{return r.json()}}).then(function(j){{Object.assign(window.MZN_SLUG,j)}}).catch(function(){{}});</script>
+<script src="/atlas/atlas-maluku.js?v={VERSIE}" defer></script>
 <script>(function(){{var q=document.getElementById('q'),res=document.getElementById('res'),L=null;
 function n(s){{return s.toLowerCase().normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/[^a-z0-9 ]/g,' ').trim()}}
 function load(){{if(L)return Promise.resolve(L);return fetch('/zoek.json').then(function(r){{return r.json()}}).then(function(j){{L=j.map(function(x){{x.k=n(x.n+' '+(x.o||''));return x}});return L}})}}
@@ -644,7 +704,10 @@ def main():
     rows, kust = D.dorpen()
     pf = HIER / 'gegevens' / 'plaatsen.json'
     plaatsen = json.loads(pf.read_text()) if pf.exists() else {}
+    hf = HIER / 'gegevens' / 'hoogte.json'
+    hoogtes = json.loads(hf.read_text()) if hf.exists() else {}
     for d in rows:
+        d['hoogte'] = hoogtes.get(d['code'])
         d['echt'] = d['code'] in plaatsen
         if d['echt']:
             d['la'], d['lo'] = plaatsen[d['code']]
@@ -709,6 +772,7 @@ def main():
             'nw': nieuws_bij(d, items),
             'bos': bosdata.get(d['code']), 'bosjaar': int(str(bosdata.get('_versie', 'GFC-2001')).split('-')[1]),
             'buren': buren, 'kust': kust.get(d['kab'], []), 'buurlinks': buurlinks,
+            'kust_dorp': aan_kust(d, kust, g),
         }
         f = uit / d['slug'] / 'index.html'
         f.parent.mkdir(parents=True, exist_ok=True)
@@ -722,6 +786,8 @@ def main():
         f.write_text(eiland_html(g, [d for d in rows if d['groep'] == g], nu, brandset))
     (uit / 'index.html').write_text(start_html(D.GROEPEN, brandlijst, nu))
     (uit / 'zoek.json').write_text(json.dumps(zoek, ensure_ascii=False, separators=(',', ':')))
+    (uit / 'slugs.json').write_text(json.dumps({d['code']: d['slug'] for d in rows}, separators=(',', ':')))
+    shutil.copytree(D.ATLAS, uit / 'atlas')
     shutil.copy(HIER / 'static' / 'dorp.css', uit / 'dorp.css')
     (uit / 'CNAME').write_text('live.moza.nu\n')
     (uit / 'robots.txt').write_text(f'User-agent: *\nAllow: /\nSitemap: {SITE}/sitemap.xml\n')

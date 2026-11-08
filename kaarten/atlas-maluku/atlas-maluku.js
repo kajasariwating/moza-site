@@ -163,7 +163,7 @@
    '<section class="mzn-why"><h3 class="mzn-t">Waarom dorp en niet negeri?</h3>'+
     '<p>Op de Molukken heeft een dorp niet overal dezelfde naam. Op Ambon, de Lease-eilanden en Seram zeg je vooral negeri. Op de Kei-eilanden heet een dorp ohoi. In delen van Seram en op de Zuidwestereilanden hoor je ook aman of hena. Elders hebben dorpen een eigen naam in de lokale taal.</p>'+
     '<p>Deze kaart laat alle Molukken zien. Daarom gebruiken we het gewone woord dorp. Zo doen we geen enkele streek tekort. De overheid noemt een dorp desa. Een kelurahan is een wijk met een ambtenaar als hoofd.</p>'+
-    '<p class="mzn-more">Lees meer: <a href="/kennisbank/wat-is-een-negeri-en-wat-doet-een-raja-in-de-molukken">Wat is een negeri?</a> en <a href="/kennisbank/waar-ligt-de-eilandengroep-molukken-precies">Waar liggen de Molukken?</a></p></section>'+
+    '<p class="mzn-more">Lees meer: <a href="'+(window.MZN_SLUG?'https://www.moza.nu':'')+'/kennisbank/waar-ligt-de-eilandengroep-molukken-precies">Waar liggen de Molukken?</a></p></section>'+
   '</div><div class="mzn-foot">Bron: grenzen en codes uit <a href="https://github.com/cahyadsn/wilayah_boundaries" target="_blank" rel="noopener">wilayah_boundaries</a> (open data, MIT-licentie), provincies Maluku en Maluku Utara. Grenzen zijn vereenvoudigd en niet geschikt voor juridisch gebruik. Bergen: © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap-bijdragers</a> (ODbL).</div></aside>'+
   '<div class="mzn-ro">Beweeg over de kaart</div>';
 
@@ -391,7 +391,8 @@
         '<dt>Ligging</dt><dd>'+dms(f.la,'NB','ZB')+'<br>'+dms(f.lo,'OL','WL')+'</dd>'+
         '<dt>Code</dt><dd>'+f.k+'</dd></dl>'+
         (f.nog?'<p class="warn">De brondata heeft voor dit dorp geen grens. De stip geeft de ligging bij benadering.</p>':'')+
-        (f.kb==='81.01'&&f.la<-5?'<p class="warn">Let op: de brondata zet dit gebied ver ten zuiden van Seram. Mogelijk klopt de ligging niet.</p>':'');
+        (f.kb==='81.01'&&f.la<-5?'<p class="warn">Let op: de brondata zet dit gebied ver ten zuiden van Seram. Mogelijk klopt de ligging niet.</p>':'')+
+        (window.MZN_SLUG&&window.MZN_SLUG[f.k]?'<a href="/'+window.MZN_SLUG[f.k]+'/" style="display:flex;align-items:center;justify-content:center;min-height:48px;margin-top:12px;padding:0 14px;background:#111;color:#fff;text-decoration:none;font-weight:900;font-size:16px;border:2px solid #111;box-shadow:4px 4px 0 #FF4D2E">Wat speelt er nu in '+esc(f.n)+'? &rarr;</a>':'');
       card.hidden=false;card.querySelector('.x').onclick=clearSel;readout(f);
       if(fly){
         loadKab(f.kb).then(function(){
