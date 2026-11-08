@@ -657,7 +657,7 @@ def main():
         wcel = lcel = zcel = None
         items = None
     else:
-        print('brand…'); punten = D.cached('branden', 0.9, D.branden)
+        print('brand…'); punten = D.cached('branden-v2', 0.9, D.branden)
         print('  punten:', None if punten is None else len(punten))
         print('bevingen…'); bev = D.cached('bevingen', 0.9, D.bevingen)
         print('  bevingen:', None if bev is None else len(bev))
