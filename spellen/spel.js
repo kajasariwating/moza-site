@@ -69,17 +69,20 @@
     '.mzsp-start button{font:inherit;font-weight:900;font-size:18px;padding:14px 18px;background:#1F3BD1;color:#fff;border:3px solid #111;box-shadow:4px 4px 0 #111;cursor:pointer}' +
     'html.moza-dark .mzsp-start button{border-color:#F4F2EC;box-shadow:4px 4px 0 #FF7AB6}';
   /* Delen vanuit de pagina zelf: hier werken het deelmenu en de app-links het best. */
-  window.mzDeel = function(doel, t, u){
+  window.mzDeel = function(doel, t, u, blob){
     var mobiel = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
     var tekst = t + '\n' + u;
+    var file = null; try { if (blob) file = new File([blob], 'moza-score.png', {type: 'image/png'}); } catch(e){}
+    if (doel === 'opslaan' && blob){ var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'moza-score.png'; document.body.appendChild(a); a.click(); a.remove(); return 'opgeslagen'; }
     if (doel === 'whatsapp'){
       if (mobiel){ location.href = 'whatsapp://send?text=' + encodeURIComponent(tekst); return 'ok'; }
       window.open('https://wa.me/?text=' + encodeURIComponent(tekst), '_blank', 'noopener'); return 'ok';
     }
-    if (doel === 'facebook' && !(mobiel && navigator.share)){
-      window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(u), '_blank', 'noopener'); return 'ok';
+    if (mobiel && navigator.share){
+      if (file && navigator.canShare && navigator.canShare({files: [file]})){ navigator.share({files: [file], text: tekst}).catch(function(){}); return 'ok'; }
+      if (doel !== 'facebook'){ navigator.share({text: t, url: u}).catch(function(){}); return 'ok'; }
     }
-    if (mobiel && navigator.share){ navigator.share({text: t, url: u}).catch(function(){}); return 'ok'; }
+    if (doel === 'facebook'){ window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(u), '_blank', 'noopener'); return 'ok'; }
     try { navigator.clipboard.writeText(tekst); return 'gekopieerd'; } catch(e){ return false; }
   };
 
@@ -87,7 +90,10 @@
 
   function launcher(el, html, naam){
     if (!document.getElementById('mzsp-app-css')){ var st = document.createElement('style'); st.id = 'mzsp-app-css'; st.textContent = APP_KADER; document.head.appendChild(st); }
-    el.innerHTML = '<div class="mzsp-start"><p>Het spel opent schermvullend. Met het kruisje ga je terug.</p><button type="button">Speel ' + (NAMEN[naam] || 'het spel') + '</button></div>';
+    var held = el.closest && el.closest('.mzsp-held');
+    el.innerHTML = held
+      ? '<button type="button" class="mzsp-speel">' + (naam === 'puzzel' ? 'Start de puzzel' : 'Start het spel') + ' <span aria-hidden="true">\u2192</span></button>'
+      : '<div class="mzsp-start"><p>Het spel opent schermvullend. Met het kruisje ga je terug.</p><button type="button">Speel ' + (NAMEN[naam] || 'het spel') + '</button></div>';
     el.querySelector('button').addEventListener('click', function(){ openApp(html, naam); });
     if (location.hash === '#spelen') openApp(html, naam);
   }
@@ -177,6 +183,25 @@
   /* Automatisch: in de pagina-injectie van de blog /spellen staat
        window.mzSpellen = {'raad-het-woord':'woord', 'kruiswoordpuzzel':'puzzel'};
      Op een bericht met zo'n adres zet dit script het spel onder de tekst van het bericht. */
+  /* Klein tegelbeeld in de kop, in de stijl van het spel zelf */
+  function tegels(spel){
+    var h = '';
+    if (spel === 'puzzel'){
+      var cel = {}; 'PUZZEL'.split('').forEach(function(l, i){ cel['1,' + i] = l; });
+      'KENNIS'.split('').forEach(function(l, i){ cel[i + ',4'] = l; });
+      h = '<div class="tg tg-p">';
+      for (var r = 0; r < 6; r++) for (var c = 0; c < 6; c++){
+        var l = cel[r + ',' + c];
+        h += l ? '<i class="' + (r === 1 && c === 4 ? 'ge' : 'wi') + '">' + l + '</i>' : '<i class="lg"></i>';
+      }
+      return h + '</div>';
+    }
+    var rij = [['mi','ge','mi','mi'], ['bl','mi','ge','mi'], ['bl','bl','bl','bl']], woord = 'MOZA';
+    h = '<div class="tg tg-w">';
+    rij.forEach(function(k, r){ k.forEach(function(x, c){ h += '<i class="' + x + '">' + (r === 2 ? woord[c] : '') + '</i>'; }); });
+    return h + '</div>';
+  }
+
   function auto(){
     var map = window.mzSpellen || {};
     var slug = location.pathname.replace(/\/+$/, '').split('/').pop();
@@ -213,14 +238,61 @@
         kop.parentNode.replaceChild(det, kop);
       }
     } catch(e){}
-    plek.appendChild(div);
+    /* Uitnodigende kop bovenaan: beeld, titel, korte belofte en een grote startknop. */
+    var info = INFO[slug] || {};
+    H.classList.add('mzsp-post');
+    var hst = document.createElement('style'); hst.id = 'mzsp-held-css'; hst.textContent = HELD_CSS; document.head.appendChild(hst);
+    var held = document.createElement('section'); held.className = 'mzsp-held';
+    held.innerHTML =
+      '<div class="beeld b-' + spel + '" aria-hidden="true">' + tegels(spel) + '</div>' +
+      '<div class="tekst"><span class="lbl"><b>MOZA</b>' + (info.label || 'Spel van vandaag') + '</span>' +
+      '<h1>' + (info.titel || NAMEN[spel] || '') + '</h1>' +
+      '<p class="belofte">' + (info.belofte || '') + '</p>' +
+      '<div class="plek"></div>' +
+      '<ul class="feit">' + (info.feiten || []).map(function(f){ return '<li>' + f + '</li>'; }).join('') + '</ul></div>';
+    plek.insertBefore(held, plek.firstChild);
+    if (isTelefoon()) { div.style.cssText = ''; held.querySelector('.plek').appendChild(div); }
+    else { held.querySelector('.plek').innerHTML = '<a class="mzsp-speel" href="#mzsp-spel">' + (info.knop || 'Speel') + ' <span aria-hidden="true">\u2193</span></a>'; div.id = 'mzsp-spel'; held.parentNode.insertBefore(div, held.nextSibling); }
   }
 
   /* Overzicht op /spellen: vervangt de standaard bloglijst door kaarten met cover. */
   var INFO = {
-    'raad-het-woord': {cover:'cover/cover-woord.png', tekst:'Raad in zes pogingen het woord van de dag. Elk woord heeft een Molukse knipoog.', knop:'Raad het woord'},
-    'kruiswoordpuzzel': {cover:'cover/cover-puzzel.png', tekst:'Test je kennis van de Molukken en Molukkers in Nederland. Elke dag een makkelijke en een moeilijke puzzel, met bij elk woord een weetje.', knop:'Test je kennis'}
+    'raad-het-woord': {cover:'cover/cover-woord.png', tekst:'Raad in zes pogingen het woord van de dag. Elk woord heeft een Molukse knipoog.', knop:'Raad het woord',
+      label:'Woord van de dag', titel:'Raad het <em>woord</em>', belofte:'Zes pogingen. E\u00e9n woord met een Molukse knipoog. Lukt het jou?',
+      feiten:['Elke dag nieuw om 06:00', 'Duurt een paar minuten', 'Daag je vrienden uit']},
+    'kruiswoordpuzzel': {cover:'cover/cover-puzzel.png', tekst:'Test je kennis van de Molukken en Molukkers in Nederland. Elke dag een makkelijke en een moeilijke puzzel, met bij elk woord een weetje.', knop:'Test je kennis',
+      label:'Puzzel van vandaag', titel:'Kruiswoord<em>puzzel</em>', belofte:'Hoeveel weet jij van de Molukken? Kies makkelijk of moeilijk en leer bij elk woord iets nieuws.',
+      feiten:['Elke dag nieuw om 06:00', 'Makkelijk of moeilijk', 'Bij elk woord een weetje']}
   };
+  var HELD_CSS =
+    /* Lege ruimte boven het bericht weg, de eigen kop vervangt titel en datum */
+    'html.mzsp-post section.content-collection{padding-top:12px!important}' +
+    'html.mzsp-post article.entry{padding-top:0!important}' +
+    'html.mzsp-post .blog-item-top-wrapper{display:none!important}' +
+    '.mzsp-held{margin:0 0 28px;border:3px solid #111;background:#fff;color:#111;box-shadow:8px 8px 0 #1F3BD1;font-family:"Hanken Grotesk",system-ui,sans-serif;display:grid;grid-template-columns:1fr}' +
+    '.mzsp-held .beeld{border-bottom:3px solid #111;background:#1F3BD1;display:flex;align-items:center;justify-content:center;padding:14px}.mzsp-held .beeld.b-woord{background:#F4F2EC}' +
+    '.mzsp-held .tg{display:grid;gap:4px}.mzsp-held .tg-p{grid-template-columns:repeat(6,22px);grid-auto-rows:22px;gap:3px}.mzsp-held .tg-p i{font-size:13px}.mzsp-held .tg-w{grid-template-columns:repeat(4,34px);grid-auto-rows:34px;gap:5px}' +
+    '.mzsp-held .tg i{display:flex;align-items:center;justify-content:center;font-style:normal;font-weight:900;font-size:15px;border:2px solid #111;color:#111}' +
+    '.mzsp-held .tg-w i{font-size:20px;box-shadow:2px 2px 0 #111}' +
+    '.mzsp-held .tg .lg{border:0;background:transparent}.mzsp-held .tg .wi{background:#fff}.mzsp-held .tg .ge{background:#E9F25A}' +
+    '.mzsp-held .tg .mi{background:#8A877F}.mzsp-held .tg .bl{background:#1F3BD1;color:#fff}' +
+    '.mzsp-held .tekst{padding:18px 18px 20px;display:flex;flex-direction:column;gap:12px;min-width:0}' +
+    '.mzsp-held .lbl{display:flex;align-items:center;gap:10px;font-weight:800;font-size:13px;letter-spacing:.08em;text-transform:uppercase}' +
+    '.mzsp-held .lbl b{background:#111;color:#E9F25A;padding:3px 8px;font-weight:900;letter-spacing:.02em}' +
+    '.mzsp-held h1{margin:0!important;font-weight:900!important;font-size:clamp(34px,9vw,56px)!important;line-height:1!important;letter-spacing:-.02em!important;color:#111!important;text-wrap:balance;overflow-wrap:anywhere}' +
+    '.mzsp-held h1 em{font-family:"Fraunces",Georgia,serif;font-style:italic;font-weight:600;color:#1F3BD1;letter-spacing:0}' +
+    '.mzsp-held .belofte{margin:0!important;font-size:17px!important;line-height:1.45!important;color:#3a3935!important}' +
+    '.mzsp-held .plek{margin-top:4px}.mzsp-held .plek .mz-spel{margin:0}' +
+    '.mzsp-held .mzsp-speel{display:flex;width:100%;justify-content:center;align-items:center;gap:10px;box-sizing:border-box;font:inherit;font-weight:900;font-size:20px;padding:16px 18px;background:#E9F25A;color:#111!important;border:3px solid #111;box-shadow:5px 5px 0 #111;cursor:pointer;text-decoration:none!important}' +
+    '.mzsp-held .mzsp-speel:active{transform:translate(3px,3px);box-shadow:2px 2px 0 #111}' +
+    '.mzsp-held .mzsp-speel:focus-visible{outline:3px solid #FF7AB6;outline-offset:3px}' +
+    '.mzsp-held .feit{list-style:none;margin:2px 0 0!important;padding:0!important;display:flex;flex-wrap:wrap;gap:6px 16px;font-size:14px;font-weight:700;color:#5B5A55}' +
+    '.mzsp-held .feit li{margin:0!important;padding:0!important}.mzsp-held .feit li::before{content:"";display:inline-block;width:8px;height:8px;background:#FF7AB6;margin-right:7px;vertical-align:1px}' +
+    '@media (min-width:761px){.mzsp-held{grid-template-columns:minmax(0,7fr) minmax(0,5fr)}.mzsp-held .beeld{order:2;border-bottom:0;border-left:3px solid #111}.mzsp-held .tg-p{grid-template-columns:repeat(6,40px);grid-auto-rows:40px;gap:5px}.mzsp-held .tg-p i{font-size:22px}.mzsp-held .tg-w{grid-template-columns:repeat(4,56px);grid-auto-rows:56px;gap:8px}.mzsp-held .tg-w i{font-size:28px}.mzsp-held .tekst{padding:28px 30px;justify-content:center}.mzsp-held .mzsp-speel{width:auto;align-self:flex-start}}' +
+    'html.moza-dark .mzsp-held{background:#1b1b1b;color:#F4F2EC;border-color:#F4F2EC;box-shadow:8px 8px 0 #FF7AB6}' +
+    'html.moza-dark .mzsp-held h1{color:#F4F2EC!important}html.moza-dark .mzsp-held h1 em{color:#8FA0FF}' +
+    'html.moza-dark .mzsp-held .belofte{color:#CFCDC5!important}html.moza-dark .mzsp-held .feit{color:#B4B2AA}' +
+    'html.moza-dark .mzsp-held .beeld{border-color:#F4F2EC}html.moza-dark .mzsp-held .lbl b{background:#F4F2EC;color:#111}';
   var OV_CSS =
     '.mzsp-ov{max-width:1100px;margin:40px auto 64px;padding:0 max(16px,env(safe-area-inset-left,0px));font-family:"Hanken Grotesk",system-ui,sans-serif;color:#111}' +
     '.mzsp-ov h1{font-weight:900;font-size:clamp(40px,7vw,64px);letter-spacing:-.02em;line-height:1;margin:0 0 12px}' +

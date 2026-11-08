@@ -262,6 +262,7 @@ button{font:inherit;color:inherit;cursor:pointer}
       <button class="deel wa" type="button" data-doel="whatsapp">WhatsApp</button>
       <button class="deel fb" type="button" data-doel="facebook">Facebook</button>
       <button class="deel ig" type="button" data-doel="instagram">Instagram</button>
+      <button class="deel" type="button" data-doel="opslaan" id="deelOpslaan">Bewaar afbeelding</button>
     </div>
     <div class="knoppen eind-knoppen"><button class="knop" type="button" data-sluit>Afsluiten</button></div>
     <p class="eind-oefen" hidden><button class="linkknop" type="button" id="knopNogEen">Of oefen met een ander woord</button></p>
@@ -668,7 +669,8 @@ button{font:inherit;color:inherit;cursor:pointer}
     $("eindeMorgen").hidden = !dag;
     clearInterval(aftelTimer); if (dag){ aftel(); aftelTimer = setInterval(aftel, 1000); }
     $("deelbak").hidden = true;
-    zetDeelLinks();
+    zetDeelLinks(); maakKaartNu();
+    try { $("deelOpslaan").hidden = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent); } catch (e){}
     toonVenster($("vensterEinde"));
   }
 
@@ -682,27 +684,96 @@ button{font:inherit;color:inherit;cursor:pointer}
   var DEEL_URL = "https://www.moza.nu/spellen/raad-het-woord";
   function zetDeelLinks(){}
 /* Delen: liefst via de pagina eromheen (moza.nu), want daar opent het deelmenu en de app het best. */
-function mzDeelLokaal(doel, t, u){
+function mzDeelLokaal(doel, t, u, blob){
   var mobiel = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
   var tekst = t + "\n" + u;
-  function kopie(){ try { navigator.clipboard.writeText(tekst); return "gekopieerd"; } catch (e){ return false; } }
+  var file = null; try { if (blob) file = new File([blob], "moza-score.png", {type: "image/png"}); } catch (e){}
+  if (doel === "opslaan" && blob){ var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "moza-score.png"; document.body.appendChild(a); a.click(); a.remove(); return "opgeslagen"; }
   if (doel === "whatsapp"){
     if (mobiel){ try { window.top.location.href = "whatsapp://send?text=" + encodeURIComponent(tekst); } catch (e){ location.href = "whatsapp://send?text=" + encodeURIComponent(tekst); } return "ok"; }
     window.open("https://wa.me/?text=" + encodeURIComponent(tekst), "_blank", "noopener"); return "ok";
   }
-  if (doel === "facebook" && !(mobiel && navigator.share)){
-    window.open("https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(u), "_blank", "noopener"); return "ok";
+  if (mobiel && navigator.share){
+    if (file && navigator.canShare && navigator.canShare({files: [file]})){ navigator.share({files: [file], text: tekst}).catch(function(){}); return "ok"; }
+    if (doel !== "facebook"){ navigator.share({text: t, url: u}).catch(function(){}); return "ok"; }
   }
-  if (mobiel && navigator.share){ navigator.share({text: t, url: u}).catch(function(){}); return "ok"; }
-  return kopie();
+  if (doel === "facebook"){ window.open("https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(u), "_blank", "noopener"); return "ok"; }
+  try { navigator.clipboard.writeText(tekst); return "gekopieerd"; } catch (e){ return false; }
 }
-function mzDeel(doel, t, u){
-  try { if (window.parent !== window && window.parent.mzDeel){ var r = window.parent.mzDeel(doel, t, u); if (r) return r; } } catch (e){}
-  return mzDeelLokaal(doel, t, u);
+function mzDeel(doel, t, u, blob){
+  try { if (window.parent !== window && window.parent.mzDeel){ var r = window.parent.mzDeel(doel, t, u, blob); if (r) return r; } } catch (e){}
+  return mzDeelLokaal(doel, t, u, blob);
+}
+/* Scorekaart als afbeelding (1080 x 1350), om te delen. Geen letters: niets verklappen. */
+function mzKaart(o){
+  var W = 1080, Hh = 1350, c = document.createElement("canvas"); c.width = W; c.height = Hh;
+  var x = c.getContext("2d");
+  var BL = "#1F3BD1", GE = "#E9F25A", ZW = "#111111", RO = "#FF7AB6", OND = "#F4F2EC";
+  var laad = (document.fonts && document.fonts.load) ? Promise.all([
+    document.fonts.load('900 80px "Hanken Grotesk"'), document.fonts.load('800 40px "Hanken Grotesk"'),
+    document.fonts.load('400 40px "Hanken Grotesk"'), document.fonts.load('italic 600 80px "Fraunces"')
+  ]).catch(function(){}) : Promise.resolve();
+  return laad.then(function(){
+    var H = '"Hanken Grotesk", system-ui, sans-serif', F = '"Fraunces", Georgia, serif';
+    x.fillStyle = OND; x.fillRect(0, 0, W, Hh);
+    // kaart met harde schaduw
+    x.fillStyle = BL; x.fillRect(84, 84, W - 140, Hh - 140);
+    x.fillStyle = "#FFFFFF"; x.fillRect(60, 60, W - 140, Hh - 140);
+    x.lineWidth = 8; x.strokeStyle = ZW; x.strokeRect(60, 60, W - 140, Hh - 140);
+    var L = 120;
+    // label
+    x.font = "900 34px " + H; var lbl = "MOZA"; var lw = x.measureText(lbl).width;
+    x.fillStyle = ZW; x.fillRect(L, 120, lw + 36, 58); x.fillStyle = GE; x.textBaseline = "middle"; x.fillText(lbl, L + 18, 150);
+    x.fillStyle = ZW; x.font = "800 30px " + H; x.fillText((o.label || "").toUpperCase().split("").join(String.fromCharCode(8202)), L + lw + 60, 150);
+    // titel
+    x.textBaseline = "alphabetic"; var fs = 96, ruimte = W - 2 * L - 40, tw, aw;
+    do { x.font = "900 " + fs + "px " + H; tw = x.measureText(o.titel + (o.spatie === false ? "" : " ")).width; x.font = "italic 600 " + fs + "px " + F; aw = x.measureText(o.accent).width; fs -= 4; } while (tw + aw > ruimte && fs > 40);
+    fs += 4; x.font = "900 " + fs + "px " + H; x.fillStyle = ZW; x.fillText(o.titel, L, 300);
+    x.font = "italic 600 " + fs + "px " + F; x.fillStyle = BL; x.fillText(o.accent, L + tw, 300);
+    // grote score
+    x.font = "900 190px " + H; x.fillStyle = ZW; x.fillText(o.groot, L, 500);
+    x.font = "400 40px " + H; x.fillStyle = "#4A4844"; x.fillText(o.klein, L, 590);
+    // raster
+    var R = o.raster, rows = R.length, cols = R[0].length, gap = o.gap == null ? 14 : o.gap;
+    var maxW = W - 2 * L - 20, maxH = 440;
+    var cel = Math.floor(Math.min((maxW - (cols - 1) * gap) / cols, (maxH - (rows - 1) * gap) / rows, 120));
+    var gw = cols * cel + (cols - 1) * gap, gx = L, gy = 625 + Math.round((maxH - (rows * cel + (rows - 1) * gap)) / 2);
+    var kl = {goed: BL, plek: GE, mis: "#6B6862", vol: BL, leeg: null};
+    for (var r = 0; r < rows; r++) for (var k = 0; k < cols; k++){
+      var v = R[r][k]; if (!kl[v]) continue;
+      var px = gx + k * (cel + gap), py = gy + r * (cel + gap);
+      if (gap > 0){ x.fillStyle = ZW; x.fillRect(px + 6, py + 6, cel, cel); }
+      x.fillStyle = kl[v]; x.fillRect(px, py, cel, cel);
+      x.lineWidth = gap > 0 ? 5 : 3; x.strokeStyle = ZW; x.strokeRect(px, py, cel, cel);
+    }
+    // sticker
+    if (o.sticker){
+      x.save(); x.translate(W - 250, 470); x.rotate(-0.14);
+      x.beginPath(); x.arc(0, 0, 92, 0, Math.PI * 2); x.fillStyle = RO; x.fill(); x.lineWidth = 6; x.strokeStyle = ZW; x.stroke();
+      x.fillStyle = ZW; x.textAlign = "center"; x.textBaseline = "middle"; x.font = "900 32px " + H;
+      var sl = o.sticker.split("\n"); sl.forEach(function(s, i){ x.fillText(s, 0, (i - (sl.length - 1) / 2) * 36); });
+      x.restore(); x.textAlign = "left";
+    }
+    // voet
+    x.textBaseline = "alphabetic"; x.fillStyle = ZW; x.font = "900 48px " + H; x.fillText(o.vraag, L, 1150);
+    x.font = "800 36px " + H; x.fillStyle = BL; x.fillText("moza.nu/spellen", L, 1205);
+    return new Promise(function(res){ c.toBlob(function(b){ res(b); }, "image/png"); });
+  });
 }
 
+
+  var kaartBlob = null;
+  function maakKaartNu(){
+    kaartBlob = null;
+    var rijen = S.gokken.map(function(g){ return kleur(g, S.woord); });
+    if (!rijen.length) return;
+    mzKaart({label: S.modus === "dag" ? "Woord nr. " + S.nr : "Oefenen", titel: "Raad het", accent: "woord",
+      groot: (S.gewonnen ? S.gokken.length : "X") + "/6", klein: "Thema: " + S.item.t,
+      raster: rijen, vraag: S.gewonnen ? "Kun jij het sneller?" : "Lukt het jou wel?"}).then(function(b){ kaartBlob = b; });
+  }
   function deel(doel){
-    var r = mzDeel(doel, deelTekst(), DEEL_URL);
+    var r = mzDeel(doel, deelTekst(), DEEL_URL, kaartBlob);
+    if (r === "opgeslagen"){ meld("De afbeelding is opgeslagen."); return; }
     if (r === "gekopieerd") meld(doel === "instagram" ? "Gekopieerd. Plak het in je Instagram-story of bericht." : "Gekopieerd. Plak je uitslag waar je wilt.");
     else if (!r) deelFallback(deelTekst() + "\n" + DEEL_URL);
   }
