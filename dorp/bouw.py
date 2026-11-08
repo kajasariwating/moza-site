@@ -345,6 +345,8 @@ def pagina(titel, omschrijving, pad, body, extra_head=''):
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<script>(function(){{var d=document.documentElement,t=null;try{{t=localStorage.getItem('moza-theme')}}catch(e){{}}if(t==='dark'||(!t&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches))d.classList.add('moza-dark');
+window.mzThema=function(){{var dk=!d.classList.contains('moza-dark');d.classList.toggle('moza-dark',dk);try{{localStorage.setItem('moza-theme',dk?'dark':'light')}}catch(e){{}};var m=document.querySelector('meta[name=theme-color]');if(m)m.content=dk?'#17181D':'#1F3BD1'}}}})();</script>
 <title>{e(titel)}</title>
 <meta name="description" content="{e(omschrijving)}">
 <link rel="canonical" href="{SITE}{pad}">
@@ -365,7 +367,7 @@ def pagina(titel, omschrijving, pad, body, extra_head=''):
 {extra_head}{PLAUSIBLE}
 </head>
 <body>
-<header class="kop"><a class="merk" href="/" aria-label="Kabar Maluku Live, naar de startpagina"><span class="kb">KABAR<small aria-hidden="true"><span>M</span><span>A</span><span>L</span><span>U</span><span>K</span><span>U</span></small><span class="sr">Maluku</span><i></i></span><span class="lv">LIVE</span></a><a class="knop" href="/">{ICON_ZOEK}Ander dorp</a></header>
+<header class="kop"><a class="merk" href="/" aria-label="Kabar Maluku Live, naar de startpagina"><span class="kb">KABAR<small aria-hidden="true"><span>M</span><span>A</span><span>L</span><span>U</span><span>K</span><span>U</span></small><span class="sr">Maluku</span><i></i></span><span class="lv">LIVE</span></a><span class="rechts"><button class="thema" type="button" aria-label="Nachtmodus aan of uit" onclick="mzThema()"><svg class="maan-i" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M20 14.5A8 8 0 019.5 4 8 8 0 1020 14.5z"/></svg><svg class="zon-i" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg></button><a class="knop" href="/" aria-label="Ander dorp zoeken">{ICON_ZOEK}<span class="kt">Ander dorp</span></a></span></header>
 {body}
 <footer class="voet"><div class="w"><p class="pw">Kabar Maluku Live, powered by <a class="mz" href="https://www.moza.nu" aria-label="MOZA">MOZA</a></p><p>Voor, door en met Molukkers. Bekijk ook <a href="https://www.moza.nu/kaarten">alle kaarten</a> en <a href="https://www.moza.nu/lezen">het laatste nieuws</a> op moza.nu.</p>
 <p>Klopt er iets niet? <a href="https://www.moza.nu/contact">Laat het ons weten</a>.</p></div></footer>
