@@ -36,7 +36,77 @@
       .catch(function(){ el.innerHTML = '<p style="padding:24px 0">Het spel kon niet laden. Probeer het later nog eens.</p>'; });
   }
 
+  /* ---------- Telefoon: spel opent schermvullend, als een app ---------- */
+  var NAMEN = {woord:'Raad het woord', puzzel:'Kruiswoordpuzzel'};
+  var APP_CSS = {
+    puzzel:
+      'html.mz-app .wrap{padding-block:8px 24px!important}' +
+      'html.mz-app .spelkop{margin-bottom:6px!important;gap:8px!important}' +
+      'html.mz-app .spelkop .knop{padding:6px 10px!important}' +
+      'html.mz-app .spelkop .titel{font-size:16px!important}' +
+      'html.mz-app .tijd{font-size:18px!important}' +
+      'html.mz-app .speelveld{gap:16px!important}' +
+      'html.mz-app .links{gap:8px!important;min-height:calc(100dvh - 16px)}' +
+      'html.mz-app .balk{min-height:48px!important}html.mz-app .balk .tekst{font-size:15px!important}' +
+      'html.mz-app .puzzelkaart{padding:8px!important;box-shadow:4px 4px 0 var(--schaduw)!important}' +
+      'html.mz-app .raster{width:min(100%, calc((100dvh - 400px) * var(--n) / var(--r)))!important;margin:0 auto!important}' +
+      'html.mz-app .gereedschap .knop{padding:7px 10px!important;font-size:14px!important}' +
+      'html.mz-app .toets{display:flex!important;margin-top:auto!important;position:sticky;bottom:0;z-index:4;background:var(--bg);padding:6px 0 calc(6px + env(safe-area-inset-bottom,0px))}' +
+      'html.mz-app .toets button{height:42px!important}',
+    woord: ''
+  };
+  var APP_KADER =
+    '.mzsp-app{position:fixed;inset:0;z-index:2147483000;display:flex;flex-direction:column;background:#F4F2EC;color:#111}' +
+    'html.moza-dark .mzsp-app{background:#121212;color:#F4F2EC}' +
+    '.mzsp-app .bar{display:flex;align-items:center;gap:10px;padding:calc(8px + env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) 8px max(12px,env(safe-area-inset-left,0px));border-bottom:3px solid currentColor;font-family:"Hanken Grotesk",system-ui,sans-serif}' +
+    '.mzsp-app .bar b{flex:1;font-weight:900;font-size:18px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
+    '.mzsp-app .bar span{font-weight:900;font-size:12px;letter-spacing:.1em;background:#111;color:#E9F25A;padding:4px 8px}' +
+    '.mzsp-app .bar button{font:inherit;font-weight:900;font-size:22px;line-height:1;width:40px;height:40px;border:2px solid currentColor;background:transparent;color:inherit;cursor:pointer}' +
+    '.mzsp-app iframe{flex:1;width:100%;border:0;display:block;background:transparent}' +
+    'html.mzsp-open,html.mzsp-open body{overflow:hidden!important;overscroll-behavior:none}' +
+    '.mzsp-start{border:3px solid currentColor;padding:20px;display:flex;flex-direction:column;gap:12px;font-family:"Hanken Grotesk",system-ui,sans-serif}' +
+    '.mzsp-start p{margin:0;font-size:16px}' +
+    '.mzsp-start button{font:inherit;font-weight:900;font-size:18px;padding:14px 18px;background:#1F3BD1;color:#fff;border:3px solid #111;box-shadow:4px 4px 0 #111;cursor:pointer}' +
+    'html.moza-dark .mzsp-start button{border-color:#F4F2EC;box-shadow:4px 4px 0 #FF7AB6}';
+  function isTelefoon(){ return window.matchMedia('(max-width: 760px)').matches; }
+
+  function launcher(el, html, naam){
+    if (!document.getElementById('mzsp-app-css')){ var st = document.createElement('style'); st.id = 'mzsp-app-css'; st.textContent = APP_KADER; document.head.appendChild(st); }
+    el.innerHTML = '<div class="mzsp-start"><p>Het spel opent schermvullend. Met het kruisje ga je terug.</p><button type="button">Speel ' + (NAMEN[naam] || 'het spel') + '</button></div>';
+    el.querySelector('button').addEventListener('click', function(){ openApp(html, naam); });
+    if (location.hash === '#spelen') openApp(html, naam);
+  }
+
+  function openApp(html, naam){
+    if (document.querySelector('.mzsp-app')) return;
+    var ov = document.createElement('div'); ov.className = 'mzsp-app'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-label', NAMEN[naam] || 'Spel');
+    ov.innerHTML = '<div class="bar"><span>MOZA</span><b>' + (NAMEN[naam] || 'Spel') + '</b><button type="button" aria-label="Spel sluiten">✕</button></div>';
+    var f = document.createElement('iframe'); f.title = NAMEN[naam] || 'Spel'; f.setAttribute('allow', 'web-share; clipboard-write');
+    f.srcdoc = '<!doctype html><html class="mz-app"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">' +
+      '<style>[hidden]{display:none!important}' + (DUBBEL[naam] || '') + (APP_CSS[naam] || '') + '</style></head><body>' + html + '</body></html>';
+    ov.appendChild(f); document.body.appendChild(ov);
+    H.classList.add('mzsp-open');
+    var dicht = false;
+    function sluit(viaTerug){
+      if (dicht) return; dicht = true;
+      ov.remove(); H.classList.remove('mzsp-open');
+      window.removeEventListener('popstate', terug);
+      if (!viaTerug && history.state && history.state.mzspApp) history.back();
+    }
+    function terug(){ sluit(true); }
+    try { history.pushState({mzspApp:1}, ''); window.addEventListener('popstate', terug); } catch(e){}
+    ov.querySelector('.bar button').addEventListener('click', function(){ sluit(false); });
+    f.addEventListener('load', function(){
+      var d = f.contentDocument; if (!d) return;
+      var r = d.documentElement;
+      function thema(){ r.setAttribute('data-theme', H.classList.contains('moza-dark') ? 'dark' : 'light'); }
+      thema();
+      try { f.contentWindow.focus(); } catch(e){}
+    });
+  }
+
   function bouw(el, html, naam){
+    if (isTelefoon()) return launcher(el, html, naam);
     var f = document.createElement('iframe');
     f.title = 'MOZA spel';
     f.setAttribute('scrolling', 'no');
