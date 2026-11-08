@@ -292,10 +292,10 @@ def golf_lichaam(m):
 
 
 VISSER = [
-    'Goed weer om met een kleine boot de zee op te gaan.',
-    'Te doen met een kleine boot, maar het schommelt. Blijf dicht bij de kust.',
-    'Niet verstandig met een kleine boot. Blijf aan wal of vaar alleen als het rustig is.',
-    'Gevaarlijk voor kleine boten. Blijf aan wal.',
+    'Rustig water. Vissers kunnen met hun kleine boot gewoon ver de zee op.',
+    'Voor vissers die dit gewend zijn, is het te doen. De golven schommelen wel. Ze blijven dichter bij de kust.',
+    'Te ruw voor de meeste kleine boten. Veel vissers blijven aan wal of gaan maar kort de zee op, dicht bij huis.',
+    'Zwaar weer. Vissers blijven met hun kleine boot aan wal.',
 ]
 
 OVERSTEEK = [

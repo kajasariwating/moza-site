@@ -539,7 +539,7 @@ def dorp_html(d, ctx, nu):
 <h2 id="h-zee">Hoe is de zee morgen?</h2>
 <div class="blok"><p class="groot">{e(kop)}</p>
 <div class="drie">{cellen}</div>
-<p><b>Ga je vissen met een kleine boot?</b> {vis}</p>
+<p><b>Voor vissers met een kleine boot:</b> {vis}</p>
 <p><b>Steek je over met de speedboot of ferry{', ' + e(vb) if vb else ''}?</b> {over}</p>
 </div></section>''')
 
