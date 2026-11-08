@@ -4,7 +4,7 @@
   function esc(t){return String(t||'').replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
   /* Rubriekstukken: kop zoals een nieuwsartikel */
   var VASTE=/\/cover-(kaart-van-de-week|achter-de-foto|leeswijzer|woord-van-de-week|dit-weekend|deze-week-toen|jullie-zeiden|moza-deze-maand)(-simpel)?\.png/i;
-  var NM={dwt:'Deze week toen',dw:'Dit weekend',kvdw:'Kaart van de week',adf:'Achter de foto',lw:'Leeswijzer',wvdw:'Woord van de week',jz:'Jullie zeiden',mdm:'MOZA deze maand'};
+  var NM={dwt:'Deze week toen',dw:'Dit weekend',kvdw:'Kaart van de week',kml:'Kabar Maluku Live',adf:'Achter de foto',lw:'Leeswijzer',wvdw:'Woord van de week',jz:'Jullie zeiden',mdm:'MOZA deze maand'};
   function rubriekKop(){
     if(H.classList.contains('mz-nieuw'))return true;
     if(!H.classList.contains('mzr'))return document.readyState==='complete';
@@ -16,7 +16,7 @@
     /* Het rubrieklabel vervangt "Geplaatst in van de redactie"; andere scripts bouwen de chips soms opnieuw op, dus een paar seconden blijven controleren */
     zetTag();var tt=0,ti=setInterval(function(){zetTag();if(++tt>40)clearInterval(ti)},250);
     /* Vaste uitleg bovenaan: laat zien dat je een rubriek leest (en bij Deze week toen welke datum en hoe lang geleden) */
-    var UIT={dwt:'Elke zaterdag kijkt MOZA.nu terug op iets wat deze week jaren geleden gebeurde.',dw:'Elke vrijdag zet MOZA.nu de Molukse activiteiten van het weekend op een rij.',kvdw:'Elke maandag legt MOZA.nu uit wat een van de live kaarten deze week laat zien.',lw:'Elke woensdag: een vraag uit het leven, met uitleg en boeken die helpen.',wvdw:'Elke donderdag legt MOZA.nu één Moluks woord uit.',adf:'Op themadagen vertelt MOZA.nu het verhaal achter een foto.',jz:'Na elke peiling deelt MOZA.nu wat lezers antwoordden.',mdm:'Elke eerste van de maand: wat er de afgelopen maand op MOZA.nu gebeurde.'};
+    var UIT={dwt:'Elke zaterdag kijkt MOZA.nu terug op iets wat deze week jaren geleden gebeurde.',dw:'Elke vrijdag zet MOZA.nu de Molukse activiteiten van het weekend op een rij.',kvdw:'Deze rubriek liep tot november 2026. Op maandag staat nu Kabar Maluku Live.',kml:'Elke maandag kijkt MOZA.nu met Kabar Maluku Live naar één dorp of streek op de Molukken: brand, weer, zee en aardbevingen.',lw:'Elke woensdag: een vraag uit het leven, met uitleg en boeken die helpen.',wvdw:'Elke donderdag legt MOZA.nu één Moluks woord uit.',adf:'Op themadagen vertelt MOZA.nu het verhaal achter een foto.',jz:'Na elke peiling deelt MOZA.nu wat lezers antwoordden.',mdm:'Elke eerste van de maand: wat er de afgelopen maand op MOZA.nu gebeurde.'};
     function zetUitleg(){if(document.querySelector('.mzrk-uitleg'))return;var key='';for(var k2 in UIT)if(H.classList.contains('mzr-'+k2))key=k2;if(!key)return;var c=document.querySelector('.blog-item-content .sqs-html-content');if(!c)return;var d=document.createElement('div');d.className='mzrk-uitleg'+(key==='dw'?' roze':'');var t='<b>'+esc(NM[key])+'</b>'+esc(UIT[key]);if(key==='dwt'){var big=document.querySelector('.mzr-hero .mzr-big'),sub=document.querySelector('.mzr-hero .mzr-sub');if(big)t+=' Vandaag: <strong>'+esc(big.textContent.trim())+'</strong>'+(sub?', '+esc(sub.textContent.trim()):'')+'.'}d.innerHTML=t;var intro=document.querySelector('.moza-intro');if(intro&&intro.parentNode)intro.parentNode.insertBefore(d,intro);else c.insertBefore(d,c.firstChild)}
     zetUitleg();var tu=0,tiu=setInterval(function(){var u=document.querySelector('.mzrk-uitleg'),i=document.querySelector('.moza-intro');if(u&&i&&u.nextElementSibling!==i&&i.parentNode){i.parentNode.insertBefore(u,i)}zetUitleg();if(++tu>40)clearInterval(tiu)},250);
     var img=hero.querySelector('img');
@@ -34,7 +34,7 @@
   /* Voorpagina (oude opmaak): lijst onder de hero = de 5 nieuwste stukken uit Lezen, zonder de hero en zonder de 3 in Net binnen */
   var P=location.pathname.replace(/\/+$/,'')||'/';
   var MND=['jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
-  var RUBS=['Kaart van de week','Achter de foto','Leeswijzer','Woord van de week','Dit weekend','Deze week toen','Jullie zeiden','MOZA deze maand'];
+  var RUBS=['Kabar Maluku Live','Kaart van de week','Achter de foto','Leeswijzer','Woord van de week','Dit weekend','Deze week toen','Jullie zeiden','MOZA deze maand'];
   function dec(t){var d=document.createElement('textarea');d.innerHTML=t||'';return d.value}
   /* Voorpagina: hero, Net binnen en de lijst eronder komen uit drie scripts die elkaar overschrijven.
      Hero = meest gelezen stuk van de laatste 3 dagen (max 14 dagen oud), 3 uur onthouden, zodat een
@@ -78,7 +78,7 @@
         var A=ALL.filter(function(i){return nrm(i.fullUrl)!==heroU});
         var s=document.querySelector('#mzmob section.sec.o5'),tl=s&&s.querySelector('.tl');
         /* Net binnen: de 3 nieuwste, met Kaart van de week en MOZA deze maand, zonder de andere rubrieken */
-        var NB=s?A.filter(function(i){var r=rubVan(i);return !r||r==='Kaart van de week'||r==='MOZA deze maand'}).slice(0,3):[];
+        var NB=s?A.filter(function(i){var r=rubVan(i);return !r||r==='Kaart van de week'||r==='Kabar Maluku Live'||r==='MOZA deze maand'}).slice(0,3):[];
         var nh=NB.map(function(i){var d=new Date(i.publishOn);return '<a class="" href="'+esc(i.fullUrl)+'"><span class="d">'+d.getDate()+' '+MND[d.getMonth()]+'</span><span class="t">'+esc(dec(i.title))+'</span></a>'}).join('');
         /* onder de hero: de 5 nieuwste die niet al in de hero of in Net binnen staan */
         var L=A.filter(function(i){return NB.indexOf(i)<0}).slice(0,5);if(L.length<3)return;
