@@ -236,8 +236,8 @@ def weer(cellen):
     return meteo('https://api.open-meteo.com/v1/forecast', cellen, {
         'current': 'temperature_2m,weather_code,precipitation,wind_speed_10m,wind_direction_10m',
         'hourly': 'precipitation,weather_code,wind_speed_10m,wind_direction_10m',
-        'daily': 'temperature_2m_max,weather_code,precipitation_sum,sunrise,sunset',
-        'timezone': 'Asia/Jayapura', 'forecast_days': 3,
+        'daily': 'temperature_2m_max,temperature_2m_min,weather_code,precipitation_sum,precipitation_probability_max,sunrise,sunset',
+        'timezone': 'Asia/Jayapura', 'forecast_days': 7,
     })
 
 

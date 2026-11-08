@@ -140,7 +140,9 @@ def weer_bij(r, nu):
     op = dag.get('sunrise') or []
     onder = dag.get('sunset') or []
     for i, (t, tmax, code) in enumerate(zip(dag.get('time') or [], dag.get('temperature_2m_max') or [], dag.get('weather_code') or [])):
-        x = {'t': datetime.fromisoformat(t).replace(tzinfo=WIT), 'tmax': tmax, 'code': code}
+        x = {'t': datetime.fromisoformat(t).replace(tzinfo=WIT), 'tmax': tmax, 'code': code,
+             'tmin': (dag.get('temperature_2m_min') or [None] * 9)[i],
+             'kans': (dag.get('precipitation_probability_max') or [None] * 9)[i]}
         if i < len(op) and op[i] and i < len(onder) and onder[i]:
             x['op'] = datetime.fromisoformat(op[i]).replace(tzinfo=WIT)
             x['onder'] = datetime.fromisoformat(onder[i]).replace(tzinfo=WIT)
@@ -490,6 +492,16 @@ def dorp_html(d, ctx, nu):
             cellen += f'<span class="{"heet" if heet else ""}">{dn}<b class="g">{round(x["tmax"])}°</b>{e(woord)}</span>'
             if heet and not kopzin:
                 kopzin = f'{dn} wordt het snikheet.'
+        rijen = ''
+        for x in wr['dagen'][3:7]:
+            h = T.hitte(x['tmax'])
+            woord = T.weer_woord(x['code'])
+            laag = f' / {round(x["tmin"])}°' if x.get('tmin') is not None else ''
+            kans = f'{int(round(x["kans"], -1))}% kans op regen' if x.get('kans') is not None and x['kans'] >= 20 else 'Droog'
+            rijen += (f'<li><span class="dg">{T.DAGEN[x["t"].weekday()].capitalize()} {x["t"].day} {T.MAANDEN[x["t"].month - 1][:3]}</span>'
+                      f'<span class="tp"><b>{round(x["tmax"])}°</b>{laag}</span>'
+                      f'<span class="ww">{e(woord)}{" · " + e(h[1].lower()) if h and h[1] else ""} · {kans.lower() if kans != "Droog" else "droog"}</span></li>')
+        week = f'<p class="wk">De dagen daarna</p><ul class="week">{rijen}</ul>' if rijen else ''
         if kopzin:
             tekst = f'<p class="groot">{kopzin}</p><p>{e(T.HITTE_ADVIES)}</p>'
             cls = 'blok schaduw-rood'
@@ -499,7 +511,7 @@ def dorp_html(d, ctx, nu):
         m.append(f'''<section aria-labelledby="h-weer">
 <p class="label"><span class="tag" style="background:var(--geel)">Weer</span></p>
 <h2 id="h-weer">Wat voor weer wordt het?</h2>
-<div class="{cls}">{tekst}<div class="drie">{cellen}</div></div></section>''')
+<div class="{cls}">{tekst}<div class="drie">{cellen}</div>{week}</div></section>''')
 
     # ---- lucht
     if lu:
@@ -745,7 +757,7 @@ def main():
         print('  bevingen:', None if bev is None else len(bev))
         cw, _ = D.raster(rows, 0.25)
         cl, _ = D.raster(rows, 0.5)
-        print('weer…', len(cw)); wcel = D.cached('weer-v2', 2.9, lambda: D.weer(cw))
+        print('weer…', len(cw)); wcel = D.cached('weer-v3', 2.9, lambda: D.weer(cw))
         print('lucht…', len(cl)); lcel = D.cached('lucht', 2.9, lambda: D.lucht(cl))
         print('zee…'); zcel = D.cached('zee', 2.9, lambda: D.zee(cw))
         print('nieuws…'); items = D.cached('nieuws', 5.9, D.nieuws)
