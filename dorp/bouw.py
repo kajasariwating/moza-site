@@ -732,7 +732,8 @@ def main():
         shutil.rmtree(uit)
     uit.mkdir(parents=True)
     nu = datetime.now(WIT).replace(second=0, microsecond=0)
-    VERSIE = nu.strftime('%Y%m%d%H')
+    import hashlib
+    VERSIE = hashlib.md5((HIER / 'static' / 'dorp.css').read_bytes() + (D.ATLAS / 'atlas-maluku.js').read_bytes()).hexdigest()[:10]
 
     rows, kust = D.dorpen()
     pf = HIER / 'gegevens' / 'plaatsen.json'
