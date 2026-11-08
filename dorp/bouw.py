@@ -70,7 +70,7 @@ def branden_bij(d, geo, punten, nu):
         x, y = km_xy(p['la'], p['lo'], la0, lo0)
         pt = Point(x, y)
         dist = gk.distance(pt)
-        if dist > 5:
+        if dist > 5 or math.hypot(x, y) > 40:  # niet: losse stukjes grond heel ver weg
             continue
         uit.append(dict(p, binnen=dist == 0, rand=dist, km=math.hypot(x, y),
                         richting=T.richting(la0, lo0, p['la'], p['lo'])))
@@ -909,6 +909,24 @@ def main():
         if d['echt']:
             d['la'], d['lo'] = plaatsen[d['code']]
     print('dorpen:', len(rows), '· met plek van de huizen:', len(plaatsen))
+    # Dorp met grond ver weg (bv. Nua Nea: eilandjes in de Bandazee, dorp op Seram):
+    # ligt het punt heel ver van de rest van de kecamatan, neem dan het stuk grond dat erbij ligt.
+    import statistics
+    perkec = {}
+    for d in rows:
+        perkec.setdefault((d['kab'], d['kec']), []).append(d)
+    for ds in perkec.values():
+        if len(ds) < 3:
+            continue
+        mla, mlo = statistics.median(x['la'] for x in ds), statistics.median(x['lo'] for x in ds)
+        for d in ds:
+            if d['echt'] or not d['grens'] or T.km_tussen(d['la'], d['lo'], mla, mlo) < 150:
+                continue
+            delen = [Polygon([(b, a) for a, b in r]).buffer(0).representative_point() for r in d['grens'] if len(r) >= 3]
+            if delen:
+                c = min(delen, key=lambda c: T.km_tussen(c.y, c.x, mla, mlo))
+                print('  punt verplaatst:', d['naam'], d['kec'])
+                d['la'], d['lo'] = c.y, c.x
     geos = [poly_deg(d['grens']) or Point(d['lo'], d['la']).buffer(0.008) for d in rows]
     boom = STRtree(geos)
 
