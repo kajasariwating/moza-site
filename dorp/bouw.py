@@ -843,8 +843,8 @@ def start_html(groepen, brandlijst, nu, bevlijst=None):
 <div class="streep"><span></span><span></span><span></span></div>
 <main class="w">
 <section><h2>Of kies een eilandgroep</h2><div class="knoppen">{knoppen}</div></section>
-{brand}
 {bevingen_blok(bevlijst, nu)}
+{brand}
 <section aria-labelledby="h-kaart"><h2 id="h-kaart">Of kies op de kaart</h2><p>Zoom in, tik op een dorp en kies <b>Wat speelt er nu</b>.</p></section>
 </main>
 <div id="mzn-plek"></div>
