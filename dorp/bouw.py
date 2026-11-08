@@ -788,7 +788,7 @@ def recente_bevingen(rows, lijst, nu, op_land=None, dagen=7, max_n=5):
         return None
     grens = nu - timedelta(days=dagen)
     jaar = sum(1 for q in lijst if q['mag'] >= 4.0)
-    uit = []
+    uit, stil = [], 0
     for q in lijst:
         if q['t'].astimezone(WIT) < grens:
             continue
@@ -801,11 +801,14 @@ def recente_bevingen(rows, lijst, nu, op_land=None, dagen=7, max_n=5):
                 best_i = max(best_i, T.mmi(q['mag'], km, q['diepte']))
         if dicht_km > 250:
             continue  # buiten de Molukken
-        if q['mag'] >= 4.0 or best_i >= 3.5:
+        if best_i < T.VOELBAAR:
+            stil += 1 if q['mag'] >= 4.0 else 0
+            continue
+        if True:
             uit.append(dict(q, mmi=best_i, dorp=dicht, km=dicht_km,
                             land=bool(op_land and op_land(q['la'], q['lo']))))
     uit.sort(key=lambda q: q['t'], reverse=True)
-    return {'lijst': uit[:max_n], 'jaar': jaar}
+    return {'lijst': uit[:max_n], 'jaar': jaar, 'stil': stil}
 
 
 AMBON = (-3.6954, 128.1814)
@@ -823,7 +826,7 @@ def diepte_tekst(km):
 
 
 GERUST = {
-    None: 'Bijna niemand heeft hem gevoeld. Schade is niet te verwachten.',
+    None: 'Schade is niet te verwachten.',
     'licht': 'Schade is bij zo\'n lichte beving niet te verwachten.',
     'stevig': 'Er kunnen spullen zijn omgevallen. Grote schade is niet te verwachten.',
     'sterk': 'Er kan kleine schade zijn aan huizen. Bel of app je familie als je je zorgen maakt.',
@@ -834,13 +837,13 @@ GERUST = {
 def bevingen_blok(bev, nu):
     if not bev:
         return ''
-    lijst, jaar = bev['lijst'], bev['jaar']
+    lijst, jaar, stil = bev['lijst'], bev['jaar'], bev.get('stil', 0)
     per_week = round(jaar / 52)
     normaal = (f'Aardbevingen zijn in de Molukken heel gewoon. Het afgelopen jaar waren er {jaar} met kracht 4 of meer, '
                f'{"ongeveer " + str(per_week) + " per week" if per_week >= 2 else "een paar per maand"}. De meeste merk je nauwelijks.')
     kop = '<section aria-labelledby="h-bev" class="bevblok"><h2 id="h-bev">Aardbevingen deze week</h2>'
     if not lijst:
-        return kop + f'<p class="let"><b>Rustig.</b> De afgelopen 7 dagen was er geen beving van betekenis. {normaal}</p></section>'
+        return kop + f'<p class="let"><b>Rustig.</b> De afgelopen 7 dagen was er geen beving die mensen merkten. {normaal}</p></section>'
     kaarten = []
     for q in lijst:
         t = q['t'].astimezone(WIT)
@@ -860,6 +863,7 @@ def bevingen_blok(bev, nu):
             f'<p>{diepte_tekst(q["diepte"])}</p>'
             f'<p><b>Wat merkten mensen ervan?</b> {e(voel)} {GERUST.get(niveau, GERUST[None])}</p></article>')
     return (kop + '<p>Afgelopen 7 dagen, in Molukse tijd.</p>' + ''.join(kaarten)
+            + (f'<p>Daarnaast waren er deze week {stil} bevingen van kracht 4 of meer die zo diep of zo ver weg lagen dat niemand ze merkte.</p>' if stil > 1 else '')
             + f'<p class="let">{normaal} Wil je weten hoe het in jouw dorp voelde? Zoek je dorp hierboven.</p></section>')
 
 
