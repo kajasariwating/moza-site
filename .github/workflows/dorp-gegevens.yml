@@ -1,0 +1,37 @@
+name: dorp.moza.nu vaste gegevens (plek van het dorp, bos)
+
+on:
+  workflow_dispatch:
+    inputs:
+      wat:
+        description: 'plaatsen, bos of allebei'
+        default: 'allebei'
+  schedule:
+    - cron: '40 3 1 * *'   # elke eerste van de maand
+
+permissions:
+  contents: write
+
+jobs:
+  gegevens:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install shapely mapbox-vector-tile rasterio numpy
+      - name: Plek van de dorpen (OpenStreetMap)
+        if: github.event_name == 'schedule' || inputs.wat != 'bos'
+        run: python3 dorp/plaatsen.py
+      - name: Bos per dorp (Global Forest Change)
+        if: github.event_name == 'workflow_dispatch' && inputs.wat != 'plaatsen'
+        run: python3 dorp/bos.py
+      - name: Opslaan in de repo
+        run: |
+          git config user.name "moza-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add dorp/gegevens/
+          git diff --cached --quiet || git commit -m "dorp: vaste gegevens bijgewerkt"
+          git push

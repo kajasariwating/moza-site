@@ -1,0 +1,738 @@
+"""Bouwt dorp.moza.nu: een pagina per dorp, per eilandgroep, een zoekpagina en een sitemap.
+
+Gebruik:  python3 dorp/bouw.py [--uit _site] [--alleen slug,slug] [--zonder-live]
+"""
+import argparse, html, json, math, shutil, sys
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+from zoneinfo import ZoneInfo
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import data as D  # noqa: E402
+import taal as T  # noqa: E402
+from shapely.geometry import Polygon, MultiPolygon, Point, box  # noqa: E402
+from shapely.strtree import STRtree  # noqa: E402
+from shapely.ops import unary_union  # noqa: E402
+
+SITE = 'https://dorp.moza.nu'
+HIER = Path(__file__).resolve().parent
+WIT, NL = T.WIT, ZoneInfo('Europe/Amsterdam')
+e = html.escape
+
+# ---------------------------------------------------------------- geometrie
+
+KM_LAT = 110.57
+
+
+def km_xy(la, lo, la0, lo0):
+    return ((lo - lo0) * 111.32 * math.cos(math.radians(la0)), (la - la0) * KM_LAT)
+
+
+def poly_km(rings, la0, lo0):
+    ps = []
+    for r in rings:
+        if len(r) >= 3:
+            p = Polygon([km_xy(a, b, la0, lo0) for a, b in r])
+            if not p.is_valid:
+                p = p.buffer(0)
+            if not p.is_empty:
+                ps.append(p)
+    if not ps:
+        return None
+    return unary_union(ps)
+
+
+def poly_deg(rings):
+    ps = []
+    for r in rings or []:
+        if len(r) >= 3:
+            p = Polygon([(b, a) for a, b in r])
+            if not p.is_valid:
+                p = p.buffer(0)
+            if not p.is_empty:
+                ps.append(p)
+    return unary_union(ps) if ps else None
+
+
+# ---------------------------------------------------------------- per dorp: brand
+
+def branden_bij(d, geo, punten, nu):
+    """Branden binnen de grens of tot 5 km erbuiten, afgelopen 7 dagen."""
+    if not punten:
+        return []
+    la0, lo0 = d['la'], d['lo']
+    gk = poly_km(d['grens'], la0, lo0) if d['grens'] else Point(0, 0).buffer(1.0)
+    uit = []
+    for p in punten:
+        if (nu - p['t']).total_seconds() > 7 * 86400:
+            continue
+        x, y = km_xy(p['la'], p['lo'], la0, lo0)
+        pt = Point(x, y)
+        dist = gk.distance(pt)
+        if dist > 5:
+            continue
+        uit.append(dict(p, binnen=dist == 0, rand=dist, km=math.hypot(x, y),
+                        richting=T.richting(la0, lo0, p['la'], p['lo'])))
+    # tel hoe vaak dezelfde plek binnen 12 uur gezien is (andere satelliet of overkomst)
+    for p in uit:
+        p['keer'] = sum(1 for q in uit if abs((q['t'] - p['t']).total_seconds()) < 12 * 3600
+                        and T.km_tussen(p['la'], p['lo'], q['la'], q['lo']) < 1.0)
+    # voeg punten samen die binnen 1 km en 12 uur van elkaar liggen (een brand, meerdere metingen)
+    uit.sort(key=lambda p: p['t'], reverse=True)
+    groepen = []
+    for p in uit:
+        for g in groepen:
+            if T.km_tussen(p['la'], p['lo'], g['la'], g['lo']) < 1.0 and abs((g['t'] - p['t']).total_seconds()) < 12 * 3600:
+                g['keer'] = max(g['keer'], p['keer'])
+                if p['conf'] == 'h':
+                    g['conf'] = 'h'
+                g['binnen'] = g['binnen'] or p['binnen']
+                break
+        else:
+            groepen.append(dict(p))
+    groepen.sort(key=lambda p: (not p['binnen'], -p['t'].timestamp()))
+    return groepen
+
+
+# ---------------------------------------------------------------- per dorp: bevingen
+
+def bevingen_bij(d, lijst, nu):
+    if lijst is None:
+        return None
+    gevoeld, klein = [], 0
+    for q in lijst:
+        km = T.km_tussen(d['la'], d['lo'], q['la'], q['lo'])
+        if km > 600:
+            continue
+        i = T.mmi(q['mag'], km, q['diepte'])
+        if i >= T.VOELBAAR:
+            gevoeld.append(dict(q, km=km, mmi=i))
+        elif km < 150:
+            klein += 1
+    gevoeld.sort(key=lambda q: q['t'], reverse=True)
+    return {'gevoeld': gevoeld, 'klein': klein, 'perjaar': len(gevoeld)}
+
+
+# ---------------------------------------------------------------- per dorp: weer, lucht, zee
+
+def uren(r, veld):
+    h = r.get('hourly') or {}
+    tijden = h.get('time') or []
+    waarden = h.get(veld) or []
+    return [(datetime.fromisoformat(t).replace(tzinfo=WIT), v) for t, v in zip(tijden, waarden)]
+
+
+def weer_bij(r, nu):
+    if not r:
+        return None
+    cur = r.get('current') or {}
+    dag = r.get('daily') or {}
+    regen = uren(r, 'precipitation')
+    nu_regen = (cur.get('precipitation') or 0) >= 0.2
+    vooruit = [(t, v) for t, v in regen if nu <= t + timedelta(hours=1) <= nu + timedelta(hours=12)]
+    if nu_regen:
+        eind = next((t for t, v in vooruit if (v or 0) < 0.2 and t > nu), None)
+        regenzin = f'Regen tot ongeveer {eind.hour}:00' if eind else 'Regen de komende uren'
+    else:
+        start = next((t for t, v in vooruit if (v or 0) >= 0.3), None)
+        regenzin = f'Regen vanaf ongeveer {start.hour}:00' if start else 'Droog de komende uren'
+    dagen = []
+    for t, tmax, code in zip(dag.get('time') or [], dag.get('temperature_2m_max') or [], dag.get('weather_code') or []):
+        dagen.append({'t': datetime.fromisoformat(t).replace(tzinfo=WIT), 'tmax': tmax, 'code': code})
+    wind = uren(r, 'wind_speed_10m')
+    wrichting = cur.get('wind_direction_10m')
+    return {'temp': cur.get('temperature_2m'), 'code': cur.get('weather_code'), 'regenzin': regenzin,
+            'dagen': dagen, 'wind': wind, 'wrichting': wrichting, 'wsnel': cur.get('wind_speed_10m')}
+
+
+def lucht_bij(r, nu):
+    if not r:
+        return None
+    per = {}
+    for t, v in uren(r, 'pm2_5'):
+        if v is None:
+            continue
+        per.setdefault(t.date(), []).append(v)
+    dagen = []
+    for dt in sorted(per):
+        vs = per[dt]
+        if len(vs) < 6:
+            continue
+        dagen.append({'d': dt, 'pm': sum(vs) / len(vs)})
+    if not dagen:
+        return None
+    vandaag = next((x for x in dagen if x['d'] == nu.date()), None)
+    return {'dagen': dagen, 'vandaag': vandaag}
+
+
+def zee_bij(rz, rw, nu):
+    if not rz or not rw:
+        return None
+    golf = uren(rz, 'wave_height')
+    if not any(v is not None for _, v in golf):
+        return None
+    wind = rw['wind'] if rw else []
+    morgen = (nu + timedelta(days=1)).date()
+    delen = []
+    for naam, a, b in (('Ochtend', 6, 12), ('Middag', 12, 18), ('Avond', 18, 22)):
+        g = [v for t, v in golf if t.date() == morgen and a <= t.hour < b and v is not None]
+        w = [v for t, v in wind if t.date() == morgen and a <= t.hour < b and v is not None]
+        if not g:
+            return None
+        delen.append({'naam': naam, 'golf': max(g), 'wind': max(w) if w else None})
+    return {'delen': delen}
+
+
+# ---------------------------------------------------------------- nieuws
+
+def nieuws_bij(d, items):
+    if not items:
+        return []
+    import re
+    namen = {d['naam'], d['officieel']}
+    pats = [re.compile(r'(?<![\w-])' + re.escape(n) + r'(?![\w-])', re.I) for n in namen if len(n) >= 3]
+    uit = [it for it in items if any(p.search(it['tekst']) for p in pats)]
+    uit.sort(key=lambda x: x['t'], reverse=True)
+    return uit[:2]
+
+
+# ---------------------------------------------------------------- kaart (svg)
+
+def kaart_svg(d, geo, buren, kust, brandpunten, wrichting):
+    la0, lo0 = d['la'], d['lo']
+    g = poly_km(d['grens'], la0, lo0) if d['grens'] else Point(0, 0).buffer(0.8)
+    minx, miny, maxx, maxy = g.buffer(2.5).bounds
+    for p in brandpunten:
+        x, y = km_xy(p['la'], p['lo'], la0, lo0)
+        minx, miny, maxx, maxy = min(minx, x - 1), min(miny, y - 1), max(maxx, x + 1), max(maxy, y + 1)
+    W, H = 360, 250
+    w, h = maxx - minx, maxy - miny
+    if w / h < W / H:
+        extra = (h * W / H - w) / 2
+        minx, maxx = minx - extra, maxx + extra
+    else:
+        extra = (w * H / W - h) / 2
+        miny, maxy = miny - extra, maxy + extra
+    s = W / (maxx - minx)
+    vak = box(minx, miny, maxx, maxy)
+    tol = 0.8 / s
+
+    def pad(geom):
+        geom = geom.intersection(vak).simplify(tol)
+        if geom.is_empty:
+            return ''
+        polys = [geom] if isinstance(geom, Polygon) else [x for x in getattr(geom, 'geoms', []) if isinstance(x, Polygon)]
+        out = []
+        for p in polys:
+            for ring in [p.exterior] + list(p.interiors):
+                cs = list(ring.coords)
+                if len(cs) < 3:
+                    continue
+                out.append('M' + 'L'.join(f'{(x - minx) * s:.1f} {(maxy - y) * s:.1f}' for x, y in cs) + 'Z')
+        return ''.join(out)
+
+    land = ''
+    for poly in kust:
+        if not poly or len(poly[0]) < 3:
+            continue
+        try:
+            pk = Polygon([km_xy(a, b, la0, lo0) for a, b in poly[0]],
+                         [[km_xy(a, b, la0, lo0) for a, b in r] for r in poly[1:] if len(r) >= 3])
+            if not pk.is_valid:
+                pk = pk.buffer(0)
+        except Exception:
+            continue
+        if pk.intersects(vak):
+            land += pad(pk)
+    buurlijn = ''
+    for b in buren:
+        pk = poly_km(b['grens'], la0, lo0)
+        if pk is not None and pk.intersects(vak):
+            buurlijn += pad(pk)
+    eigen = pad(g)
+    stukken = [f'<svg viewBox="0 0 {W} {H}" role="img" aria-label="Kaart van de grond van {e(d["naam"])} met plekken waar brand is gezien">',
+               f'<rect width="{W}" height="{H}" fill="var(--zee)"/>']
+    if land:
+        stukken.append(f'<path d="{land}" fill="var(--land)" fill-rule="evenodd"/>')
+    if buurlijn:
+        stukken.append(f'<path d="{buurlijn}" fill="none" stroke="var(--mut)" stroke-width="1" stroke-opacity=".6"/>')
+    stukken.append(f'<path d="{eigen}" fill="#1F3BD1" fill-opacity=".16" stroke="#1F3BD1" stroke-width="3" fill-rule="evenodd"/>')
+    x0, y0 = (0 - minx) * s, (maxy - 0) * s
+    stukken.append(f'<rect x="{x0 - 6:.1f}" y="{y0 - 6:.1f}" width="12" height="12" fill="#111" stroke="#fff" stroke-width="1.5"/>')
+    stukken.append(f'<text x="{x0 + 10:.1f}" y="{y0 + 4:.1f}" font-size="12" font-weight="800" fill="var(--inkt)" paint-order="stroke" stroke="var(--land)" stroke-width="3">{e(d["naam"])}</text>')
+    for i, p in reversed(list(enumerate(brandpunten[:9], 1))):
+        x, y = km_xy(p['la'], p['lo'], la0, lo0)
+        px, py = (x - minx) * s, (maxy - y) * s
+        kleur = '#FF4D2E' if i == 1 else '#FF7AB6'
+        stukken.append(f'<circle cx="{px:.1f}" cy="{py:.1f}" r="{9 if i == 1 else 7}" fill="{kleur}" stroke="#111" stroke-width="2"/>')
+        stukken.append(f'<text x="{px:.1f}" y="{py + 4:.1f}" font-size="10" font-weight="900" text-anchor="middle" fill="#111">{i}</text>')
+    if wrichting is not None:
+        naar = (wrichting + 180) % 360
+        stukken.append(f'<g transform="translate({W - 30} {H - 34})"><circle r="20" fill="var(--papier)" stroke="var(--rand)" stroke-width="2"/>'
+                       f'<g transform="rotate({naar:.0f})"><path d="M0 12V-11M-6 -4L0 -11L6 -4" fill="none" stroke="#1F3BD1" stroke-width="3"/></g></g>'
+                       f'<text x="{W - 30}" y="{H - 4}" font-size="11" font-weight="800" text-anchor="middle" fill="var(--inkt)">Wind</text>')
+    stukken.append('</svg>')
+    return ''.join(stukken)
+
+
+# ---------------------------------------------------------------- html-stukken
+
+ICON_ZOEK = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>'
+
+PLAUSIBLE = ('<script>(function(){if(!/(^|\\.)moza\\.nu$/.test(location.hostname))return;'
+             'if(/(?:^|; )mz_noc=1/.test(document.cookie))return;try{if(localStorage.getItem("plausible_ignore")==="true")return}catch(e){}'
+             'var s=document.createElement("script");s.defer=true;s.setAttribute("data-domain","moza.nu");'
+             's.src="https://plausible.io/js/script.js";document.head.appendChild(s)})();</script>')
+
+
+def pagina(titel, omschrijving, pad, body, extra_head=''):
+    return f'''<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{e(titel)}</title>
+<meta name="description" content="{e(omschrijving)}">
+<link rel="canonical" href="{SITE}{pad}">
+<meta property="og:title" content="{e(titel)}">
+<meta property="og:description" content="{e(omschrijving)}">
+<meta property="og:url" content="{SITE}{pad}">
+<meta property="og:site_name" content="MOZA">
+<meta name="theme-color" content="#1F3BD1">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;700;800;900&family=Fraunces:ital,wght@1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/dorp.css?v={VERSIE}">
+<link rel="icon" href="https://www.moza.nu/favicon.ico">
+{extra_head}{PLAUSIBLE}
+</head>
+<body>
+<header class="kop"><a class="logo" href="https://www.moza.nu" aria-label="Naar moza.nu">MOZA</a><a class="knop" href="/">{ICON_ZOEK}Ander dorp</a></header>
+{body}
+<footer class="voet"><div class="w"><p>Een dienst van <a href="https://www.moza.nu">MOZA</a>, voor, door en met Molukkers. Bekijk ook <a href="https://www.moza.nu/kaarten">alle kaarten</a>.</p>
+<p>Klopt er iets niet? <a href="https://www.moza.nu/contact">Laat het ons weten</a>.</p></div></footer>
+</body>
+</html>'''
+
+
+def klok_js(nu_nl_verschil):
+    return ('<script>(function(){var el=document.getElementById("tijd");if(!el)return;function z(){try{el.textContent='
+            'new Intl.DateTimeFormat("nl-NL",{timeZone:"Asia/Jayapura",hour:"2-digit",minute:"2-digit"}).format(new Date())}catch(e){}}'
+            'z();setInterval(z,30000)})();</script>')
+
+
+def uurtekst(t):
+    return f'{t.hour} uur' if t.minute < 30 else f'half {(t.hour % 12) + 1}'
+
+
+# ---------------------------------------------------------------- dorpspagina
+
+def samenvatting(d, br, bv, wr, lu, nu):
+    """Eén of twee zinnen bovenaan: het belangrijkste eerst."""
+    naam = e(d['naam'])
+    # zware beving in de afgelopen 3 dagen
+    if bv and bv['gevoeld']:
+        q = bv['gevoeld'][0]
+        if q['mmi'] >= 4.5 and (nu - q['t'].astimezone(WIT)) < timedelta(days=3):
+            return (f'{T.wanneer_hoofdletter(q["t"].astimezone(WIT), nu)} was er een aardbeving die je in {naam} '
+                    f'<b>goed kon voelen</b>. Kijk hieronder hoe sterk.')
+    vers = [p for p in br if (nu - p['t'].astimezone(WIT)) < timedelta(hours=48)]
+    if vers:
+        p = vers[0]
+        waar = 'op de grond van het dorp' if p['binnen'] else 'vlak bij de grond van het dorp'
+        zin = (f'{T.wanneer_hoofdletter(p["t"].astimezone(WIT), nu)} zag de satelliet een brand {waar}, '
+               f'<b>{T.afstand(p["km"])}</b> naar {p["richting"]}.')
+        if wr and wr.get('wrichting') is not None and (wr.get('wsnel') or 0) >= 5:
+            naar = (wr['wrichting'] + 180) % 360
+            x, y = km_xy(d['la'], d['lo'], p['la'], p['lo'])
+            hoek = (math.degrees(math.atan2(x, y)) + 360) % 360
+            verschil = abs((naar - hoek + 180) % 360 - 180)
+            if verschil < 50:
+                zin += ' De wind blaast de rook vandaag <b>richting het dorp</b>.'
+            elif verschil > 130:
+                zin += ' De wind blaast de rook vandaag <b>weg van het dorp</b>.'
+        return zin
+    if lu and lu['vandaag']:
+        l = T.lucht(lu['vandaag']['pm'])
+        if l and l['code'] in ('ongezond', 'zeerongezond'):
+            return f'De lucht in {naam} is vandaag <b>ongezond</b> door rook. {l["advies"]}'
+    if wr:
+        heet = [x for x in wr['dagen'][:3] if T.hitte(x['tmax']) and T.hitte(x['tmax'])[0] == 'snikheet']
+        if heet:
+            dagnaam = 'Vandaag' if heet[0]['t'].date() == nu.date() else ('Morgen' if heet[0]['t'].date() == (nu + timedelta(days=1)).date() else T.DAGEN[heet[0]['t'].weekday()].capitalize())
+            return f'{dagnaam} wordt het <b>snikheet</b> in {naam}. {T.HITTE_ADVIES}'
+    if br:
+        return f'Deze week zag de satelliet {"één keer" if len(br) == 1 else str(len(br)) + " keer"} brand in of rond {naam}. Niet in de afgelopen twee dagen.'
+    return f'Het is rustig rond {naam}. De satelliet zag de afgelopen week <b>geen brand</b> in of rond het dorp.'
+
+
+def dorp_html(d, ctx, nu):
+    naam = d['naam']
+    br, bv, wr, lu, zz, nw = (ctx[k] for k in ('br', 'bv', 'wr', 'lu', 'zz', 'nw'))
+    groep = D.GROEPEN.get(d['groep'], '')
+    delen = []
+
+    # ---- hero
+    verschil = int((nu.utcoffset() - nu.astimezone(NL).utcoffset()).total_seconds() // 3600)
+    chips = [f'<div class="chip"><span class="label">In het dorp</span><b id="tijd">{nu:%H:%M}</b>'
+             f'<small>{verschil} uur later dan in Nederland</small></div>']
+    if wr and wr.get('temp') is not None:
+        regent = wr['regenzin'].startswith('Regen tot') or wr['regenzin'].startswith('Regen de')
+        klein = wr['regenzin'] if regent else f'{T.weer_woord(wr["code"])}. {wr["regenzin"]}'
+        chips.append(f'<div class="chip"><span class="label">Weer nu</span><b>{round(wr["temp"])}°</b>'
+                     f'<small>{e(klein)}</small></div>')
+    sub = f'{e(d["kec"])} · {e(groep)}'
+    samen = samenvatting(d, br, bv, wr, lu, nu)
+    delen.append(f'''<section class="hero" aria-labelledby="h1"><div class="w">
+<p class="label live"><i></i>Mijn dorp · live</p>
+<h1 id="h1">{e(naam)}</h1>
+<p class="sub">{sub}</p>
+<div class="chips">{''.join(chips)}</div>
+<p class="samen">{samen}</p>
+<p class="accent">zo staat het er nu voor</p>
+</div></section>
+<div class="streep"><span></span><span></span><span></span></div>''')
+
+    m = []
+    # ---- brand
+    lijst = ''
+    for i, p in enumerate(br[:9], 1):
+        t = p['t'].astimezone(WIT)
+        kop = f'{T.wanneer_hoofdletter(t, nu)} · {T.afstand(p["km"])} naar {p["richting"]}'
+        lijst += (f'<li class="{"eerste" if i == 1 else ""}"><span class="nr" style="background:{"#FF4D2E" if i == 1 else "#FF7AB6"}">{i}</span>'
+                  f'<span><b>{e(kop)}</b><span class="t">{e(T.brand_plek(p))} {e(T.brand_zekerheid(p))}</span></span></li>')
+    if br:
+        brandkop = 'Waar brandt het?'
+        intro = ''
+    else:
+        brandkop = 'Is er brand?'
+        intro = f'<div class="blok"><p class="groot">De satelliet zag de afgelopen week geen brand in of rond {e(naam)}.</p></div>'
+    svg = kaart_svg(d, None, ctx['buren'], ctx['kust'], br, wr.get('wrichting') if wr else None)
+    m.append(f'''<section aria-labelledby="h-brand">
+<p class="label"><span class="tag" style="background:var(--rood)">Brand</span></p>
+<h2 id="h-brand">{brandkop}</h2>{intro}
+<figure class="kaart">{svg}<figcaption>Het blauwe vlak is de grond van {e(naam)}. {'Het zwarte blokje is het dorp.' if d['echt'] else 'Het zwarte blokje is het midden van de grond van het dorp. Afstanden zijn vanaf dat punt.'} Je ziet alles tot ongeveer 5 kilometer rondom.</figcaption></figure>
+{f'<ol class="lijst">{lijst}</ol>' if lijst else ''}
+</section>''')
+
+    # ---- weer
+    if wr and wr['dagen']:
+        cellen, kopzin = '', None
+        for x in wr['dagen'][:3]:
+            h = T.hitte(x['tmax'])
+            heet = h and h[0] == 'snikheet'
+            dn = 'Vandaag' if x['t'].date() == nu.date() else ('Morgen' if x['t'].date() == (nu + timedelta(days=1)).date() else T.DAGEN[x['t'].weekday()].capitalize())
+            woord = h[1] if h and h[1] else T.weer_woord(x['code'])
+            cellen += f'<span class="{"heet" if heet else ""}">{dn}<b class="g">{round(x["tmax"])}°</b>{e(woord)}</span>'
+            if heet and not kopzin:
+                kopzin = f'{dn} wordt het snikheet.'
+        if kopzin:
+            tekst = f'<p class="groot">{kopzin}</p><p>{e(T.HITTE_ADVIES)}</p>'
+            cls = 'blok schaduw-rood'
+        else:
+            tekst = f'<p class="groot">{e(T.weer_woord(wr["dagen"][0]["code"]))} vandaag, {round(wr["dagen"][0]["tmax"])} graden.</p>'
+            cls = 'blok'
+        m.append(f'''<section aria-labelledby="h-weer">
+<p class="label"><span class="tag" style="background:var(--geel)">Weer</span></p>
+<h2 id="h-weer">Wat voor weer wordt het?</h2>
+<div class="{cls}">{tekst}<div class="drie">{cellen}</div></div></section>''')
+
+    # ---- lucht
+    if lu:
+        l = T.lucht(lu['vandaag']['pm']) if lu['vandaag'] else None
+        vakjes = ''
+        toon = [x for x in lu['dagen'] if x['d'] <= (nu + timedelta(days=1)).date()][-6:]
+        for x in toon:
+            ll = T.lucht(x['pm'])
+            if x['d'] == nu.date():
+                lab, cls = 'nu', 'nu'
+            elif x['d'] > nu.date():
+                lab, cls = 'morgen', 'later'
+            else:
+                lab, cls = T.DAG_KORT[x['d'].weekday()], ''
+            vakjes += f'<span class="{cls}"><i class="c-{ll["code"]}" title="{ll["label"]}"></i>{lab}</span>'
+        if l:
+            m.append(f'''<section aria-labelledby="h-lucht">
+<p class="label"><span class="tag" style="background:var(--roze)">Lucht</span></p>
+<h2 id="h-lucht">Is de lucht gezond?</h2>
+<div class="blok"><p class="groot">{e(l["zin"])}</p>{f'<p>{e(l["advies"])}</p>' if l['advies'] else ''}
+<div class="dagen" role="img" aria-label="Hoe gezond de lucht was, per dag">{vakjes}</div>
+<div class="leg"><span><i class="c-gezond"></i>Gezond</span><span><i class="c-rook"></i>Wat rook</span><span><i class="c-ongezond"></i>Ongezond</span></div>
+</div></section>''')
+
+    # ---- zee
+    if zz:
+        cellen, onrust = '', []
+        for x in zz['delen']:
+            gw, ww = T.golven(x['golf']), T.wind(x['wind'])
+            o = T.zee_onrustig(x['golf'], x['wind'])
+            onrust.append(o)
+            cellen += f'<span class="{"hoog" if o else ""}">{x["naam"]}<b>{gw}</b>{(ww or "").capitalize()}</span>'
+        z = zz['delen']
+        if all(onrust):
+            kop, advies = 'Morgen is het de hele dag onrustig op zee.', 'Ga je met de boot? Kijk dan goed uit en vraag ter plekke of er gevaren wordt.'
+        elif not any(onrust):
+            kop, advies = f'Morgen de hele dag {T.golven(max(x["golf"] for x in z)).lower()} en {T.wind(max((x["wind"] or 0) for x in z))}.', 'Rustig op zee.'
+        else:
+            rustig = [x['naam'].lower() for x, o in zip(z, onrust) if not o]
+            woelig = [x['naam'].lower() for x, o in zip(z, onrust) if o]
+            kop = f"Morgen is het 's {rustig[0]}s rustig op zee. 's {woelig[0].capitalize()}s wordt het onrustig."
+            advies = f"Wie met de boot gaat, kan het beste 's {rustig[0]}s gaan."
+        m.append(f'''<section aria-labelledby="h-zee">
+<p class="label"><span class="tag" style="background:var(--blauw);color:#fff">Zee</span></p>
+<h2 id="h-zee">Kan de boot morgen varen?</h2>
+<div class="blok"><p class="groot">{e(kop)}</p><p>{e(advies)}</p><div class="drie">{cellen}</div></div></section>''')
+
+    # ---- bevingen
+    if bv is not None:
+        if bv['gevoeld']:
+            q = bv['gevoeld'][0]
+            t = q['t'].astimezone(WIT)
+            g = T.beving_gevoel(q['mmi'])
+            kop = f'De laatste beving die je in het dorp kon voelen, was {T.wanneer(t, nu)} rond {uurtekst(t)}.'
+            n = bv['perjaar']
+            normaal = (f'<p class="let"><b>Dat is normaal.</b> Rond {e(naam)} voel je zo\'n beving {T.hoe_vaak(n)}.'
+                       if n >= 4 else f'<p class="let">Bevingen die je voelt, zijn hier niet zo vaak: {T.hoe_vaak(n)}.')
+            if bv['klein'] >= 20:
+                normaal += ' Kleine bevingen die je niet voelt, zijn er veel vaker.'
+            normaal += '</p>'
+            inhoud = f'<p class="groot">{e(kop)}</p><p>{e(g[1])}</p>{normaal}'
+        else:
+            inhoud = f'<p class="groot">Het afgelopen jaar was er geen beving die je in {e(naam)} kon voelen.</p>'
+        m.append(f'''<section aria-labelledby="h-beving">
+<p class="label"><span class="tag" style="background:#111;color:#fff">Aardbevingen</span></p>
+<h2 id="h-beving">Heeft de aarde gebeefd?</h2>
+<div class="blok">{inhoud}</div></section>''')
+
+    # ---- bos
+    bos = ctx.get('bos')
+    if bos and bos.get('bos2000', 0) > 5:
+        frac = bos['verlies'] / bos['bos2000'] if bos['bos2000'] else 0
+        deel = T.deel_van(frac)
+        jaren = bos.get('perjaar') or {}
+        mx = max(jaren.values()) if jaren else 0
+        staaf = ''
+        reeks = list(range(2001, max([int(y) for y in jaren] + [2001]) + 1))
+        for y in reeks:
+            v = jaren.get(str(y), 0)
+            hgt = 4 + 96 * v / mx if mx else 4
+            staaf += f'<i class="{"max" if mx and v == mx else ""}" style="height:{hgt:.0f}%" title="{y}"></i>'
+        topjaar = max(jaren, key=jaren.get) if jaren else None
+        if deel and bos['verlies'] >= 1:
+            kop = f'Sinds 2001 is ongeveer {deel} stukken bos rond {e(naam)} verdwenen.' if not deel.startswith('de helft') else f'Sinds 2001 is ongeveer de helft van het bos rond {e(naam)} verdwenen.'
+            tekst = f'Dat is zo groot als {T.voetbalvelden(bos["verlies"])}.' + (f' Het meeste verdween in {topjaar}.' if topjaar else '')
+        else:
+            kop, tekst = f'Het bos rond {e(naam)} is sinds 2001 bijna niet kleiner geworden.', ''
+        m.append(f'''<section aria-labelledby="h-bos">
+<p class="label"><span class="tag" style="background:var(--geel)">Bos</span></p>
+<h2 id="h-bos">Hoeveel bos is er nog?</h2>
+<div class="blok warm"><p class="groot">{kop}</p>{f'<p>{e(tekst)}</p>' if tekst else ''}
+{f'<div class="staaf" role="img" aria-label="Hoeveel bos er per jaar verdween">{staaf}</div><div class="as"><span>{reeks[0]}</span><span>Hoe hoger, hoe meer bos weg</span><span>{reeks[-1]}</span></div>' if jaren and mx else ''}
+</div></section>''')
+
+    # ---- nieuws
+    if nw:
+        kaartjes = ''.join(f'<a class="nieuws" href="{e(x["url"])}"><span>{x["t"].astimezone(WIT).day} {T.MAANDEN[x["t"].astimezone(WIT).month - 1]} {x["t"].astimezone(WIT).year}</span><b>{e(x["titel"])}</b></a>' for x in nw)
+        m.append(f'<section aria-labelledby="h-nieuws"><h2 id="h-nieuws">Nieuws over {e(naam)}</h2>{kaartjes}</section>')
+
+    # ---- buurdorpen
+    if ctx['buurlinks']:
+        rijen = ''.join(f'<a class="rij" href="/{b["slug"]}/"><b>{e(b["naam"])}<small>{e(b["kec"])}</small></b>{"<span class=badge>BRAND</span>" if b.get("brand") else "<span aria-hidden=true>→</span>"}</a>' for b in ctx['buurlinks'])
+        m.append(f'<section aria-labelledby="h-buren"><h2 id="h-buren">Dorpen in de buurt</h2><div class="verder">{rijen}</div>'
+                 f'<a href="/eiland/{d["groep"]}/">Alle dorpen in {e(groep)} →</a></section>')
+
+    m.append(f'''<section class="weten" aria-labelledby="h-weten">
+<p class="label" id="h-weten">Goed om te weten</p>
+<p>De satelliet ziet van bovenaf waar het heet is. Meestal is dat brand, maar niet altijd. Twijfel je? Bel of app je familie.</p>
+<p>De grens van het dorp op de kaart is ongeveer. Hij zegt niets over van wie de grond is.</p>
+<p>Bijgewerkt op {nu.day} {T.MAANDEN[nu.month - 1]} om {nu:%H:%M} (tijd in het dorp). Bronnen: NASA FIRMS (brand), Open-Meteo (weer, lucht en zee), USGS (aardbevingen){', Global Forest Watch (bos)' if bos else ''}, grenzen: wilayah_boundaries.</p>
+</section>''')
+    delen.append('<main class="w">' + ''.join(m) + '</main>')
+
+    titel = f'{naam}: brand, weer en aardbevingen bij het dorp | MOZA'
+    import re
+    omschrijving = re.sub(r'<[^>]+>', '', samen)[:155]
+    ld = json.dumps({'@context': 'https://schema.org', '@type': 'Place', 'name': naam,
+                     'geo': {'@type': 'GeoCoordinates', 'latitude': d['la'], 'longitude': d['lo']},
+                     'containedInPlace': {'@type': 'Place', 'name': f'{d["kec"]}, {d["prov"]}, Indonesië'}}, ensure_ascii=False)
+    return pagina(titel, omschrijving, f'/{d["slug"]}/', ''.join(delen) + klok_js(verschil),
+                  f'<script type="application/ld+json">{ld}</script>\n')
+
+
+# ---------------------------------------------------------------- eiland en start
+
+def eiland_html(g, lijst, nu, brandset):
+    per = {}
+    for d in sorted(lijst, key=lambda x: (x['kec'], x['naam'])):
+        per.setdefault(d['kec'], []).append(d)
+    nbrand = sum(1 for d in lijst if d['code'] in brandset)
+    blokken = ''.join(
+        f'<div class="kec"><h3>{e(k)}</h3><ul>' + ''.join(
+            f'<li><a href="/{d["slug"]}/">{"<i aria-label=brand></i>" if d["code"] in brandset else ""}{e(d["naam"])}</a></li>' for d in ds) + '</ul></div>'
+        for k, ds in per.items())
+    body = f'''<section class="hero"><div class="w"><p class="label">Eilandgroep</p><h1>{e(D.GROEPEN[g])}</h1>
+<p class="sub">{e(D.GROEP_SUB[g])} · {len(lijst)} dorpen</p>
+<p class="samen">{f'Deze week zag de satelliet brand bij <b>{nbrand} {"dorp" if nbrand == 1 else "dorpen"}</b>. Die zijn gemarkeerd met een rode stip.' if nbrand else 'Deze week zag de satelliet <b>geen brand</b> bij de dorpen hier.'}</p></div></section>
+<div class="streep"><span></span><span></span><span></span></div>
+<main class="w"><section><h2>Kies je dorp</h2>{blokken}</section></main>'''
+    return pagina(f'Dorpen in {D.GROEPEN[g]}: brand, weer en aardbevingen | MOZA',
+                  f'Alle {len(lijst)} dorpen in {D.GROEPEN[g]} ({D.GROEP_SUB[g]}). Zie per dorp of er brand is, wat voor weer het wordt en of de aarde beefde.',
+                  f'/eiland/{g}/', body)
+
+
+def start_html(groepen, brandlijst, nu):
+    knoppen = ''.join(f'<a href="/eiland/{g}/">{e(n)}</a>' for g, n in D.GROEPEN.items())
+    brand = ''
+    if brandlijst:
+        brand = ('<section><h2>Brand gezien bij</h2><p>Afgelopen 48 uur, op de grond van het dorp.</p><div class="verder">'
+                 + ''.join(f'<a class="rij" href="/{d["slug"]}/"><b>{e(d["naam"])}<small>{e(d["kec"])} · {e(D.GROEPEN[d["groep"]])}</small></b><span class="badge">BRAND</span></a>' for d in brandlijst[:12])
+                 + '</div></section>')
+    body = f'''<section class="hero"><div class="w">
+<p class="label">Mijn dorp</p><h1>Wat speelt er bij jouw dorp?</h1>
+<p class="accent">brand, beving, lucht en weer</p>
+<label for="q" style="margin-top:8px;font-size:14px;font-weight:800">Zoek je dorp of eiland</label>
+<div class="zoek">{ICON_ZOEK}<input id="q" type="search" autocomplete="off" placeholder="Bijvoorbeeld Ullath of Seram" aria-controls="res"></div>
+<div id="res" class="verder" aria-live="polite"></div>
+</div></section>
+<div class="streep"><span></span><span></span><span></span></div>
+<main class="w">
+<section><h2>Of kies een eilandgroep</h2><div class="knoppen">{knoppen}</div></section>
+{brand}
+</main>
+<script>(function(){{var q=document.getElementById('q'),res=document.getElementById('res'),L=null;
+function n(s){{return s.toLowerCase().normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/[^a-z0-9 ]/g,' ').trim()}}
+function load(){{if(L)return Promise.resolve(L);return fetch('/zoek.json').then(function(r){{return r.json()}}).then(function(j){{L=j.map(function(x){{x.k=n(x.n+' '+(x.o||''));return x}});return L}})}}
+function esc(s){{return String(s).replace(/[&<>"]/g,function(c){{return{{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}}[c]}})}}
+function show(){{var v=n(q.value);if(v.length<2){{res.innerHTML='';return}}load().then(function(L){{
+var gs={json.dumps({g: n for g, n in D.GROEPEN.items()}, ensure_ascii=False)},kw={json.dumps(EILAND_WOORDEN, ensure_ascii=False)},gh='';Object.keys(gs).forEach(function(g){{if(kw[g].some(function(w){{return w.indexOf(v)===0||v.indexOf(w)===0}}))gh+='<a class="rij" style="background:#1F3BD1;color:#fff" href="/eiland/'+g+'/"><b>'+esc(gs[g])+'<small style="color:#fff">Alle dorpen in deze eilandgroep</small></b><span aria-hidden="true">→</span></a>'}});
+var a=L.filter(function(x){{return x.k.indexOf(v)===0}}),b=L.filter(function(x){{return x.k.indexOf(v)>0}});var r=a.concat(b).slice(0,12);
+res.innerHTML=gh+r.map(function(x){{return '<a class="rij" href="/'+x.s+'/"><b>'+esc(x.n)+'<small>'+esc(x.c)+' · '+esc(x.g)+'</small></b>'+(x.b?'<span class="badge">BRAND</span>':'<span aria-hidden="true">→</span>')+'</a>'}}).join('')||'<p>Geen dorp gevonden. Probeer een andere schrijfwijze.</p>'}})}}
+q.addEventListener('input',show);if(q.value)show()}})();</script>'''
+    return pagina('Mijn dorp: brand, weer en aardbevingen bij jouw dorp op de Molukken | MOZA',
+                  'Zoek je dorp op de Molukken en zie of er brand is, of de lucht gezond is, wat voor weer het wordt en of de aarde beefde. Voor alle 2.420 dorpen.',
+                  '/', body)
+
+
+# ---------------------------------------------------------------- hoofdprogramma
+
+VERSIE = '1'
+EILAND_WOORDEN = {
+    'ambon': ['ambon', 'leihitu', 'salahutu', 'pulau ambon'],
+    'lease': ['lease', 'haruku', 'saparua', 'nusalaut', 'nusa laut'],
+    'seram': ['seram', 'ceram', 'manipa', 'geser', 'gorom', 'kelang', 'boano'],
+    'buru': ['buru'],
+    'banda': ['banda', 'neira'],
+    'zuidoost': ['kei', 'aru', 'tanimbar', 'tual', 'yamdena', 'dobo'],
+    'zuidwest': ['zuidwest', 'wetar', 'kisar', 'leti', 'babar', 'damer', 'romang', 'moa', 'lakor', 'luang', 'sermata'],
+    'noord': ['noord', 'halmahera', 'ternate', 'tidore', 'bacan', 'sula', 'morotai', 'obi', 'makian', 'taliabu'],
+}
+
+
+def main():
+    global VERSIE
+    ap = argparse.ArgumentParser()
+    ap.add_argument('--uit', default=str(Path.cwd() / '_site'))
+    ap.add_argument('--alleen', default='')
+    ap.add_argument('--zonder-live', action='store_true')
+    a = ap.parse_args()
+    uit = Path(a.uit)
+    if uit.exists():
+        shutil.rmtree(uit)
+    uit.mkdir(parents=True)
+    nu = datetime.now(WIT).replace(second=0, microsecond=0)
+    VERSIE = nu.strftime('%Y%m%d%H')
+
+    rows, kust = D.dorpen()
+    pf = HIER / 'gegevens' / 'plaatsen.json'
+    plaatsen = json.loads(pf.read_text()) if pf.exists() else {}
+    for d in rows:
+        d['echt'] = d['code'] in plaatsen
+        if d['echt']:
+            d['la'], d['lo'] = plaatsen[d['code']]
+    print('dorpen:', len(rows), '· met plek van de huizen:', len(plaatsen))
+    geos = [poly_deg(d['grens']) or Point(d['lo'], d['la']).buffer(0.008) for d in rows]
+    boom = STRtree(geos)
+
+    if a.zonder_live:
+        punten = bev = None
+        wcel = lcel = zcel = None
+        items = None
+    else:
+        print('brand…'); punten = D.cached('branden', 0.9, D.branden)
+        print('  punten:', None if punten is None else len(punten))
+        print('bevingen…'); bev = D.cached('bevingen', 0.9, D.bevingen)
+        print('  bevingen:', None if bev is None else len(bev))
+        cw, _ = D.raster(rows, 0.25)
+        cl, _ = D.raster(rows, 0.5)
+        print('weer…', len(cw)); wcel = D.cached('weer', 2.9, lambda: D.weer(cw))
+        print('lucht…', len(cl)); lcel = D.cached('lucht', 2.9, lambda: D.lucht(cl))
+        print('zee…'); zcel = D.cached('zee', 2.9, lambda: D.zee(cw))
+        print('nieuws…'); items = D.cached('nieuws', 5.9, D.nieuws)
+    bosdata = {}
+    bf = HIER / 'gegevens' / 'bos.json'
+    if bf.exists():
+        bosdata = json.loads(bf.read_text())
+
+    _, per_w = D.raster(rows, 0.25)
+    _, per_l = D.raster(rows, 0.5)
+
+    alleen = set(x for x in a.alleen.split(',') if x)
+    zoek, brandset, brandlijst = [], set(), []
+    # eerst brand per dorp (ook nodig voor badges bij buren)
+    brand_per = {}
+    for d in rows:
+        brand_per[d['code']] = branden_bij(d, None, punten, nu) if punten else []
+        if any(p['binnen'] for p in brand_per[d['code']]):
+            brandset.add(d['code'])
+            if any(p['binnen'] and (nu - p['t'].astimezone(WIT)) < timedelta(hours=48) for p in brand_per[d['code']]):
+                brandlijst.append(d)
+
+    for i, d in enumerate(rows):
+        zoek.append({'n': d['naam'], 'o': d['officieel'] if d['officieel'] != d['naam'] else '', 's': d['slug'],
+                     'c': d['kec'], 'g': D.GROEPEN.get(d['groep'], ''), 'b': 1 if d['code'] in brandset else 0})
+        if alleen and d['slug'] not in alleen:
+            continue
+        g = geos[i]
+        vak = g.buffer(0.06)
+        buren_idx = [j for j in boom.query(vak) if j != i]
+        buren = [rows[j] for j in buren_idx if rows[j]['grens']]
+        dichtst = sorted((rows[j] for j in buren_idx), key=lambda b: T.km_tussen(d['la'], d['lo'], b['la'], b['lo']))[:4]
+        buurlinks = [dict(b, brand=b['code'] in brandset) for b in dichtst]
+        wr_raw = wcel.get(per_w[d['code']]) if wcel else None
+        nu_d = nu
+        wr = weer_bij(wr_raw, nu_d)
+        ctx = {
+            'br': brand_per[d['code']],
+            'bv': bevingen_bij(d, bev, nu),
+            'wr': wr,
+            'lu': lucht_bij(lcel.get(per_l[d['code']]) if lcel else None, nu),
+            'zz': zee_bij(zcel.get(per_w[d['code']]) if zcel else None, wr, nu),
+            'nw': nieuws_bij(d, items),
+            'bos': bosdata.get(d['code']),
+            'buren': buren, 'kust': kust.get(d['kab'], []), 'buurlinks': buurlinks,
+        }
+        f = uit / d['slug'] / 'index.html'
+        f.parent.mkdir(parents=True, exist_ok=True)
+        f.write_text(dorp_html(d, ctx, nu))
+        if i % 200 == 0:
+            print(' ', i, d['slug'])
+
+    for g in D.GROEPEN:
+        f = uit / 'eiland' / g / 'index.html'
+        f.parent.mkdir(parents=True, exist_ok=True)
+        f.write_text(eiland_html(g, [d for d in rows if d['groep'] == g], nu, brandset))
+    (uit / 'index.html').write_text(start_html(D.GROEPEN, brandlijst, nu))
+    (uit / 'zoek.json').write_text(json.dumps(zoek, ensure_ascii=False, separators=(',', ':')))
+    shutil.copy(HIER / 'static' / 'dorp.css', uit / 'dorp.css')
+    (uit / 'CNAME').write_text('dorp.moza.nu\n')
+    (uit / 'robots.txt').write_text(f'User-agent: *\nAllow: /\nSitemap: {SITE}/sitemap.xml\n')
+    (uit / '404.html').write_text(pagina('Niet gevonden | MOZA', 'Deze pagina bestaat niet.', '/404.html',
+                                         '<main class="w"><section><h2>Dit dorp vinden we niet</h2><p><a href="/">Zoek je dorp →</a></p></section></main>'))
+    dag = nu.strftime('%Y-%m-%d')
+    urls = [f'{SITE}/'] + [f'{SITE}/eiland/{g}/' for g in D.GROEPEN] + [f'{SITE}/{d["slug"]}/' for d in rows]
+    (uit / 'sitemap.xml').write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+                                     + ''.join(f'<url><loc>{u}</loc><lastmod>{dag}</lastmod></url>\n' for u in urls) + '</urlset>\n')
+    print('klaar:', uit)
+
+
+if __name__ == '__main__':
+    main()
