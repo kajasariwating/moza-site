@@ -43,7 +43,7 @@
   /* Tip van MOZA stopt op dezelfde tijd als op moza.nu; daarna het laatste nieuws */
   function tip(){var t=document.querySelector('#mzd .mzt-d[data-eind]');if(t&&Date.now()>+t.getAttribute('data-eind')){t.remove();var n=document.querySelector('#mzd .mzt-n');if(n)n.hidden=false}}
   /* Ander dorp op de startpagina: naar het zoekveld */
-  function ander(){var a=document.querySelector('.kop a.ander'),q=document.getElementById('q');if(a&&q)a.addEventListener('click',function(e){e.preventDefault();q.scrollIntoView({block:'center',behavior:'smooth'});setTimeout(function(){q.focus()},300)})}
+  function ander(){var a=document.querySelector('#mzd a.ander'),q=document.getElementById('q');if(a&&q)a.addEventListener('click',function(e){e.preventDefault();q.scrollIntoView({block:'center',behavior:'smooth'});setTimeout(function(){q.focus()},300)})}
   function start(){tip();nuIn();meer();ander()}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
 })();

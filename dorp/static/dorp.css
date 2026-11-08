@@ -277,39 +277,16 @@ html.moza-dark .mznav a{color:#ECECF1}
 #mzd .dlogo .kb small{align-self:stretch;display:flex;justify-content:space-between;font-size:11px;line-height:1;font-weight:900;letter-spacing:0;margin-top:2px}
 #mzd .dlogo .kb i{position:absolute;top:-7px;right:-7px;width:12px;height:12px;border-radius:50%;background:var(--rood);border:2px solid #111}
 #mzd .dlogo .lv{display:inline-flex;align-items:center;margin-left:7px;padding:0 8px;background:#111;color:#fff;font-size:12px;font-weight:900;letter-spacing:.1em}
-#mzd .dnav{display:flex;align-items:center;gap:21px}
-#mzd .dnav a{white-space:nowrap;color:inherit;font:500 17px/22.848px "Hanken Grotesk",system-ui,sans-serif;padding:1.7px 0 2px}
-#mzd .dnav a:hover{text-decoration:underline;text-underline-offset:4px}
-#mzd .dnav a.ddon{display:inline-flex;align-items:center;height:43px;padding:10px 20px;border-radius:999px;background:#1F3BD1;color:#fff;font-weight:700}
-#mzd .dnav a.ddon:hover{text-decoration:none;background:#1830B0}
 #mzd .dr{margin-left:auto;display:flex;align-items:center;gap:12px}
-#mzd .dbeeld,#mzd .dinst{display:inline-flex;align-items:center;gap:7px;color:inherit;font:700 16px/16px "Hanken Grotesk",system-ui,sans-serif;margin-right:14px}
-#mzd .dinst{gap:8px}
-#mzd .dbeeld svg{width:17px;height:17px}
-#mzd .dinst svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
-#mzd .dinst span{text-decoration:underline;text-underline-offset:5px;text-decoration-thickness:2px}
-#mzd .dbeeld:hover span,#mzd .dinst:hover span{text-decoration:underline}
-@media (max-width:1599px){#mzd .dbeeld span,#mzd .dinst span{display:none}}
-#mzd .dcart{display:inline-flex;align-items:center;justify-content:center;height:43px;min-width:60px;padding:7px 14px;border:2px solid #111;border-radius:999px;color:inherit}
-#mzd .dcart svg{width:20px;height:20px}
-#mzd .dacct{display:inline-flex;align-items:center;justify-content:center;height:40px;padding:0 15px 0 11px;gap:7px;border:2px solid #111;border-radius:999px;color:#111;background:#fff}
-#mzd .dacct:hover{background:#E9F25A}
-#mzd .dacct svg{width:19px;height:19px;display:block}
-#mzd .dacct .t{font-weight:800;font-size:15px;line-height:1;white-space:nowrap}
-@media (max-width:1399px){#mzd .dacct .t{display:none}#mzd .dacct{width:40px;padding:0}}
-@media (max-width:1199px){#mzd .dacct{display:none}}
 #mzd .dlh{width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;border:2px solid #111;border-radius:999px;background:none;color:#111;padding:0;cursor:pointer}
 #mzd .dlh svg{width:21px;height:21px}
 #mzd .dth{width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;border:2px solid #1F3BD1;border-radius:50%;background:#1F3BD1;color:#fff;padding:0;cursor:pointer}
 #mzd .dth svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 #mzd .dth .i-sun{display:none}
 html.moza-dark #mzd .d1{background:#12151F;color:#ECECF1}
-html.moza-dark #mzd .dcart,html.moza-dark #mzd .dlh{border-color:#ECECF1;color:#ECECF1}
-html.moza-dark #mzd .dacct{background:#111;color:#ECECF1;border-color:#fff}
-html.moza-dark #mzd .dacct:hover{background:#222}
+html.moza-dark #mzd .dlh{border-color:#ECECF1;color:#ECECF1}
 html.moza-dark #mzd .dth{background:#E9F25A;border-color:#E9F25A;color:#111}
 html.moza-dark #mzd .dth .i-moon{display:none}html.moza-dark #mzd .dth .i-sun{display:block}
-@media (max-width:1279px){#mzd .dlogo{margin-right:20px}#mzd .dlogo .lv{display:none}#mzd .dnav{gap:16px}#mzd .dr{gap:10px}#mzd .dbeeld,#mzd .dinst{margin-right:6px}}
 /* Gele balk */
 #mzd .d2{display:flex;align-items:stretch;height:42px;padding:0 48px;background:#E9F25A;color:#17191A}
 #mzd .mzt-d{display:flex;align-items:center;gap:10px;flex:1 1 0%;min-width:0;height:42px;padding:0 20px 0 0;white-space:nowrap;overflow:hidden;color:#17191A}
@@ -380,19 +357,17 @@ html.moza-dark #mztabs .mg h3 a{color:var(--ink)!important}
 /* Terug naar MOZA: op de plek waar op moza.nu de Kabar-link staat */
 #mztabs .mg li a.terug{display:inline-flex;align-items:center;gap:6px;margin:2px 0 6px;padding:5px 9px;white-space:nowrap;font-size:14px;background:#1F3BD1;color:#fff!important;border:2px solid #111;box-shadow:3px 3px 0 #E9F25A;font-weight:900}
 #mztabs .mg li a.terug:hover{background:#1830B0}
-/* Kabar-kop onder de tegels: alleen nog Delen en Ander dorp, als tegels */
-header.kop{position:sticky;top:201px;z-index:9980;display:block;height:0;padding:0;border:0;background:none;overflow:visible}
-header.kop .rechts{position:absolute;top:22px;right:max(24px,calc((100vw - 1120px)/2))}
-header.kop .merk{display:none}
-header.kop .rechts{gap:10px}
-header.kop .knop{flex-direction:column;justify-content:center;gap:4px;width:100px;height:66px;min-height:0;padding:0;background:#fff;color:#111;border:2px solid #111;font-size:13px;font-weight:900;line-height:1.1;box-shadow:4px 4px 0 #FF7AB6;cursor:pointer}
-header.kop .knop svg{width:22px;height:22px}
-header.kop .knop .kt{display:block}
-header.kop .knop.ander{background:#E9F25A;color:#111;box-shadow:4px 4px 0 #111}
-header.kop .knop:hover{transform:translate(-1px,-1px)}
-html.moza-dark header.kop .knop{background:#17181D;color:#ECECF1;border-color:#ECECF1}
-html.moza-dark header.kop .knop.ander{background:#E9F25A;color:#111;border-color:#111}
-html.mzd-meer header.kop{display:none}
+/* Tegels in de bovenbalk: Delen, Ander dorp en Homepage MOZA */
+#mzd .dr{margin-left:auto;display:flex;align-items:center;gap:12px}
+#mzd .dtg{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:100px;height:58px;padding:0 12px;margin-right:4px;background:#fff;color:#111;border:2px solid #111;box-shadow:4px 4px 0 #FF7AB6;font:900 13px/1.1 "Hanken Grotesk",system-ui,sans-serif;white-space:nowrap;cursor:pointer;text-decoration:none}
+#mzd .dtg svg{width:22px;height:22px;flex:none}
+#mzd .dtg.ander{background:#E9F25A;box-shadow:4px 4px 0 #111}
+#mzd .dtg.home{background:#1F3BD1;color:#fff;box-shadow:4px 4px 0 #E9F25A}
+#mzd .dtg:hover{transform:translate(-1px,-1px)}
+#mzd .dtg+.dlh{margin-left:10px}
+html.moza-dark #mzd .dtg{background:#17181D;color:#ECECF1;border-color:#ECECF1}
+html.moza-dark #mzd .dtg.ander{background:#E9F25A;color:#111;border-color:#111;box-shadow:4px 4px 0 #ECECF1}
+html.moza-dark #mzd .dtg.home{background:#1F3BD1;color:#fff;border-color:#ECECF1}
+/* De oude Kabar-kop is op de computer niet meer nodig */
+header.kop{display:none}
 }
-/* Smallere computerschermen: geen ruimte naast de tekst, dan een eigen strook onder de tegels */
-@media (min-width:1025px) and (max-width:1167px){header.kop{position:relative;top:auto;height:auto;display:flex;justify-content:flex-end;padding:10px 24px;background:var(--zacht)}header.kop .rechts{position:static}}

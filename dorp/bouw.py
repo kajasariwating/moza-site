@@ -494,18 +494,17 @@ def moza_balk_gegevens(nu):
 
 
 def mozakop_desktop(g):
-    nav = ''.join(f'<a href="{_mz(u)}">{n}</a>' for u, n in [('/lezen', 'Lezen'), ('/weten', 'Kennis'), ('/podium', 'Podium'), ('/evenementen', 'Agenda'), ('/boekenplank', 'Boekenplank'), ('/store', 'Toko Buku')])
     logo = ('<a class="dlogo" href="/" aria-label="Kabar Maluku Live, naar de startpagina"><span class="kb">KABAR<small aria-hidden="true">'
             '<span>M</span><span>A</span><span>L</span><span>U</span><span>K</span><span>U</span></small><span class="sr">Maluku</span><i></i></span><span class="lv">LIVE</span></a>')
-    rechts = ('<span class="dr">'
-              f'<a class="dbeeld" href="{_mz("/beeldbank")}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2"/><path d="m21 17-5-5-8 7"/></svg><span>Beeldbank</span></a>'
-              f'<a class="dinst" href="{_mz("/uploaden")}" aria-label="Insturen bij de redactie"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4"/><path d="M7 9l5-5 5 5"/><path d="M4 16v4h16v-4"/></svg><span>Insturen</span></a>'
-              f'<a class="dcart" href="{_mz("/cart")}" aria-label="Winkelmandje op moza.nu">{_TAS}</a>'
-              f'<a class="dacct" href="{_mz("/account")}" aria-label="Mijn MOZA: inloggen en je bestellingen bekijken" title="Mijn MOZA"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span class="t">Mijn MOZA</span></a>'
+    # Rechts in de bovenbalk: de tegels Delen, Ander dorp en Homepage MOZA, met leesbaarheid en nachtmodus ernaast
+    rechts = ('<nav class="dr" aria-label="Menu">'
+              f'<button type="button" class="dtg deel" data-deel aria-label="Deel deze pagina">{ic("deel")}<span>Delen</span></button>'
+              f'<a class="dtg ander" href="/" aria-label="Ander dorp zoeken">{ICON_ZOEK}<span>Ander dorp</span></a>'
+              f'<a class="dtg home" href="{_mz("/")}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7v10h-6v-6H9v6H3z"/></svg><span>Homepage MOZA</span></a>'
               '<button type="button" class="dlh" onclick="mzGroot()" aria-label="Grotere letters aan of uit" title="Leeshulp: grotere letters"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + _IC_AA + '</svg></button>'
               '<button type="button" class="dth" onclick="mzThema()" aria-label="Nachtmodus aan of uit" title="Nachtmodus"><svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>'
-              '</span>')
-    r1 = f'<div class="d1">{logo}<nav class="dnav" aria-label="Menu van MOZA">{nav}<a class="ddon" href="{_mz("/doneer")}">Doneer</a></nav>{rechts}</div>'
+              '</nav>')
+    r1 = f'<div class="d1">{logo}{rechts}</div>'
     # Gele balk
     links = ''
     n = g.get('nieuws')
