@@ -241,3 +241,13 @@ html.moza-dark .mznav a{color:#ECECF1}
 .rij .badge.bv-licht,.verder .badge.bv-licht{background:var(--geel)}
 .rij .badge.bv-stevig,.verder .badge.bv-stevig{background:var(--roze)}
 .badge.bv-sterk,.badge.bv-zwaar{background:var(--rood)}
+/* ---------- Bevingen op de startpagina ---------- */
+.bevkaart{background:var(--papier);border:2px solid var(--rand);box-shadow:5px 5px 0 var(--blauw);padding:16px;margin:0 0 16px}
+.bevkaart.bk-stevig{box-shadow:5px 5px 0 var(--roze)}
+.bevkaart.bk-sterk,.bevkaart.bk-zwaar{box-shadow:5px 5px 0 var(--rood)}
+.bevkaart .bk-tijd{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 6px;font-size:15px}
+.bevkaart h3{margin:0 0 8px;font-size:20px;font-weight:900;letter-spacing:-.01em;line-height:1.25}
+.bevkaart p{margin:0 0 8px}
+.bevkaart p:last-child{margin:0}
+.rij .badge.bv-geen,.bevkaart .badge.bv-geen,.bevkaart .badge.bv-licht{background:var(--geel)}
+.bevkaart .badge.bv-stevig{background:var(--roze)}

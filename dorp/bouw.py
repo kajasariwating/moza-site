@@ -782,11 +782,12 @@ def eiland_html(g, lijst, nu, brandset):
                   f'/eiland/{g}/', body, f'<script type="application/ld+json">{ld}</script>\n')
 
 
-def recente_bevingen(rows, lijst, nu, dagen=7, drempel=3.5, max_n=8):
-    """Bevingen van de afgelopen dagen die mensen in minstens één dorp goed konden voelen."""
+def recente_bevingen(rows, lijst, nu, op_land=None, dagen=7, max_n=5):
+    """Bevingen van de afgelopen dagen die het vermelden waard zijn: kracht 4 of meer, of ergens goed voelbaar."""
     if lijst is None:
         return None
     grens = nu - timedelta(days=dagen)
+    jaar = sum(1 for q in lijst if q['mag'] >= 4.0)
     uit = []
     for q in lijst:
         if q['t'].astimezone(WIT) < grens:
@@ -798,32 +799,68 @@ def recente_bevingen(rows, lijst, nu, dagen=7, drempel=3.5, max_n=8):
                 dicht, dicht_km = d, km
             if km < 400:
                 best_i = max(best_i, T.mmi(q['mag'], km, q['diepte']))
-        if best_i >= drempel and dicht:
-            uit.append(dict(q, mmi=best_i, dorp=dicht, km=dicht_km))
+        if dicht_km > 250:
+            continue  # buiten de Molukken
+        if q['mag'] >= 4.0 or best_i >= 3.5:
+            uit.append(dict(q, mmi=best_i, dorp=dicht, km=dicht_km,
+                            land=bool(op_land and op_land(q['la'], q['lo']))))
     uit.sort(key=lambda q: q['t'], reverse=True)
-    return uit[:max_n]
+    return {'lijst': uit[:max_n], 'jaar': jaar}
 
 
-def dagnaam(t, nu):
-    d = (nu.date() - t.date()).days
-    return 'Vandaag' if d == 0 else 'Gisteren' if d == 1 else T.DAGEN[t.weekday()].capitalize()
+AMBON = (-3.6954, 128.1814)
 
 
-def bevingen_blok(bevlijst, nu):
-    if bevlijst is None:
+def diepte_tekst(km):
+    km = round(km)
+    if km < 30:
+        return f'De beving lag ondiep, ongeveer {km} km onder de grond. Dan voel je hem dichtbij goed.'
+    if km < 70:
+        return f'De beving lag ongeveer {km} km onder de grond.'
+    if km < 300:
+        return f'De beving lag diep: ongeveer {km} km onder de grond. Daardoor komt er boven veel minder kracht aan.'
+    return f'De beving lag heel diep: ongeveer {km} km onder de grond. Daardoor merk je er boven weinig van.'
+
+
+GERUST = {
+    None: 'Bijna niemand heeft hem gevoeld. Schade is niet te verwachten.',
+    'licht': 'Schade is bij zo\'n lichte beving niet te verwachten.',
+    'stevig': 'Er kunnen spullen zijn omgevallen. Grote schade is niet te verwachten.',
+    'sterk': 'Er kan kleine schade zijn aan huizen. Bel of app je familie als je je zorgen maakt.',
+    'zwaar': 'Er kan schade zijn. Neem contact op met je familie en volg wat de instanties ter plekke zeggen.',
+}
+
+
+def bevingen_blok(bev, nu):
+    if not bev:
         return ''
-    kop = '<section aria-labelledby="h-bev"><h2 id="h-bev">Aardbevingen die je kon voelen</h2><p>Afgelopen 7 dagen, in Molukse tijd. Tik op een dorp voor uitleg.</p>'
-    if not bevlijst:
-        return kop + '<p class="let">Geen beving die mensen goed konden voelen. Kleine bevingen zijn er bijna elke dag, die merk je meestal niet.</p></section>'
-    rijen = []
-    for q in bevlijst:
-        d, t = q['dorp'], q['t'].astimezone(WIT)
+    lijst, jaar = bev['lijst'], bev['jaar']
+    per_week = round(jaar / 52)
+    normaal = (f'Aardbevingen zijn in de Molukken heel gewoon. Het afgelopen jaar waren er {jaar} met kracht 4 of meer, '
+               f'{"ongeveer " + str(per_week) + " per week" if per_week >= 2 else "een paar per maand"}. De meeste merk je nauwelijks.')
+    kop = '<section aria-labelledby="h-bev" class="bevblok"><h2 id="h-bev">Aardbevingen deze week</h2>'
+    if not lijst:
+        return kop + f'<p class="let"><b>Rustig.</b> De afgelopen 7 dagen was er geen beving van betekenis. {normaal}</p></section>'
+    kaarten = []
+    for q in lijst:
+        t = q['t'].astimezone(WIT)
         g = T.beving_gevoel(q['mmi'])
-        woord = g[1].split('.')[0]
-        plek = f'Bij {d["naam"]}' if q['km'] < 15 else f'{round(q["km"])} km van {d["naam"]}'
-        rijen.append(f'<a class="rij" href="/{d["slug"]}/"><b>{e(plek)}<small>{dagnaam(t, nu)} om {t:%H:%M} · {e(T.plek_kort(d))}</small></b>'
-                     f'<span class="badge bv-{g[0]}">{e(woord.upper())}</span></a>')
-    return kop + '<div class="verder">' + ''.join(rijen) + '</div></section>'
+        niveau = g[0] if g else None
+        voel = g[1] if g else 'Bijna niemand heeft hem gevoeld.'
+        woord = g[1].split('.')[0].upper() if g else 'NIET GEVOELD'
+        plek = T.plek_kort(q['dorp'])
+        waar = (f'op {plek}' if q['land'] else f'in zee bij {plek}')
+        ka = T.km_tussen(q['la'], q['lo'], *AMBON)
+        extra = f', ongeveer {round(ka)} km van de stad Ambon' if 15 < ka < 300 else ''
+        kracht = f'{q["mag"]:.1f}'.replace('.', ',')
+        kaarten.append(
+            f'<article class="bevkaart bk-{niveau or "geen"}"><p class="bk-tijd"><b>{e(T.wanneer_hoofdletter(t, nu))} om {t:%H:%M}</b>'
+            f'<span class="badge bv-{niveau or "geen"}">{e(woord)}</span></p>'
+            f'<h3>Kracht {kracht}, {e(waar)}{e(extra)}</h3>'
+            f'<p>{diepte_tekst(q["diepte"])}</p>'
+            f'<p><b>Wat merkten mensen ervan?</b> {e(voel)} {GERUST.get(niveau, GERUST[None])}</p></article>')
+    return (kop + '<p>Afgelopen 7 dagen, in Molukse tijd.</p>' + ''.join(kaarten)
+            + f'<p class="let">{normaal} Wil je weten hoe het in jouw dorp voelde? Zoek je dorp hierboven.</p></section>')
 
 
 def start_html(groepen, brandlijst, nu, bevlijst=None):
@@ -964,7 +1001,10 @@ def main():
             if any(p['binnen'] and (nu - p['t'].astimezone(WIT)) < timedelta(hours=48) for p in brand_per[d['code']]):
                 brandlijst.append(d)
 
-    bevlijst = recente_bevingen(rows, bev, nu)
+    def op_land(la, lo):
+        pt = Point(lo, la)
+        return any(geos[j].contains(pt) for j in boom.query(pt))
+    bevlijst = recente_bevingen(rows, bev, nu, op_land)
 
     for i, d in enumerate(rows):
         zoek.append({'n': d['naam'], 'o': d['officieel'] if d['officieel'] != d['naam'] else '', 's': d['slug'],
