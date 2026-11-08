@@ -395,7 +395,7 @@ def onder_html(deel):
                f'<a class="mm-beeld" href="{u("/beeldbank")}"><b>Beeldbank</b><span>Foto’s van Molukkers in Nederland door de jaren heen</span></a>'
                '</div></div>')
     data = json.dumps({'t': t, 'e': x}, ensure_ascii=False).replace('</', '<\\/')
-    return balk + deelvel + meervel + f'<script>window.MZK_DEEL={data}</script><script src="/onder.js?v={VERSIE}" defer></script>'
+    return balk + deelvel + meervel + f'<script>window.MZK_DEEL={data}</script><script src="/onder.js?v={VERSIE}" defer></script><script src="/kop.js?v={VERSIE}" defer></script>'
 
 
 DEEL_STANDAARD = ('Kabar Maluku Live', 'Check wat er speelt in jouw dorp in de Molukken: brand, weer, zee en aardbevingen. Ieder uur bijgewerkt.')
@@ -415,6 +415,135 @@ MOZAKOP = ('<div class="mzkop"><a class="mzkb" href="/" aria-label="Kabar Maluku
            '<button type="button" class="mzib" aria-label="Nachtmodus aan of uit" onclick="mzThema()">' + _MAAN + _ZON + '</button>'
            '<a class="mztas" href="https://www.moza.nu/cart?' + _U + '" aria-label="Winkelmandje op moza.nu">' + _TAS + '</a></span>'
            '<a class="mzdon" href="https://www.moza.nu/doneer?' + _U + '">Doneer</a></div>')
+
+# ---------- Kop op de computer: 1-op-1 zoals moza.nu, alleen het logo is van Kabar Maluku ----------
+_ZU = 'utm_source=kabar&utm_medium=kop'
+MZD = ''
+
+
+def _mz(pad):
+    return f'{MZ}{pad}?{_ZU}'
+
+
+def _sv(d, extra=''):
+    return f'<svg viewBox="0 0 24 24" aria-hidden="true"{extra}>{d}</svg>'
+
+
+_IC_KAL = '<rect x="4" y="5" width="16" height="15" rx="1"/><path d="M4 10h16M9 3v4M15 3v4"/>'
+_IC_KAART = '<path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/>'
+_IC_KRANT = '<path d="M4 5h13v14H6a2 2 0 0 1-2-2z"/><path d="M17 9h3v8a2 2 0 0 1-2 2"/><path d="M7 9h7M7 13h7"/>'
+_IC_BOEK = '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20"/>'
+_IC_TAS = '<path d="M6 8h12l-1 12H7z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/>'
+_IC_INFO = '<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/>'
+_IC_AA = '<path d="M3 19 8 5l5 14M4.8 14h6.4"/><path d="M15 19l3.5-9 3.5 9M16 16.5h5"/>'
+_IC_POLL = '<path d="M5 20V12M12 20V5M19 20v-9"/><path d="M3 20h18"/>'
+_IC_PIN = '<path d="M12 21s-7-6.5-7-12a7 7 0 0 1 14 0c0 5.5-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/>'
+PEILINGEN = 2  # gelijk houden met PEILINGEN in bron/header.html
+
+# Meer-menu zoals op moza.nu. Bij Kaarten staat bovenaan geen Kabar-link (je bent er al), maar Terug naar MOZA.
+MEER_G = [
+    ('Lezen', '/lezen', '#1F3BD1', '#1F3BD1', _IC_KRANT, [('Net binnen', '/lezen'), ('Nieuws uit Maluku', '/nieuws/maluku'), ('Van de redactie', '/lezen#categorie-van-de-redactie'), ('Erkenning', '/lezen#categorie-erkenning'), ('Molukse wijk', '/lezen#categorie-molukse-wijk'), ('Erfgoed', '/lezen#categorie-erfgoed'), ('Cultuur', '/lezen#categorie-cultuur')]),
+    ('Rubrieken', '/lezen/tag/rubriek', '#111', '#E9F25A', _IC_KAL, [('Alle rubrieken', '/lezen/tag/rubriek'), ('Kabar Maluku Live', '/lezen/tag/Kabar+Maluku+Live'), ('Achter de foto', '/lezen/tag/Achter+de+foto'), ('Leeswijzer', '/lezen/tag/Leeswijzer'), ('Woord van de week', '/lezen/tag/Woord+van+de+week'), ('Dit weekend', '/lezen/tag/Dit+weekend'), ('Deze week toen', '/lezen/tag/Deze+week+toen'), ('Jullie zeiden', '/lezen/tag/Jullie+zeiden'), ('MOZA deze maand', '/lezen/tag/MOZA+deze+maand')]),
+    ('Kennis', '/weten', '#D9468A', '#FF7AB6', _IC_BOEK, [('Kennisbank', '/weten'), ('Begrippenlijst', '/begrippen'), ('Sejarah Maluku', '/sejarah-maluku'), ('Jaartallen', '/jaartallen'), ('Onderzoek', '/onderzoek'), ('Organisaties', '/organisaties')]),
+    ('Kaarten', '/kaarten', '#D7381A', '#FF4D2E', _IC_KAART, [('Bosbranden', '/kaarten/bosbranden'), ('Weer en zee', '/kaarten/weer-en-zee'), ('Aardbevingen', '/kaarten/aardbevingen'), ('Luchtkwaliteit', '/kaarten/luchtkwaliteit'), ('Bos en ontbossing', '/kaarten/bos-en-ontbossing'), ('Rampen', '/kaarten/rampen'), ('Zeewater', '/kaarten/zeewater'), ('Satellietbeeld', '/kaarten/satelliet'), ('Vulkanen', '/kaarten/vulkanen'), ('Regen', '/kaarten/regen'), ('Eb en vloed', '/kaarten/getij'), ('Koraalriffen', '/kaarten/koraal'), ('Forten en specerijen', '/kaarten/forten'), ('Talen van de Molukken', '/kaarten/talen'), ('Overtochten 1951', '/kaarten/overtochten-1951'), ('Vluchten', '/kaarten/vluchten'), ('Molukse wijken', '/kaarten/molukse-wijken'), ('Grafstatus', '/kaarten/grafstatus')]),
+    ('Agenda', '/evenementen', '#D7381A', '#FF4D2E', _IC_KAL, [('Alle evenementen', '/evenementen'), ('Evenement aanmelden', '/uploaden')]),
+    ('Doe mee', '/podium', '#111', '#E9F25A', _IC_KAL, [('Agenda', '/evenementen'), ('Podium', '/podium'), ('Insturen', '/uploaden'), ('Beeldbank', '/beeldbank')]),
+    ('Winkel en steun', '/store', '#111', '#111', _IC_TAS, [('Toko Buku', '/store'), ('Boekenplank', '/boekenplank'), ('Doneer', '/doneer'), ('Maandelijks doneren', '/maandelijks-doneren')]),
+    ('Over MOZA', '/over-moza', '#111', '#EDDCB8', _IC_INFO, [('Over MOZA', '/over-moza'), ('Team', '/team'), ('Verantwoording', '/verantwoording')]),
+]
+
+
+def moza_balk_gegevens(nu):
+    """Haalt bij het bouwen van moza.nu: de Tip van MOZA, het laatste nieuws en de agendategel. Lukt het niet, dan blijven die leeg."""
+    import re
+    g = {'tip': None, 'nieuws': None, 'agenda': ''}
+    try:
+        b = D.get(MZ + '/', timeout=20, tries=2)
+        h = b.decode('utf-8', 'replace') if b else ''
+        m = re.search(r'<script id="mz-tip-js">(.*?)</script>', h, re.S)
+        if m:
+            t = m.group(1)
+            ei = re.search(r'Date\.UTC\((\d+),(\d+),(\d+),(\d+),(\d+)\)', t)
+            ur = re.search(r"var URL='([^']+)'", t)
+            bi = re.search(r"<b>(.*?)</b><small>(.*?)</small><span class=\"lg\">(.*?)</span>", t)
+            if ei and ur and bi:
+                y, mo, d, hh, mi = map(int, ei.groups())
+                eind = datetime(y, mo + 1, d, hh, mi, tzinfo=timezone.utc)
+                if datetime.now(timezone.utc) < eind:
+                    g['tip'] = {'eind': int(eind.timestamp() * 1000), 'url': ur.group(1), 'b': bi.group(1), 'small': bi.group(2), 'lg': bi.group(3)}
+    except Exception as ex:  # noqa
+        print('  tip van moza.nu niet gelukt:', ex)
+    try:
+        j = D.get_json(MZ + '/lezen?format=json', timeout=20, tries=2) or {}
+        it = (j.get('items') or [])[0]
+        g['nieuws'] = {'url': it.get('fullUrl') or '/lezen', 'lg': html.unescape(it.get('title') or '')}
+    except Exception as ex:  # noqa
+        print('  nieuws van moza.nu niet gelukt:', ex)
+    try:
+        j = D.get_json(MZ + '/evenementen?format=json', timeout=20, tries=2) or {}
+        ams = datetime.now(ZoneInfo('Europe/Amsterdam'))
+        dg = (ams.weekday() + 1) % 7  # zoals getDay() in JavaScript: zondag 0
+        e = ams.replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=((7 - dg) % 7) + 1)
+        nu_ms, e_ms = ams.timestamp() * 1000, e.timestamp() * 1000
+        act = [x for x in (j.get('upcoming') or []) if (x.get('endDate') or x.get('startDate') or 0) >= nu_ms]
+        w = len([x for x in act if (x.get('startDate') or 0) < e_ms])
+        g['agenda'] = (f'{w} dit weekend' if dg == 0 or dg >= 5 else f'{w} deze week') if w else (f'{len(act)} in de agenda' if act else '')
+    except Exception as ex:  # noqa
+        print('  agenda van moza.nu niet gelukt:', ex)
+    return g
+
+
+def mozakop_desktop(g):
+    nav = ''.join(f'<a href="{_mz(u)}">{n}</a>' for u, n in [('/lezen', 'Lezen'), ('/weten', 'Kennis'), ('/podium', 'Podium'), ('/evenementen', 'Agenda'), ('/boekenplank', 'Boekenplank'), ('/store', 'Toko Buku')])
+    logo = ('<a class="dlogo" href="/" aria-label="Kabar Maluku Live, naar de startpagina"><span class="kb">KABAR<small aria-hidden="true">'
+            '<span>M</span><span>A</span><span>L</span><span>U</span><span>K</span><span>U</span></small><span class="sr">Maluku</span><i></i></span><span class="lv">LIVE</span></a>')
+    rechts = ('<span class="dr">'
+              f'<a class="dbeeld" href="{_mz("/beeldbank")}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2"/><path d="m21 17-5-5-8 7"/></svg><span>Beeldbank</span></a>'
+              f'<a class="dinst" href="{_mz("/uploaden")}" aria-label="Insturen bij de redactie"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4"/><path d="M7 9l5-5 5 5"/><path d="M4 16v4h16v-4"/></svg><span>Insturen</span></a>'
+              f'<a class="dcart" href="{_mz("/cart")}" aria-label="Winkelmandje op moza.nu">{_TAS}</a>'
+              f'<a class="dacct" href="{_mz("/account")}" aria-label="Mijn MOZA: inloggen en je bestellingen bekijken" title="Mijn MOZA"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span class="t">Mijn MOZA</span></a>'
+              '<button type="button" class="dlh" onclick="mzGroot()" aria-label="Grotere letters aan of uit" title="Leeshulp: grotere letters"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + _IC_AA + '</svg></button>'
+              '<button type="button" class="dth" onclick="mzThema()" aria-label="Nachtmodus aan of uit" title="Nachtmodus"><svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>'
+              '</span>')
+    r1 = f'<div class="d1">{logo}<nav class="dnav" aria-label="Menu van MOZA">{nav}<a class="ddon" href="{_mz("/doneer")}">Doneer</a></nav>{rechts}</div>'
+    # Gele balk
+    links = ''
+    n = g.get('nieuws')
+    nieuws = (f'<a class="mzt-d mzt-n" href="{e(n["url"] if n["url"].startswith("http") else MZ + n["url"])}?{_ZU}"{" hidden" if g.get("tip") else ""}>'
+              f'{_sv(_IC_KRANT)}<b>Nieuws</b><small>net binnen</small><span class="lg">{e(n["lg"])}</span><span class="ar" aria-hidden="true">→</span></a>') if n else ''
+    t = g.get('tip')
+    if t:
+        links = (f'<a class="mzt-d" data-eind="{t["eind"]}" href="{e(MZ + t["url"])}?{_ZU}">'
+                 '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15"/><path d="M4 10h16M8 3v4M16 3v4"/></svg>'
+                 f'<b>{t["b"]}</b><small>{t["small"]}</small><span class="lg">{t["lg"]}</span><span class="ar" aria-hidden="true">→</span></a>')
+    links += nieuws or '<span class="mzt-leeg"></span>'
+    wx = '<span class="mzv-wx" aria-live="off"><span>Nu in <b class="am-place">Ambon</b></span><span class="am-sep">·</span><span class="am-time"></span><span class="am-w"></span></span>'
+    zoek = (f'<form class="mt-search" role="search" action="{MZ}/search" method="get"><input type="search" name="q" placeholder="Zoek op MOZA" aria-label="Zoek op MOZA" autocomplete="off" enterkeyhint="search">'
+            '<button type="submit" class="mt-btn" aria-label="Zoeken"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.8-4.8"/></svg></button></form>')
+    r2 = f'<div class="d2">{links}{wx}{zoek}</div>'
+    # Tegels en Meer, zoals #mztabs op moza.nu
+    tb = (f'<nav class="tb" aria-label="Rubrieken"><a href="{_mz("/")}">Voorpagina</a><a href="{_mz("/lezen")}">Net binnen</a><a href="{_mz("/nieuws/maluku")}">Maluku</a>'
+          '<button type="button" class="meer" aria-expanded="false" aria-controls="mztabs-mp"><span>Meer</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button></nav>')
+    ag = g.get('agenda') or ''
+    tl = ('<div class="tl" aria-label="Snel naar">'
+          f'<a class="ag" href="{_mz("/evenementen")}">{_sv(_IC_KAL)}<b>Agenda</b><small>{e(ag)}</small></a>'
+          f'<a href="{_mz("/kaarten")}"><span class="bd">LIVE</span>{_sv(_IC_KAART)}<b>Live kaarten</b></a>'
+          f'<a class="nu" href="/" aria-current="page">{_sv(_IC_PIN)}<b>Kabar Maluku</b><small>Check jouw dorp</small></a>'
+          f'<a href="{_mz("/begrippen")}">{_sv(_IC_AA)}<b>Begrippen</b></a>'
+          f'<a href="{_mz("/organisaties")}"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 4.5a3 3 0 0 1 0 6"/><path d="M21 20a6 6 0 0 0-3.5-5.4"/></svg><b>Organisaties</b></a>'
+          f'<a href="{_mz("/jaartallen")}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h18"/><circle cx="6" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="18" cy="12" r="2"/><path d="M6 5v5M12 14v5M18 5v5"/></svg><b>Jaartallen</b></a>'
+          f'<a class="pl" href="{_mz("/peilingen")}">{_sv(_IC_POLL)}<b>Jouw mening</b><small>{PEILINGEN} peilingen</small></a></div>')
+    groepen = ''
+    for naam, pad, kl, bg, ico, items in MEER_G:
+        donker = bg in ('#E9F25A', '#EDDCB8')
+        lijst = ''.join(f'<li><a href="{_mz(u)}">{n}</a></li>' for n, u in items)
+        if naam == 'Kaarten':
+            lijst = f'<li><a class="terug" href="{_mz("/")}">Terug naar MOZA <span aria-hidden="true">→</span></a></li>' + lijst
+        groepen += (f'<div class="mg"><span class="ico" style="background:{bg};color:{"#111" if donker else "#fff"}">{_sv(ico)}</span>'
+                    f'<h3><a href="{_mz(pad)}" style="color:{kl}">{naam}</a></h3><ul>{lijst}</ul></div>')
+    tabs = f'<div id="mztabs" data-nosnippet><div class="row">{tb}{tl}</div><div class="mp" id="mztabs-mp" hidden>{groepen}</div></div>'
+    return f'<div id="mzd" data-nosnippet>{r1}{r2}{tabs}</div>'
+
 
 def pagina(titel, omschrijving, pad, body, extra_head='', robots='index,follow', deel=DEEL_STANDAARD):
     return f'''<!doctype html>
@@ -448,7 +577,8 @@ window.mzThema=function(){{var dk=!d.classList.contains('moza-dark');d.classList
 </head>
 <body>
 {MOZAKOP}
-<header class="kop"><a class="merk" href="/" aria-label="Kabar Maluku Live, naar de startpagina"><span class="kb">KABAR<small aria-hidden="true"><span>M</span><span>A</span><span>L</span><span>U</span><span>K</span><span>U</span></small><span class="sr">Maluku</span><i></i></span><span class="lv">LIVE</span></a><span class="rechts"><button class="knop deelk" type="button" data-deel aria-label="Deel deze pagina">{ic("deel")}<span class="kt">Delen</span></button><a class="knop" href="/" aria-label="Ander dorp zoeken">{ICON_ZOEK}<span class="kt">Ander dorp</span></a></span></header>
+{MZD}
+<header class="kop"><a class="merk" href="/" aria-label="Kabar Maluku Live, naar de startpagina"><span class="kb">KABAR<small aria-hidden="true"><span>M</span><span>A</span><span>L</span><span>U</span><span>K</span><span>U</span></small><span class="sr">Maluku</span><i></i></span><span class="lv">LIVE</span></a><span class="rechts"><button class="knop deelk" type="button" data-deel aria-label="Deel deze pagina">{ic("deel")}<span class="kt">Delen</span></button><a class="knop ander" href="/" aria-label="Ander dorp zoeken">{ICON_ZOEK}<span class="kt">Ander dorp</span></a></span></header>
 {body}
 <footer class="voet"><div class="w"><p class="pw">Kabar Maluku Live, powered by <a class="mz" href="https://www.moza.nu" aria-label="MOZA">MOZA</a></p><p>Voor, door en met Molukkers. Bekijk ook <a href="https://www.moza.nu/kaarten">alle kaarten</a> en <a href="https://www.moza.nu/lezen">het laatste nieuws</a> op moza.nu.</p>
 <p>Klopt er iets niet? <a href="https://www.moza.nu/contact">Laat het ons weten</a>.</p></div></footer>
@@ -932,7 +1062,7 @@ EILAND_WOORDEN = {
 
 
 def main():
-    global VERSIE
+    global VERSIE, MZD
     ap = argparse.ArgumentParser()
     ap.add_argument('--uit', default=str(Path.cwd() / '_site'))
     ap.add_argument('--alleen', default='')
@@ -944,8 +1074,9 @@ def main():
     uit.mkdir(parents=True)
     nu = datetime.now(WIT).replace(second=0, microsecond=0)
     import hashlib
-    VERSIE = hashlib.md5((HIER / 'static' / 'dorp.css').read_bytes() + (HIER / 'static' / 'onder.js').read_bytes() + (D.ATLAS / 'atlas-maluku.js').read_bytes()).hexdigest()[:10]
+    VERSIE = hashlib.md5((HIER / 'static' / 'kop.js').read_bytes() + (HIER / 'static' / 'dorp.css').read_bytes() + (HIER / 'static' / 'onder.js').read_bytes() + (D.ATLAS / 'atlas-maluku.js').read_bytes()).hexdigest()[:10]
 
+    MZD = mozakop_desktop(moza_balk_gegevens(nu))
     rows, kust = D.dorpen()
     pf = HIER / 'gegevens' / 'plaatsen.json'
     plaatsen = json.loads(pf.read_text()) if pf.exists() else {}
@@ -1059,6 +1190,7 @@ def main():
     shutil.copytree(D.ATLAS, uit / 'atlas')
     shutil.copy(HIER / 'static' / 'dorp.css', uit / 'dorp.css')
     shutil.copy(HIER / 'static' / 'onder.js', uit / 'onder.js')
+    shutil.copy(HIER / 'static' / 'kop.js', uit / 'kop.js')
     shutil.copy(HIER / 'static' / 'og.png', uit / 'og.png')
     shutil.copy(HIER / 'static' / 'favicon.svg', uit / 'favicon.svg')
     for f in (HIER / 'static').glob('google*.html'):  # verificatie Google Search Console
