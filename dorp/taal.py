@@ -305,6 +305,14 @@ OVERSTEEK = [
     'Grote kans dat speedboten niet varen. Ook de ferry kan uitvallen. Vraag bij de haven en stel je reis zo nodig uit.',
 ]
 
-OVERSTEEK_VOORBEELD = {
-    'lease': 'bijvoorbeeld van Tulehu naar Haruku, Saparua of Nusalaut',
-}
+LEASE_EILAND = {'pulau haruku': 'Haruku', 'saparua': 'Saparua', 'saparua timur': 'Saparua', 'nusa laut': 'Nusalaut', 'nusalaut': 'Nusalaut'}
+
+
+def oversteek_voorbeeld(d):
+    """Vanuit het dorp gezien: van het eiland naar Ambon (zoals familie op bezoek reist)."""
+    if d['groep'] != 'lease':
+        return None
+    eiland = LEASE_EILAND.get(d['kec'].lower())
+    if not eiland:
+        return None
+    return f'bijvoorbeeld van {eiland} naar Tulehu op Ambon'

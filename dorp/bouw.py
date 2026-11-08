@@ -527,7 +527,7 @@ def dorp_html(d, ctx, nu):
         else:
             rustig, woelig = deel(best)[0], deel(slechtst)[0]
             kop = f"Morgen is de zee ’s {rustig}s het rustigst. ’s {woelig.capitalize()}s wordt het {'onrustig' if slechtst >= 2 else 'wat woeliger'}."
-        vb = T.OVERSTEEK_VOORBEELD.get(d['groep'])
+        vb = T.oversteek_voorbeeld(d)
         if slechtst == best:
             vis, over = e(T.VISSER[best]), e(T.OVERSTEEK[best])
         else:
