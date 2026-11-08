@@ -109,16 +109,16 @@ def brand_plek(p):
 # Grenzen: WHO-advieswaarde voor een dag is 15. Daarboven merken gevoelige mensen het.
 
 LUCHT = [
-    (15, 'gezond', 'Gezond',
-     'De lucht is schoon.', ''),
-    (35, 'rook', 'Wat rook',
-     'Er hangt wat rook of stof. Voor de meeste mensen is dat geen probleem.',
+    (15, 'gezond', 'Helder',
+     'De lucht is helder. Je kijkt ver over zee, ziet de bergen en de eilanden aan de overkant scherp en je ruikt geen rook.', ''),
+    (35, 'rook', 'Lichte waas',
+     'Er hangt een lichte waas. Bergen en eilanden verderop zijn minder scherp te zien en soms ruik je een vleug rook. Voor de meeste mensen is dat geen probleem.',
      'Ouderen, mensen met gezondheidsklachten en kinderen blijven beter wat meer binnen.'),
-    (75, 'ongezond', 'Ongezond',
-     'De lucht is ongezond door rook.',
+    (75, 'ongezond', 'Rook',
+     'Er hangt duidelijk rook. De lucht ziet grijs of geelachtig, de zon is flets en buiten ruik je het. Eilanden aan de overkant zijn slecht te zien.',
      'Ouderen, mensen met gezondheidsklachten en kinderen blijven het beste binnen. Iedereen doet het buiten rustig aan.'),
-    (1e9, 'zeerongezond', 'Zeer ongezond',
-     'De lucht is erg ongezond door rook.',
+    (1e9, 'zeerongezond', 'Dikke rook',
+     'Er hangt dikke rook. Je kijkt vaak maar een paar honderd meter ver, de zon is een oranje bol en je ogen en keel kunnen prikken.',
      'Iedereen blijft zo veel mogelijk binnen, met ramen en deuren dicht. Een mondkapje helpt buiten.'),
 ]
 

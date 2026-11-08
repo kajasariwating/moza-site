@@ -507,7 +507,7 @@ def dorp_html(d, ctx, nu):
 <h2 id="h-lucht">Is de lucht gezond?</h2>
 <div class="blok"><p class="groot">{e(l["zin"])}</p>{f'<p>{e(l["advies"])}</p>' if l['advies'] else ''}
 <div class="dagen" role="img" aria-label="Hoe gezond de lucht was, per dag">{vakjes}</div>
-<div class="leg"><span><i class="c-gezond"></i>Gezond</span><span><i class="c-rook"></i>Wat rook</span><span><i class="c-ongezond"></i>Ongezond</span></div>
+<div class="leg"><span><i class="c-gezond"></i>Helder</span><span><i class="c-rook"></i>Lichte waas</span><span><i class="c-ongezond"></i>Rook</span><span><i class="c-zeerongezond"></i>Dikke rook</span></div>
 </div></section>''')
 
     # ---- zee (alleen voor dorpen aan de kust)
