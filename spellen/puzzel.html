@@ -145,6 +145,11 @@ button:focus-visible,.cel:focus-visible{outline:3px solid var(--roze);outline-of
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .cel.l.vast,:root:not([data-theme="light"]) .cel.l.goed,:root:not([data-theme="light"]) .lijst li .opl{color:#8FA2FF}}
 .weetje{border:2px solid var(--rand);background:var(--geel);color:#111;padding:10px 14px;font-size:15px}
 .weetje b{display:block;font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+.weetje .weg{display:none}
+html.mz-app .weetje{position:fixed;left:max(10px,env(safe-area-inset-left,0px));right:max(10px,env(safe-area-inset-right,0px));z-index:6;box-shadow:4px 4px 0 var(--rand);padding:10px 40px 10px 12px;font-size:14px;line-height:1.4;animation:wIn .2s ease-out;cursor:pointer}
+html.mz-app .weetje .weg{display:block;position:absolute;top:6px;right:6px;width:28px;height:28px;border:2px solid #111;background:#fff;color:#111;font-size:14px;font-weight:900;padding:0;line-height:1}
+@keyframes wIn{from{transform:translateY(8px);opacity:0}}
+@media (prefers-reduced-motion:reduce){html.mz-app .weetje{animation:none}}
 .lijst li .uit{display:block;font-size:13px;color:var(--zacht);margin-top:2px}
 .lijst li button.af{text-decoration:none;color:var(--ink)}
 .lijst li button.af .om{color:var(--zacht)}
@@ -187,7 +192,11 @@ const app=document.getElementById('app');
 let P=null, ST=null, timerId=null;
 
 function ontleed(idx){
-  const pz=DATA[idx], R=pz.R, C=pz.C;
+  const pz0=DATA[idx];
+  /* Lege randen weg, zodat het raster zo groot mogelijk kan worden */
+  let r0=1e9,c0=1e9,r1=0,c1=0; pz0.words.forEach(w=>{const L=w.w.length; r0=Math.min(r0,w.r); c0=Math.min(c0,w.c); r1=Math.max(r1,w.r+(w.d==='V'?L-1:0)); c1=Math.max(c1,w.c+(w.d==='H'?L-1:0));});
+  const pz=Object.assign({},pz0,{R:r1-r0+1,C:c1-c0+1,words:pz0.words.map(w=>Object.assign({},w,{r:w.r-r0,c:w.c-c0}))});
+  const R=pz.R, C=pz.C;
   const g=Array.from({length:R},()=>Array(C).fill('#'));
   const slots=pz.words.map(w=>{
     const cells=[...w.w].map((ch,k)=>{const r=w.r+(w.d==='V'?k:0), c=w.c+(w.d==='H'?k:0); g[r][c]=ch; return [r,c];});
@@ -217,7 +226,8 @@ function overzicht(){
 
 function spel(idx){
   P=ontleed(idx);
-  const op=S.prog[P.id], klaar=S.done[P.id];
+  let op=S.prog[P.id]; const klaar=S.done[P.id];
+  if(op&&(!op.f||op.f.length!==P.R||op.f[0].length!==P.C)) op=null; /* oude voortgang van vóór het bijsnijden */
   const leeg=P.g.map(r=>r.replace(/[^#]/g,'.'));
   ST={f:(klaar?P.g:(op?op.f:leeg)).map(r=>r.split('')), t:klaar?klaar.t:(op?op.t:0), h:new Set(op?op.h:[]), vast:new Set(), fout:new Set(), sel:null, dir:'H', pauze:false, klaar:!!klaar, gezien:new Set()};
   if(P.lv==='makkelijk') P.slots.forEach(s=>{const [r,c]=s.cells[0]; ST.vast.add(r+','+c); ST.f[r][c]=P.g[r][c];});
@@ -264,6 +274,7 @@ function bouwRaster(){
     teken();
   });
   new ResizeObserver(()=>P&&el.style.setProperty('--c',(el.clientWidth/P.C)+'px')).observe(el);
+  pasRaster(); setTimeout(pasRaster,60); setTimeout(pasRaster,400); if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>pasRaster());
 }
 function bouwLijsten(){
   ['H','V'].forEach(d=>{ document.getElementById('lijst'+d).innerHTML=P.slots.filter(s=>s.d===d).map(s=>'<li><button data-slot="'+s.idx+'"><b>'+s.nr+'</b><span class="inh"></span></button></li>').join(''); });
@@ -300,12 +311,39 @@ function teken(){
   });
   if(s){
     document.getElementById('balk').innerHTML=esc(s.clue)+'<small>'+s.nr+' '+(s.d==='H'?'horizontaal':'verticaal')+' · '+s.cells.length+' letters</small>';
+    { const bh=document.querySelector('.balk').offsetHeight; if(bh!==window.__bh){ window.__bh=bh; pasRaster(); } }
     const a=document.querySelector('.lijst [data-slot="'+s.idx+'"]'); if(a&&window.matchMedia('(min-width:861px)').matches) a.scrollIntoView({block:'nearest'});
   }
 }
+/* In de app (telefoon): raster zo groot als past tussen omschrijving en toetsenbord */
+function pasRaster(){
+  if(!document.documentElement.classList.contains('mz-app')||!P) return;
+  const q=x=>document.querySelector(x), el=q('#raster'), kaart=q('.puzzelkaart'), houder=q('.raster-houder');
+  if(!el||!kaart) return;
+  const h=x=>{const e=q(x); return e?e.getBoundingClientRect().height:0;};
+  const chrome=kaart.getBoundingClientRect().height-el.getBoundingClientRect().height;
+  const vast=h('.spelkop')+h('.balk')+h('.gereedschap')+h('.toets')+chrome+6+8+8+3*8+14;
+  let rasterH=Math.max(120,innerHeight-vast);
+  const zet=()=>{el.style.width=Math.min(houder.clientWidth,rasterH*P.C/P.R)+'px'; el.style.margin='0 auto';};
+  zet();
+  /* Bijstellen op wat er echt overblijft tussen knoppen en toetsenbord */
+  for(let i=0;i<3;i++){
+    const g=q('.gereedschap').getBoundingClientRect().bottom, t=q('.toets').getBoundingClientRect().top;
+    const over=t-g-6; if(Math.abs(over)<3) break;
+    rasterH=Math.max(120,el.getBoundingClientRect().height+over); zet();
+  }
+}
+addEventListener('resize',()=>pasRaster());
+let weetjeT=null;
 function toonWeetje(s){
   const w=document.getElementById('weetje'); if(!w) return;
-  w.innerHTML='<b>Goed: '+esc(s.disp)+'</b>'+esc(s.uitleg); w.hidden=false;
+  w.innerHTML='<button class="weg" aria-label="Sluiten">✕</button><b>Goed: '+esc(s.disp)+'</b>'+esc(s.uitleg); w.hidden=false;
+  w.onclick=()=>{w.hidden=true;};
+  clearTimeout(weetjeT);
+  if(document.documentElement.classList.contains('mz-app')){
+    const t=document.querySelector('.toets'); w.style.bottom=((t?t.getBoundingClientRect().height:190)+8)+'px';
+    weetjeT=setTimeout(()=>{w.hidden=true;},Math.min(12000,4000+s.uitleg.length*45));
+  }
 }
 function zet(r,c,l){ if(ST.vast.has(r+','+c)) return; ST.f[r][c]=l; ST.fout.delete(r+','+c); if(l==='.') ST.h.delete(r+','+c); }
 function nieuwGoed(){

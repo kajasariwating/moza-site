@@ -40,17 +40,17 @@
   var NAMEN = {woord:'Raad het woord', puzzel:'Kruiswoordpuzzel'};
   var APP_CSS = {
     puzzel:
-      'html.mz-app .wrap{padding-block:8px 24px!important}' +
+      'html.mz-app .wrap{padding-block:8px 8px!important}' +
       'html.mz-app .spelkop{margin-bottom:6px!important;gap:8px!important}' +
       'html.mz-app .spelkop .knop{padding:6px 10px!important}' +
       'html.mz-app .spelkop .titel{font-size:16px!important}' +
+      'html.mz-app .spelkop .titel small{display:none!important}html.mz-app .links{gap:6px!important}' +
       'html.mz-app .tijd{font-size:18px!important}' +
       'html.mz-app .speelveld{gap:16px!important}' +
       'html.mz-app .links{gap:8px!important;min-height:calc(100dvh - 16px)}' +
-      'html.mz-app .balk{min-height:48px!important}html.mz-app .balk .tekst{font-size:15px!important}' +
-      'html.mz-app .puzzelkaart{padding:8px!important;box-shadow:4px 4px 0 var(--schaduw)!important}' +
-      'html.mz-app .raster{width:min(100%, calc((100dvh - 400px) * var(--n) / var(--r)))!important;margin:0 auto!important}' +
-      'html.mz-app .gereedschap .knop{padding:7px 10px!important;font-size:14px!important}' +
+      'html.mz-app .balk{min-height:70px!important}html.mz-app .balk .tekst{font-size:15px!important}' +
+      'html.mz-app .puzzelkaart{padding:4px!important;box-shadow:4px 4px 0 var(--schaduw)!important}' +
+      'html.mz-app .gereedschap .knop{padding:5px 10px!important;font-size:14px!important}' +
       'html.mz-app .toets{display:flex!important;margin-top:auto!important;position:sticky;bottom:0;z-index:4;background:var(--bg);padding:6px 0 calc(6px + env(safe-area-inset-bottom,0px))}' +
       'html.mz-app .wrap{padding-left:max(8px,env(safe-area-inset-left,0px))!important;padding-right:max(8px,env(safe-area-inset-right,0px))!important}' +
       'html.mz-app .toets{gap:6px!important}html.mz-app .toets div{gap:4px!important}' +
@@ -63,10 +63,10 @@
   var APP_KADER =
     '.mzsp-app{position:fixed;inset:0;z-index:2147483000;display:flex;flex-direction:column;background:#F4F2EC;color:#111}' +
     'html.moza-dark .mzsp-app{background:#121212;color:#F4F2EC}' +
-    '.mzsp-app .bar{display:flex;align-items:center;gap:10px;padding:calc(8px + env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) 8px max(12px,env(safe-area-inset-left,0px));border-bottom:3px solid currentColor;font-family:"Hanken Grotesk",system-ui,sans-serif}' +
+    '.mzsp-app .bar{display:flex;align-items:center;gap:10px;padding:calc(4px + env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) 4px max(12px,env(safe-area-inset-left,0px));border-bottom:3px solid currentColor;font-family:"Hanken Grotesk",system-ui,sans-serif}' +
     '.mzsp-app .bar b{flex:1;font-weight:900;font-size:18px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
     '.mzsp-app .bar span{font-weight:900;font-size:12px;letter-spacing:.1em;background:#111;color:#E9F25A;padding:4px 8px}' +
-    '.mzsp-app .bar button{font:inherit;font-weight:900;font-size:22px;line-height:1;width:40px;height:40px;border:2px solid currentColor;background:transparent;color:inherit;cursor:pointer}' +
+    '.mzsp-app .bar button{font:inherit;font-weight:900;font-size:22px;line-height:1;width:36px;height:36px;border:2px solid currentColor;background:transparent;color:inherit;cursor:pointer}' +
     '.mzsp-app iframe{flex:1;width:100%;border:0;display:block;background:transparent}' +
     'html.mzsp-open,html.mzsp-open body{overflow:hidden!important;overscroll-behavior:none}' +
     '.mzsp-start{border:3px solid currentColor;padding:20px;display:flex;flex-direction:column;gap:12px;font-family:"Hanken Grotesk",system-ui,sans-serif}' +
@@ -271,8 +271,8 @@
   };
   var HELD_CSS =
     /* Lege ruimte boven het bericht weg, de eigen kop vervangt titel en datum */
-    'html.mzsp-post section.content-collection{padding-top:12px!important}' +
-    'html.mzsp-post article.entry{padding-top:0!important}' +
+    '@media (max-width:760px){html.mzsp-post section.content-collection{padding-top:12px!important}html.mzsp-post article.entry{padding-top:0!important}}' +
+    '@media (min-width:761px){html.mzsp-post article.entry{padding-top:32px!important}}' +
     'html.mzsp-post .blog-item-top-wrapper{display:none!important}' +
     '.mzsp-held{margin:0 0 28px;border:3px solid #111;background:#fff;color:#111;box-shadow:8px 8px 0 #1F3BD1;font-family:"Hanken Grotesk",system-ui,sans-serif;display:grid;grid-template-columns:1fr}' +
     '.mzsp-held .beeld{border-bottom:3px solid #111;background:#1F3BD1;display:flex;align-items:center;justify-content:center;padding:14px}.mzsp-held .beeld.b-woord{background:#F4F2EC}' +
