@@ -782,7 +782,51 @@ def eiland_html(g, lijst, nu, brandset):
                   f'/eiland/{g}/', body, f'<script type="application/ld+json">{ld}</script>\n')
 
 
-def start_html(groepen, brandlijst, nu):
+def recente_bevingen(rows, lijst, nu, dagen=7, drempel=3.5, max_n=8):
+    """Bevingen van de afgelopen dagen die mensen in minstens één dorp goed konden voelen."""
+    if lijst is None:
+        return None
+    grens = nu - timedelta(days=dagen)
+    uit = []
+    for q in lijst:
+        if q['t'].astimezone(WIT) < grens:
+            continue
+        best_i, dicht, dicht_km = -9.0, None, 1e9
+        for d in rows:
+            km = T.km_tussen(d['la'], d['lo'], q['la'], q['lo'])
+            if km < dicht_km:
+                dicht, dicht_km = d, km
+            if km < 400:
+                best_i = max(best_i, T.mmi(q['mag'], km, q['diepte']))
+        if best_i >= drempel and dicht:
+            uit.append(dict(q, mmi=best_i, dorp=dicht, km=dicht_km))
+    uit.sort(key=lambda q: q['t'], reverse=True)
+    return uit[:max_n]
+
+
+def dagnaam(t, nu):
+    d = (nu.date() - t.date()).days
+    return 'Vandaag' if d == 0 else 'Gisteren' if d == 1 else T.DAGEN[t.weekday()].capitalize()
+
+
+def bevingen_blok(bevlijst, nu):
+    if bevlijst is None:
+        return ''
+    kop = '<section aria-labelledby="h-bev"><h2 id="h-bev">Aardbevingen die je kon voelen</h2><p>Afgelopen 7 dagen, in Molukse tijd. Tik op een dorp voor uitleg.</p>'
+    if not bevlijst:
+        return kop + '<p class="let">Geen beving die mensen goed konden voelen. Kleine bevingen zijn er bijna elke dag, die merk je meestal niet.</p></section>'
+    rijen = []
+    for q in bevlijst:
+        d, t = q['dorp'], q['t'].astimezone(WIT)
+        g = T.beving_gevoel(q['mmi'])
+        woord = g[1].split('.')[0]
+        plek = f'Bij {d["naam"]}' if q['km'] < 15 else f'{round(q["km"])} km van {d["naam"]}'
+        rijen.append(f'<a class="rij" href="/{d["slug"]}/"><b>{e(plek)}<small>{dagnaam(t, nu)} om {t:%H:%M} · {e(T.plek_kort(d))}</small></b>'
+                     f'<span class="badge bv-{g[0]}">{e(woord.upper())}</span></a>')
+    return kop + '<div class="verder">' + ''.join(rijen) + '</div></section>'
+
+
+def start_html(groepen, brandlijst, nu, bevlijst=None):
     knoppen = ''.join(f'<a href="/eiland/{g}/">{e(n)}</a>' for g, n in D.GROEPEN.items())
     brand = ''
     if brandlijst:
@@ -800,6 +844,7 @@ def start_html(groepen, brandlijst, nu):
 <main class="w">
 <section><h2>Of kies een eilandgroep</h2><div class="knoppen">{knoppen}</div></section>
 {brand}
+{bevingen_blok(bevlijst, nu)}
 <section aria-labelledby="h-kaart"><h2 id="h-kaart">Of kies op de kaart</h2><p>Zoom in, tik op een dorp en kies <b>Wat speelt er nu</b>.</p></section>
 </main>
 <div id="mzn-plek"></div>
@@ -901,6 +946,8 @@ def main():
             if any(p['binnen'] and (nu - p['t'].astimezone(WIT)) < timedelta(hours=48) for p in brand_per[d['code']]):
                 brandlijst.append(d)
 
+    bevlijst = recente_bevingen(rows, bev, nu)
+
     for i, d in enumerate(rows):
         zoek.append({'n': d['naam'], 'o': d['officieel'] if d['officieel'] != d['naam'] else '', 's': d['slug'],
                      'c': d['kec'], 'g': D.GROEPEN.get(d['groep'], ''), 'b': 1 if d['code'] in brandset else 0})
@@ -937,7 +984,7 @@ def main():
         f = uit / 'eiland' / g / 'index.html'
         f.parent.mkdir(parents=True, exist_ok=True)
         f.write_text(eiland_html(g, [d for d in rows if d['groep'] == g], nu, brandset))
-    (uit / 'index.html').write_text(start_html(D.GROEPEN, brandlijst, nu))
+    (uit / 'index.html').write_text(start_html(D.GROEPEN, brandlijst, nu, bevlijst))
     (uit / 'zoek.json').write_text(json.dumps(zoek, ensure_ascii=False, separators=(',', ':')))
     (uit / 'slugs.json').write_text(json.dumps({d['code']: d['slug'] for d in rows}, separators=(',', ':')))
     shutil.copytree(D.ATLAS, uit / 'atlas')
