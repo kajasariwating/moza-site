@@ -453,7 +453,7 @@ def mozakop_desktop():
     logo = ('<a class="dlogo" href="/" aria-label="Kabar Maluku Live, naar de startpagina"><span class="kb">KABAR<small aria-hidden="true">'
             '<span>M</span><span>A</span><span>L</span><span>U</span><span>K</span><span>U</span></small><span class="sr">Maluku</span><i></i></span><span class="lv">LIVE</span></a>')
     # Naast het logo: de tabs van moza.nu met Meer en de tegels Delen en Ander dorp. Rechts leesbaarheid en nachtmodus.
-    tabs = (f'<nav class="tb" aria-label="Menu van MOZA"><a href="{_mz("/")}">Voorpagina</a><a href="{_mz("/lezen")}">Net binnen</a><a href="{_mz("/nieuws/maluku")}">Maluku</a>'
+    tabs = (f'<nav class="tb" aria-label="Menu van MOZA"><a href="{_mz("/")}">Voorpagina MOZA</a><a href="{_mz("/lezen")}">Net binnen</a><a href="{_mz("/nieuws/maluku")}">Maluku</a>'
             '<button type="button" class="meer" aria-expanded="false" aria-controls="mzd-mp"><span>Meer</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button></nav>')
     tegels = ('<span class="dtgs">'
               f'<button type="button" class="dtg deel" data-deel aria-label="Deel deze pagina">{ic("deel")}<span>Delen</span></button>'
@@ -461,6 +461,7 @@ def mozakop_desktop():
     rechts = ('<span class="dr">'
               '<button type="button" class="dlh" onclick="mzGroot()" aria-label="Grotere letters aan of uit" title="Leeshulp: grotere letters"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + _IC_AA + '</svg></button>'
               '<button type="button" class="dth" onclick="mzThema()" aria-label="Nachtmodus aan of uit" title="Nachtmodus"><svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>'
+              f'<a class="mzlogo dmoza" href="{_mz("/")}" aria-label="MOZA, naar de voorpagina van moza.nu" title="Naar moza.nu">MOZA</a>'
               '</span>')
     def groep(naam, pad, kl, bg, ico, items):
         donker = bg in ('#E9F25A', '#EDDCB8')
