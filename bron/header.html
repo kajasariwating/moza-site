@@ -3117,7 +3117,9 @@ function html(withForm){
   '<div class="mzf-legal mzlegal"><span class="mzf-lt">© '+new Date().getFullYear()+' Stichting MOZA · KvK 87417030 · BTW NL864288591B01 · <a href="/privacyverklaring">Privacyverklaring</a> · <a href="/disclaimer">Disclaimer</a></span>'+PAY+'</div></div>';
 }
 function hash(el){if(location.hash==='#mzf-nb'){setTimeout(function(){var t=el.querySelector('#mzf-nb');if(t)t.scrollIntoView({block:'center'});var i=el.querySelector('input[type=email],input');if(i)try{i.focus({preventScroll:true})}catch(e){}},400)}}
+function inEditor(){try{return window.top!==window.self&&/^\/config/.test(window.top.location.pathname)}catch(e){return false}}
 function build(){
+ if(inEditor())return true;
  var home=location.pathname==='/'||location.pathname==='';
  if(home){var hfs=document.getElementById('footer-sections');if(hfs)[].forEach.call(hfs.children,function(c){c.style.display='none'});var ft=document.querySelector('#mzmob footer.ft');if(!ft)return false;if(ft.getAttribute('data-mzf'))return true;ft.setAttribute('data-mzf','1');ft.classList.add('mzf');ft.innerHTML=html(false);hash(ft);return true}
  if(document.querySelector('footer.mzf'))return true;
