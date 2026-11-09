@@ -512,6 +512,18 @@ Voor de hoofdfoto van een artikel: geef het artikel de tag "Beeld Naam" (zonder 
       badge(host,name); b.setAttribute('data-moza-credit','1');
     });
   }
+  /* foto's in een tekstblok: <figure><img></figure> gevolgd door <p><em>... Beeld: Naam</em></p> */
+  function inline(){
+    if(document.body.classList.contains('sqs-edit-mode-active')) return;
+    [].forEach.call(document.querySelectorAll('.sqs-html-content figure'),function(f){
+      if(f.getAttribute('data-moza-credit')||f.closest('[contenteditable=true]')||!f.querySelector('img')) return;
+      var p=f.nextElementSibling; if(!p||p.tagName!=='P') return;
+      var t=(p.textContent||'').trim(); var m=RX.exec(t); if(!m) return;
+      var name=m[1].trim(); var rest=t.slice(0,m.index+(/^[\s.;,–-]/.test(m[0])?1:0)).trim().replace(/[\s;,–-]+$/,'');
+      var tgt=p.querySelector('em,i')||p; tgt.textContent=rest; if(!rest) p.style.display='none';
+      f.style.position='relative'; badge(f,name); f.setAttribute('data-moza-credit','1');
+    });
+  }
   var heroName=null, asked=false;
   function hero(){
     var f=document.querySelector('figure.moza-hero'); if(!f) return;
@@ -520,7 +532,7 @@ Voor de hoofdfoto van een artikel: geef het artikel de tag "Beeld Naam" (zonder 
     fetch(location.pathname+'?format=json').then(function(r){return r.json();}).then(function(j){ var tags=(j.item&&j.item.tags)||[]; var t=tags.filter(function(x){return /^beeld[\s:]+\S/i.test(x);})[0]; if(t){ heroName=t.replace(/^beeld[\s:]+/i,'').trim(); hero(); } }).catch(function(){});
   }
   function hideTagChips(){ [].forEach.call(document.querySelectorAll('a[href*="/tag/"]'),function(a){ if(/\/tag\/beeld[+%:\s-]/i.test(a.getAttribute('href')||'')||/^beeld[\s:]+\S/i.test(a.textContent.trim())){ var w=a.closest('li')||a; w.style.display='none'; } }); }
-  function run(){captions(); hero(); hideTagChips(); }
+  function run(){captions(); inline(); hero(); hideTagChips(); }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',run); else run();
   [400,1200,2500,5000].forEach(function(t){setTimeout(run,t);}); window.addEventListener('load',run);
 })();
