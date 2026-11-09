@@ -4059,3 +4059,43 @@ if(!build()){var n=0,iv=setInterval(function(){if(build()||++n>60)clearInterval(
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
 })();
 </script>
+
+<!-- ===== mz-bb-thema-arch: bij een thema in de beeldbank ook de foto's uit het archief (niet te koop) tonen ===== -->
+<script id="mz-bb-thema-arch-js">
+(function(){
+  var path=location.pathname.replace(/\/$/,'');
+  if(!/^\/beeldbank(\/(?!p\/)[^\/]+)?$/.test(path))return;
+  var cache={},busy=false;
+  function ids(slug){
+    if(cache[slug])return cache[slug];
+    var out={},url='/beeldbank/'+slug+'?format=json';
+    cache[slug]=(function next(n){return fetch(url).then(function(r){return r.json();}).then(function(j){(j.items||[]).forEach(function(i){out[i.id]=1;});var nx=j.pagination&&j.pagination.nextPage&&j.pagination.nextPageUrl;if(nx&&n<10){url=nx+(nx.indexOf('?')<0?'?':'&')+'format=json';return next(n+1);}return out;});})(0).catch(function(){return out;});
+    return cache[slug];
+  }
+  function fix(root){
+    var grid=root.querySelector('.bb-grid:not(.bb-grid-arch)');if(!grid||!window.MZBB||!window.MZ_CARD)return;
+    var chip=root.querySelector('.bb-chips button[aria-pressed="true"]'),slug=chip?chip.getAttribute('data-s'):'';
+    var tier=root.querySelector('.bb-tier[aria-pressed="true"]'),q=(root.querySelector('.bb-search input')||{}).value||'';
+    if(!slug||tier||q.trim())return;
+    if(grid.querySelector('.mz-tarch'))return;
+    ids(slug).then(function(m){
+      var chip2=root.querySelector('.bb-chips button[aria-pressed="true"]');if(!chip2||chip2.getAttribute('data-s')!==slug)return;
+      if(grid.querySelector('.mz-tarch'))return;
+      var list=(MZBB.arch||[]).filter(function(x){return m[x.id];});if(!list.length)return;
+      busy=true;
+      var leeg=grid.querySelector('.bb-empty');if(leeg)leeg.remove();grid.style.columns='';
+      var w=document.createElement('div');w.innerHTML=list.map(function(x){return MZ_CARD(x);}).join('');
+      [].slice.call(w.children).forEach(function(c){c.classList.add('mz-tarch');grid.appendChild(c);});
+      var cnt=root.querySelector('.bb-count');if(cnt){var n=grid.querySelectorAll('.bb-ph').length;cnt.textContent=n+(n===1?' foto':' foto\'s');}
+      setTimeout(function(){busy=false;},50);
+    });
+  }
+  function start(){
+    var root=document.getElementById('bb');if(!root||!root.querySelector('.bb-grid'))return false;
+    var grid=root.querySelector('.bb-grid:not(.bb-grid-arch)');
+    new MutationObserver(function(){if(!busy)fix(root);}).observe(grid,{childList:true});
+    fix(root);return true;
+  }
+  var n=0,iv=setInterval(function(){if(start()||++n>80)clearInterval(iv);},250);
+})();
+</script>
