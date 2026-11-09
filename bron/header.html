@@ -4037,3 +4037,23 @@ if(!build()){var n=0,iv=setInterval(function(){if(build()||++n>60)clearInterval(
 </script>
 
 <script id="mz-woord-js" src="https://cdn.jsdelivr.net/gh/kajasariwating/moza-site@b7e97d563a3b45811ff0e38490c73df51e4132a7/woord/woord.js"></script>
+
+<!-- Nieuwsbrief: tekst in het aanmeldformulier van Squarespace (footer) op "wekelijks" zetten. -->
+<script id="mz-nb-tekst-js">
+(function(){
+  var NIEUW='Meld je aan voor onze wekelijkse nieuwsbrief!';
+  function zet(){
+    var n=0;
+    document.querySelectorAll('.newsletter-form-header-description p').forEach(function(p){
+      if(/tweewekelijks/i.test(p.textContent)){p.textContent=NIEUW;}
+      n++;
+    });
+    return n>0;
+  }
+  function start(){
+    zet();
+    var t=0;try{new MutationObserver(function(){if(t)return;t=setTimeout(function(){t=0;zet();},300);}).observe(document.body,{childList:true,subtree:true});}catch(e){}
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
+})();
+</script>
