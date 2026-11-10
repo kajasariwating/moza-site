@@ -615,6 +615,82 @@ def norm_naam(x):
     return re.sub(r'[^a-z]', '', x.lower())
 
 
+
+ROUTES = {}
+
+
+def vliegveld_voor(d, eiland=None):
+    """Vliegveld op het eiland, of Pattimura/Babullah als die dichterbij ligt. Geeft (naam, la, lo, km hemelsbreed)."""
+    if not VLIEGVELDEN:
+        return None
+    rond_eiland = eiland.buffer(0.03) if eiland is not None else None
+    op = [v for v in VLIEGVELDEN if rond_eiland is not None and rond_eiland.contains(Point(v[2], v[1]))]
+    groot = [v for v in VLIEGVELDEN if v[0].startswith(('Pattimura', 'Sultan Babullah'))
+             and T.km_tussen(d['la'], d['lo'], v[1], v[2]) <= 150]
+    kand = (op + groot) or VLIEGVELDEN
+    km, v = min(((T.km_tussen(d['la'], d['lo'], v[1], v[2]), v) for v in kand), key=lambda x: x[0])
+    return (v[0], v[1], v[2], km) if km < 400 else None
+
+
+def reis_tekst(d, soort, naam, km):
+    """'33 km over de weg', 'met de boot, 40 km hemelsbreed' of (zonder route) 'N km hemelsbreed'."""
+    if km < 2:
+        return 'vlakbij'
+    r = ROUTES.get(d['code'], {}).get(soort)
+    if r and r[0] == naam:
+        if r[2]:
+            return f'met de boot, {round(km)} km hemelsbreed'
+        if r[1]:
+            return f'{rond(r[1])} km over de weg'
+    return f'{round(km)} km hemelsbreed'
+
+
+def routes_berekenen(rows, kust):
+    """Afstand over de weg (OSRM) van elk dorp naar zijn stad en vliegveld -> gegevens/routes.json."""
+    import time
+    import urllib.request
+    taken = {}  # (la, lo) bestemming -> [(code, soort, naam, la, lo)]
+    uit = {}
+    for d in rows:
+        eil = eiland_van(d, kust)
+        stad, km = stad_voor(d, eil)
+        sla = next(((a, b) for n, a, b in STEDEN if n == stad), None)
+        vv = vliegveld_voor(d, eil)
+        for soort, naam, dl in (('stad', stad, sla), ('vlieg', vv[0] if vv else None, (vv[1], vv[2]) if vv else None)):
+            if not naam or not dl:
+                continue
+            boot = eil is None or not eil.buffer(0.03).contains(Point(dl[1], dl[0]))
+            uit.setdefault(d['code'], {})[soort] = [naam, None, boot]
+            if not boot:
+                taken.setdefault(dl, []).append((d['code'], soort, d['la'], d['lo']))
+    n = 0
+    for (bla, blo), lijst in taken.items():
+        for i in range(0, len(lijst), 90):
+            deel = lijst[i:i + 90]
+            coords = ';'.join(f'{lo:.5f},{la:.5f}' for _, _, la, lo in deel) + f';{blo:.5f},{bla:.5f}'
+            url = (f'https://router.project-osrm.org/table/v1/driving/{coords}?sources={";".join(str(k) for k in range(len(deel)))}'
+                   f'&destinations={len(deel)}&annotations=distance')
+            for poging in range(4):
+                try:
+                    req = urllib.request.Request(url, headers={'User-Agent': 'live.moza.nu (MOZA)'})
+                    j = json.load(urllib.request.urlopen(req, timeout=120))
+                    break
+                except Exception as fout:  # noqa: BLE001
+                    print('  opnieuw:', fout)
+                    time.sleep(10 * (poging + 1))
+            else:
+                continue
+            for (code, soort, _, _), rij in zip(deel, j.get('distances', [])):
+                afst = rij[0] if rij else None
+                if afst is not None:
+                    uit[code][soort][1] = round(afst / 1000, 1)
+            n += 1
+            time.sleep(1.2)
+    (HIER / 'gegevens' / 'routes.json').write_text(json.dumps(uit, ensure_ascii=False))
+    print('routes: verzoeken', n, 'dorpen', len(uit), 'met weg-afstand',
+          sum(1 for v in uit.values() for x in v.values() if x[1]))
+
+
 def kort_blok(d, kust_dorp, eiland=None):
     """Blok 'In het kort': inwoners (BPS), grond (BPS), hoogte, veerhaven of grote plaats."""
     tegels = []
@@ -645,20 +721,14 @@ def kort_blok(d, kust_dorp, eiland=None):
     else:
         stad, km = stad_voor(d, eiland)
         if not (d.get('kabnaam', '').startswith('Kota ') or km <= 10):  # dorp ligt al in of bij de stad
-            tegels.append(('Afstand tot stad', stad, 'je bent er al' if km < 2 else T.afstand(km) if km <= 3 else f'{round(km)} km hemelsbreed'))
-    if VLIEGVELDEN:
-        rond_eiland = eiland.buffer(0.03) if eiland is not None else None
-        op = [v for v in VLIEGVELDEN if rond_eiland is not None and rond_eiland.contains(Point(v[2], v[1]))]
-        # geen vliegveld op het eiland: dan het grote vliegveld van Ambon of Ternate als dat in de buurt ligt
-        groot = [v for v in VLIEGVELDEN if v[0].startswith(('Pattimura', 'Sultan Babullah'))
-                 and T.km_tussen(d['la'], d['lo'], v[1], v[2]) <= 150]
-        kand = (op + groot) or VLIEGVELDEN  # vliegveld op het eiland, of Pattimura/Babullah als die dichterbij ligt
-        vkm, vn = min(((T.km_tussen(d['la'], d['lo'], v[1], v[2]), v[0]) for v in kand), key=lambda x: x[0])
-        if vkm < 400:
-            m = re.match(r'^(.*) \((.*)\)$', vn)
-            plaats, veld = (m.group(2), m.group(1)) if m else (vn, '')
-            afst = 'vlakbij' if vkm < 2 else f'{round(vkm)} km'
-            tegels.append(('Vliegveld', plaats, f'{veld}, {afst}' if veld else afst))
+            tegels.append(('Afstand tot stad', stad, reis_tekst(d, 'stad', stad, km)))
+    v = vliegveld_voor(d, eiland)
+    if v:
+        vn, _, _, vkm = v
+        m = re.match(r'^(.*) \((.*)\)$', vn)
+        plaats, veld = (m.group(2), m.group(1)) if m else (vn, '')
+        tekst = reis_tekst(d, 'vlieg', vn, vkm)
+        tegels.append(('Vliegveld', plaats, f'{veld}, {tekst}' if veld else tekst))
     if len(tegels) < 2:
         return ''
     t = ''.join(f'<div class="tg"><span class="label">{e(l)}</span><b>{e(w)}</b><small>{e(sm)}</small></div>' for l, w, sm in tegels)
@@ -1134,6 +1204,7 @@ def main():
     ap.add_argument('--uit', default=str(Path.cwd() / '_site'))
     ap.add_argument('--alleen', default='')
     ap.add_argument('--zonder-live', action='store_true')
+    ap.add_argument('--routes', action='store_true', help='alleen afstanden over de weg berekenen')
     a = ap.parse_args()
     uit = Path(a.uit)
     if uit.exists():
@@ -1192,6 +1263,12 @@ def main():
                 c = min(delen, key=lambda c: T.km_tussen(c.y, c.x, mla, mlo))
                 print('  punt verplaatst:', d['naam'], d['kec'])
                 d['la'], d['lo'] = c.y, c.x
+
+    if a.routes:
+        routes_berekenen(rows, kust)
+        return
+    rf = HIER / 'gegevens' / 'routes.json'
+    ROUTES.update(json.loads(rf.read_text()) if rf.exists() else {})
     geos = [poly_deg(d['grens']) or Point(d['lo'], d['la']).buffer(0.008) for d in rows]
     boom = STRtree(geos)
 

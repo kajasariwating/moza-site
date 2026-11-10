@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       wat:
-        description: 'plaatsen, bos, veer of allebei'
+        description: 'plaatsen, bos, veer, routes of allebei'
         default: 'allebei'
   schedule:
     - cron: '40 3 1 * *'   # elke eerste van de maand
@@ -23,12 +23,15 @@ jobs:
           python-version: '3.12'
       - run: pip install shapely mapbox-vector-tile rasterio numpy
       - name: Plek van de dorpen (OpenStreetMap)
-        if: github.event_name == 'schedule' || (inputs.wat != 'bos' && inputs.wat != 'veer')
+        if: github.event_name == 'schedule' || inputs.wat == 'plaatsen' || inputs.wat == 'allebei'
         run: python3 dorp/plaatsen.py
       - name: Veerhavens (OpenStreetMap)
         run: python3 dorp/veerhavens.py
       - name: Vliegvelden (OpenStreetMap)
         run: python3 dorp/vliegvelden.py
+      - name: Afstand over de weg naar stad en vliegveld (OSRM)
+        if: github.event_name == 'schedule' || inputs.wat == 'routes' || inputs.wat == 'allebei'
+        run: python3 dorp/bouw.py --routes
       - name: Bos per dorp (Global Forest Change)
         if: github.event_name == 'workflow_dispatch' && (inputs.wat == 'bos' || inputs.wat == 'allebei')
         run: python3 dorp/bos.py
