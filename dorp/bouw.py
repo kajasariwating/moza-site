@@ -879,6 +879,17 @@ def recente_bevingen(rows, lijst, nu, op_land=None, dagen=7, max_n=5):
 
 
 AMBON = (-3.6954, 128.1814)
+# Grote plaatsen in de Molukken (OpenStreetMap; Labuha en Banda Neira aangevuld)
+STEDEN = [('Ambon', -3.6959, 128.1788), ('Masohi', -3.3063, 128.953), ('Piru', -3.0618, 128.195), ('Bula', -3.1053, 130.4886),
+          ('Namlea', -3.2695, 127.0992), ('Namrole', -3.8442, 126.7274), ('Banda Neira', -4.5246, 129.8965), ('Tual', -5.639, 132.7429),
+          ('Dobo', -5.7608, 134.2335), ('Saumlaki', -7.9742, 131.3049), ('Tiakur', -8.1497, 127.8051), ('Ternate', 0.7852, 127.3832),
+          ('Sofifi', 0.7348, 127.5761), ('Tidore', 0.6787, 127.4483), ('Jailolo', 1.0766, 127.4748), ('Tobelo', 1.7263, 127.9999),
+          ('Daruba', 2.0515, 128.2925), ('Weda', 0.3305, 127.869), ('Maba', 0.6759, 128.2875), ('Labuha', -0.6333, 127.4833),
+          ('Laiwui', -1.3367, 127.6364), ('Sanana', -2.0573, 125.9796), ('Bobong', -1.9463, 124.3839)]
+
+
+def dichtste_stad(la, lo):
+    return min(((n, T.km_tussen(la, lo, a, b)) for n, a, b in STEDEN), key=lambda x: x[1])
 
 
 def diepte_tekst(km):
@@ -920,8 +931,8 @@ def bevingen_blok(bev, nu):
         woord = g[1].split('.')[0].upper() if g else 'NIET GEVOELD'
         plek = T.plek_kort(q['dorp'])
         waar = (f'op {plek}' if q['land'] else f'in zee bij {plek}')
-        ka = T.km_tussen(q['la'], q['lo'], *AMBON)
-        extra = f', ongeveer {round(ka)} km van de stad Ambon' if 15 < ka < 300 else ''
+        stad, ka = dichtste_stad(q['la'], q['lo'])
+        extra = (f', vlak bij {stad}' if ka <= 10 else f', ongeveer {round(ka)} km van {stad}' if ka < 300 else '')
         kracht = f'{q["mag"]:.1f}'.replace('.', ',')
         kaarten.append(
             f'<article class="bevkaart bk-{niveau or "geen"}"><p class="bk-tijd"><b>{e(T.wanneer_hoofdletter(t, nu))} om {t:%H:%M}</b>'
