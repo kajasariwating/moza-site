@@ -577,6 +577,46 @@ def samenvatting(d, br, bv, wr, lu, nu):
     return f'Het is rustig rond {naam}. De satelliet zag de afgelopen week <b>geen brand</b> in of rond het dorp.'
 
 
+
+VEERHAVENS = []
+
+
+def rond(x):
+    x = float(x)
+    if x >= 1000:
+        return f'{int(round(x, -2)):,}'.replace(',', '.')
+    if x >= 100:
+        return str(int(round(x, -1)))
+    return str(max(1, int(round(x))))
+
+
+def kort_blok(d, kust_dorp):
+    """Blok 'In het kort': inwoners (BPS), grond (BPS), hoogte, veerhaven of grote plaats."""
+    tegels = []
+    inw = d.get('inw')
+    if inw and inw.get('n'):
+        tegels.append(('Mensen', f'{inw["n"]:,}'.replace(',', '.'), f'volgens BPS, {inw["jaar"]}'))
+    if inw and inw.get('km2'):
+        tegels.append(('Grond', f'{rond(inw["km2"] / 0.00714)} voetbalvelden', 'zo groot is de grond van het dorp'))
+    h = d.get('hoogte')
+    if h is not None:
+        waar = ('vlak aan zee' if kust_dorp and h <= 15 else 'aan zee' if kust_dorp else 'laag gelegen' if h < 60
+                else 'in de heuvels' if h < 300 else 'in de bergen')
+        tegels.append(('Hoogte', f'{rond(max(h, 1)) if h >= 50 else max(int(h), 1)} meter', waar))
+    havens = sorted(((T.km_tussen(d['la'], d['lo'], a, b), n) for n, a, b in VEERHAVENS), key=lambda x: x[0])[:1]
+    if kust_dorp and havens and havens[0][0] <= 15:
+        km, n = havens[0]
+        tegels.append(('Veerhaven', n, T.afstand(km) if km >= 0.4 else 'in het dorp'))
+    else:
+        stad, km = dichtste_stad(d['la'], d['lo'])
+        tegels.append(('Grote plaats', stad, 'je bent er al' if km < 2 else T.afstand(km) if km <= 3 else f'{round(km)} km hemelsbreed'))
+    if len(tegels) < 2:
+        return ''
+    t = ''.join(f'<div class="tg"><span class="label">{e(l)}</span><b>{e(w)}</b><small>{e(sm)}</small></div>' for l, w, sm in tegels)
+    bron = (f'<p class="nb">Bron {"inwoners en grond" if inw.get("km2") else "inwoners"}: BPS, {e(inw["bron"])}.</p>' if inw else '')
+    return (f'<section class="overdorp" aria-labelledby="h-over"><p class="label">Over het dorp</p>'
+            f'<h2 id="h-over">{e(d["naam"])} in het kort</h2><div class="tegels">{t}</div>{bron}</section>')
+
 def dorp_html(d, ctx, nu):
     naam = d['naam']
     br, bv, wr, lu, zz, nw = (ctx[k] for k in ('br', 'bv', 'wr', 'lu', 'zz', 'nw'))
@@ -781,6 +821,7 @@ def dorp_html(d, ctx, nu):
         m.append(f'<section aria-labelledby="h-buren"><h2 id="h-buren">Dorpen in de buurt</h2><div class="verder">{rijen}</div>'
                  f'<a href="/eiland/{d["groep"]}/">Alle dorpen in {e(groep)} →</a></section>')
 
+    m.append(kort_blok(d, ctx.get('kust_dorp')))
     wa_tekst = f'Hoe is het nu in {d["naam"]}? Brand, weer, zee en aardbevingen, ieder uur bijgewerkt.\n{SITE}/{d["slug"]}/?utm_source=whatsapp&utm_medium=deel'
     m.append(f'<section class="deelblok"><h2>Familie in {e(naam)}?</h2><p>Stuur deze pagina door. Dan weet iedereen waar je kunt kijken als er iets gebeurt.</p>'
              f'<div class="dknop"><a class="wa" href="https://wa.me/?text={quote(wa_tekst)}" target="_blank" rel="noopener">{ic("wa")}Deel via WhatsApp</a>'
@@ -1033,7 +1074,13 @@ def main():
     plaatsen = json.loads(pf.read_text()) if pf.exists() else {}
     hf = HIER / 'gegevens' / 'hoogte.json'
     hoogtes = json.loads(hf.read_text()) if hf.exists() else {}
+    inf = HIER / 'gegevens' / 'inwoners.json'
+    inwoners = json.loads(inf.read_text()) if inf.exists() else {}
+    vf = HIER / 'gegevens' / 'veerhavens.json'
+    global VEERHAVENS
+    VEERHAVENS = json.loads(vf.read_text()) if vf.exists() else []
     for d in rows:
+        d['inw'] = inwoners.get(d['code'])
         d['hoogte'] = hoogtes.get(d['code'])
         d['echt'] = d['code'] in plaatsen
         if d['echt']:
