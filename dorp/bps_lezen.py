@@ -142,6 +142,26 @@ def lees_luas(pagina):
     return uit
 
 
+def luas_van(kec):
+    """Oppervlakte per desa (km2), alleen als de desa samen optellen tot het totaal van de kecamatan."""
+    for p in kec.get('paginas', []):
+        t = p['tekst']
+        if not re.search(r'luas daerah|total area', t, re.I) or re.search(r'DAFTAR TABEL|LIST OF TABLES', t):
+            continue
+        r = lees_luas(p)
+        if not r or len(r) < 3:
+            continue
+        r = [(n, v) for n, v in r if not re.search(r'district|kecamatan dalam|\d', n, re.I) and v < 5000]
+        if len(r) < 3:
+            continue
+        tot = max(r, key=lambda x: x[1])
+        rest = [x for x in r if x is not tot]
+        som = sum(v for _, v in rest)
+        if tot[1] and abs(som - tot[1]) <= max(1.0, 0.03 * tot[1]):
+            return {norm(n): v for n, v in rest}
+    return {}
+
+
 def boekje(kec):
     """Zoek de tabel met inwoners per desa. Geeft (rijen, totaal, verslag)."""
     for p in kec.get('paginas', []):
@@ -198,12 +218,7 @@ def main(map_in, schrijven=False):
             if not desa:
                 verslag.append((dom, naam, kec['jaar'], len(onze), 0, st))
                 continue
-            luas = {}
-            for p in kec.get('paginas', []):
-                r = lees_luas(p)
-                if r and len(r) >= 2:
-                    luas = {norm(n): v for n, v in r}
-                    break
+            luas = luas_van(kec)
             namen = {norm(d['naam']): d for d in onze}
             gekoppeld = 0
             for bnaam, (l, pr, t) in desa:
