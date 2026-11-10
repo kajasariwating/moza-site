@@ -34,13 +34,14 @@ def api(pad):
     return json.loads(get(f'{API}/{pad}/key/{KEY}/'))
 
 
-def domeinen():
-    uit = []
-    for prov in ('81', '82'):
+def domeinen(provs=('8100', '8200')):
+    uit = {}
+    for prov in provs:
         j = api(f'domain/type/kabbyprov/prov/{prov}')
         for d in j['data'][1]:
-            uit.append({'id': d['domain_id'], 'naam': d['domain_name']})
-    return uit
+            if d['domain_id'][:2] == prov[:2]:
+                uit[d['domain_id']] = {'id': d['domain_id'], 'naam': d['domain_name']}
+    return list(uit.values())
 
 
 def publicaties(dom):
@@ -94,6 +95,7 @@ def verwerk(dom, map_uit):
 
 if __name__ == '__main__':
     if sys.argv[1] == 'lijst':
-        print(json.dumps([d['id'] for d in domeinen() if not d['id'].endswith('00')]))
+        provs = tuple(sys.argv[2].split(',')) if len(sys.argv) > 2 else ('8100', '8200')
+        print(json.dumps([d['id'] for d in domeinen(provs) if not d['id'].endswith('00')]))
     else:
         verwerk(sys.argv[2], sys.argv[3])

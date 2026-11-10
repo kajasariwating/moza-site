@@ -2,6 +2,10 @@ name: BPS boekjes per kecamatan ophalen
 
 on:
   workflow_dispatch:
+    inputs:
+      provincies:
+        description: 'BPS-provincies, bv. 8100,8200'
+        default: '8100,8200'
 
 permissions:
   contents: write
@@ -16,7 +20,7 @@ jobs:
       - id: l
         env:
           BPS_KEY: ${{ secrets.BPS_KEY }}
-        run: echo "domeinen=$(python3 dorp/bps_ophalen.py lijst)" >> "$GITHUB_OUTPUT"
+        run: echo "domeinen=$(python3 dorp/bps_ophalen.py lijst ${{ inputs.provincies }})" >> "$GITHUB_OUTPUT"
 
   ophalen:
     needs: lijst
