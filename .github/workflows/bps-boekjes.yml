@@ -1,0 +1,47 @@
+name: BPS boekjes per kecamatan ophalen
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  lijst:
+    runs-on: ubuntu-latest
+    outputs:
+      domeinen: ${{ steps.l.outputs.domeinen }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: l
+        env:
+          BPS_KEY: ${{ secrets.BPS_KEY }}
+        run: echo "domeinen=$(python3 dorp/bps_ophalen.py lijst)" >> "$GITHUB_OUTPUT"
+
+  ophalen:
+    needs: lijst
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix:
+        domein: ${{ fromJson(needs.lijst.outputs.domeinen) }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get install -y poppler-utils >/dev/null
+      - name: Boekjes ophalen
+        env:
+          BPS_KEY: ${{ secrets.BPS_KEY }}
+        run: python3 dorp/bps_ophalen.py domein ${{ matrix.domein }} /tmp/bps
+      - name: Opslaan in tak bps-ruw
+        run: |
+          git config user.name "moza-bot"
+          git config user.email "actions@users.noreply.github.com"
+          for i in 1 2 3 4 5 6 7 8; do
+            rm -rf /tmp/tak
+            git clone -q --depth 1 --branch bps-ruw "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" /tmp/tak
+            mkdir -p /tmp/tak/bps && cp /tmp/bps/*.json /tmp/tak/bps/
+            if (cd /tmp/tak && git add bps && git commit -qm "BPS ruw ${{ matrix.domein }}" && git push -q origin bps-ruw); then break; fi
+            sleep $((RANDOM % 20 + 5))
+          done
