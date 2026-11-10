@@ -1,0 +1,55 @@
+name: BPS boekjes ophalen (proef)
+
+on:
+  workflow_dispatch:
+    inputs:
+      domein:
+        description: 'BPS-domein (bv. 8171 = Kota Ambon, 8103 = Maluku Tengah)'
+        default: '8171'
+      zoek:
+        description: 'Zoekwoord in de titel (bv. Leitimur Selatan Dalam Angka)'
+        default: 'Leitimur Selatan Dalam Angka'
+
+permissions:
+  contents: read
+
+jobs:
+  ophalen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - run: sudo apt-get install -y poppler-utils >/dev/null
+      - name: Nieuwste boekje zoeken en downloaden
+        env:
+          BPS_KEY: ${{ secrets.BPS_KEY }}
+          DOMEIN: ${{ inputs.domein }}
+          ZOEK: ${{ inputs.zoek }}
+        run: |
+          set -e
+          [ -n "$BPS_KEY" ] || { echo "Geen BPS_KEY gevonden"; exit 1; }
+          mkdir -p uit
+          python3 - <<'EOF'
+          import json, os, re, urllib.parse, urllib.request
+          key, dom, zoek = os.environ['BPS_KEY'], os.environ['DOMEIN'], os.environ['ZOEK']
+          url = f"https://webapi.bps.go.id/v1/api/list/model/publication/lang/ind/domain/{dom}/keyword/{urllib.parse.quote(zoek)}/key/{key}/"
+          j = json.load(urllib.request.urlopen(url, timeout=60))
+          pubs = j['data'][1] if len(j.get('data', [])) > 1 else []
+          pubs = [p for p in pubs if 'Dalam Angka' in p['title']]
+          jaar = lambda p: int((re.findall(r'(20\d\d)', p['title']) or ['0'])[-1])
+          pubs.sort(key=jaar, reverse=True)
+          if not pubs:
+              raise SystemExit('Geen boekje gevonden')
+          p = pubs[0]
+          print('Boekje:', p['title'], p['size'])
+          req = urllib.request.Request(p['pdf'], headers={'User-Agent': 'Mozilla/5.0'})
+          open('uit/boekje.pdf', 'wb').write(urllib.request.urlopen(req, timeout=180).read())
+          open('uit/titel.txt', 'w').write(p['title'])
+          EOF
+          pdftotext -layout uit/boekje.pdf uit/boekje.txt
+          wc -c uit/boekje.txt
+          rm uit/boekje.pdf
+      - uses: actions/upload-artifact@v4
+        with:
+          name: boekje
+          path: uit/
+          retention-days: 3
