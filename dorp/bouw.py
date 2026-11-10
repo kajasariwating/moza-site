@@ -632,7 +632,7 @@ def kort_blok(d, kust_dorp, eiland=None):
     else:
         stad, km = dichtste_stad(d['la'], d['lo'])
         if not (d.get('kabnaam', '').startswith('Kota ') or km <= 10):  # dorp ligt al in of bij de stad
-            tegels.append(('Stad', stad, 'je bent er al' if km < 2 else T.afstand(km) if km <= 3 else f'{round(km)} km hemelsbreed'))
+            tegels.append(('Afstand tot stad', stad, 'je bent er al' if km < 2 else T.afstand(km) if km <= 3 else f'{round(km)} km hemelsbreed'))
     if len(tegels) < 2:
         return ''
     t = ''.join(f'<div class="tg"><span class="label">{e(l)}</span><b>{e(w)}</b><small>{e(sm)}</small></div>' for l, w, sm in tegels)
