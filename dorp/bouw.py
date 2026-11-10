@@ -18,6 +18,15 @@ from shapely.ops import unary_union  # noqa: E402
 SITE = 'https://live.moza.nu'
 HIER = Path(__file__).resolve().parent
 WIT, NL = T.WIT, ZoneInfo('Europe/Amsterdam')
+
+
+def tijd_nl(t, nu, waar='in het dorp', hoofd=True):
+    """Tijd in Nederland voorop, met de tijd in de Molukken tussen haakjes."""
+    tn, nn = t.astimezone(NL), nu.astimezone(NL)
+    w = T.wanneer(tn, nn)
+    if hoofd:
+        w = w[0].upper() + w[1:]
+    return f'{w} om {tn:%H:%M} ({t.astimezone(WIT):%H:%M} {waar})'
 e = html.escape
 
 # ---------------------------------------------------------------- geometrie
@@ -536,13 +545,13 @@ def samenvatting(d, br, bv, wr, lu, nu):
     if bv and bv['gevoeld']:
         q = bv['gevoeld'][0]
         if q['mmi'] >= 4.5 and (nu - q['t'].astimezone(WIT)) < timedelta(days=3):
-            return (f'{T.wanneer_hoofdletter(q["t"].astimezone(WIT), nu)} was er een aardbeving die je in {naam} '
+            return (f'{tijd_nl(q["t"], nu)} was er een aardbeving die je in {naam} '
                     f'<b>goed kon voelen</b>. Kijk hieronder hoe sterk.')
     vers = [p for p in br if (nu - p['t'].astimezone(WIT)) < timedelta(hours=48)]
     if vers:
         p = vers[0]
         waar = 'op de grond van het dorp' if p['binnen'] else 'vlak bij de grond van het dorp'
-        zin = (f'{T.wanneer_hoofdletter(p["t"].astimezone(WIT), nu)} zag de satelliet een brand {waar}, '
+        zin = (f'{tijd_nl(p["t"], nu)} zag de satelliet een brand {waar}, '
                f'<b>{T.afstand(p["km"])}</b> naar {p["richting"]}.')
         if wr and wr.get('wrichting') is not None and (wr.get('wsnel') or 0) >= 5:
             naar = (wr['wrichting'] + 180) % 360
@@ -609,7 +618,7 @@ def dorp_html(d, ctx, nu):
     lijst = ''
     for i, p in enumerate(br[:9], 1):
         t = p['t'].astimezone(WIT)
-        kop = f'{T.wanneer_hoofdletter(t, nu)} · {T.afstand(p["km"])} naar {p["richting"]}'
+        kop = f'{tijd_nl(t, nu)} · {T.afstand(p["km"])} naar {p["richting"]}'
         lijst += (f'<li class="{"eerste" if i == 1 else ""}"><span class="nr" style="background:{"#FF4D2E" if i == 1 else "#FF7AB6"}">{i}</span>'
                   f'<span><b>{e(kop)}</b><span class="t">{e(T.brand_plek(p))} {e(T.brand_zekerheid(p))}</span></span></li>')
     if br:
@@ -720,7 +729,7 @@ def dorp_html(d, ctx, nu):
             q = bv['gevoeld'][0]
             t = q['t'].astimezone(WIT)
             g = T.beving_gevoel(q['mmi'])
-            kop = f'De laatste beving die je in het dorp kon voelen, was {T.wanneer(t, nu)} rond {uurtekst(t)}.'
+            kop = f'De laatste beving die je in het dorp kon voelen, was {tijd_nl(t, nu, hoofd=False)}.'
             n = bv['perjaar']
             normaal = (f'<p class="let"><b>Dat is normaal.</b> Rond {e(naam)} voel je zo\'n beving {T.hoe_vaak(n)}.'
                        if n >= 4 else f'<p class="let">Bevingen die je voelt, zijn hier niet zo vaak: {T.hoe_vaak(n)}.')
@@ -935,13 +944,13 @@ def bevingen_blok(bev, nu):
         extra = (f', vlak bij {stad}' if ka <= 10 else f', ongeveer {round(ka)} km van {stad}' if ka < 300 else '')
         kracht = f'{q["mag"]:.1f}'.replace('.', ',')
         kaarten.append(
-            f'<a class="bevkaart bk-{niveau or "geen"}" href="/{q["dorp"]["slug"]}/"><p class="bk-tijd"><b>{e(T.wanneer_hoofdletter(t, nu))} om {t:%H:%M}</b>'
+            f'<a class="bevkaart bk-{niveau or "geen"}" href="/{q["dorp"]["slug"]}/"><p class="bk-tijd"><b>{e(tijd_nl(t, nu, "in de Molukken"))}</b>'
             f'<span class="badge bv-{niveau or "geen"}">{e(woord)}</span></p>'
             f'<h3>Kracht {kracht}, {e(waar)}{e(extra)}</h3>'
             f'<p>{diepte_tekst(q["diepte"])}</p>'
             f'<p><b>Wat merkten mensen ervan?</b> {e(voel)} {GERUST.get(niveau, GERUST[None])}</p>'
             f'<p class="bk-meer">Bekijk het dichtstbijzijnde dorp, {e(q["dorp"]["naam"])} →</p></a>')
-    return (kop + '<p>Afgelopen 7 dagen, in Molukse tijd.</p>' + ''.join(kaarten)
+    return (kop + '<p>Afgelopen 7 dagen. Tijden in Nederlandse tijd, met de tijd in de Molukken tussen haakjes.</p>' + ''.join(kaarten)
             + (f'<p>Daarnaast waren er deze week {stil} bevingen van kracht 4 of meer die zo diep of zo ver weg lagen dat niemand ze merkte.</p>' if stil > 1 else '')
             + f'<p class="let">{normaal} Wil je weten hoe het in jouw dorp voelde? Zoek je dorp hierboven.</p></section>')
 
