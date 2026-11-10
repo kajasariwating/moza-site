@@ -36,8 +36,8 @@ jobs:
         run: python3 dorp/bps_ophalen.py domein ${{ matrix.domein }} /tmp/bps
       - name: Opslaan in tak bps-ruw
         run: |
-          git config user.name "moza-bot"
-          git config user.email "actions@users.noreply.github.com"
+          git config --global user.name "moza-bot"
+          git config --global user.email "actions@users.noreply.github.com"
           for i in 1 2 3 4 5 6 7 8; do
             rm -rf /tmp/tak
             git clone -q --depth 1 --branch bps-ruw "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" /tmp/tak
