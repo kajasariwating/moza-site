@@ -324,3 +324,8 @@ html.moza-dark #mzd .mg h3 a{color:#ECECF1!important}
 /* De oude Kabar-kop is op de computer niet meer nodig */
 header.kop{display:none}
 }
+a.bevkaart{display:block;color:inherit;text-decoration:none}
+a.bevkaart:hover h3,a.bevkaart:focus-visible h3{text-decoration:underline;text-underline-offset:3px}
+.bevkaart .bk-meer{font-weight:800;color:var(--blauw)}
+html.moza-dark .bevkaart .bk-meer{color:#AEB9F2}
+html.moza-dark a.bevkaart{color:#ECECF1}

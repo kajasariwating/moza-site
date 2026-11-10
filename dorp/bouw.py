@@ -935,11 +935,12 @@ def bevingen_blok(bev, nu):
         extra = (f', vlak bij {stad}' if ka <= 10 else f', ongeveer {round(ka)} km van {stad}' if ka < 300 else '')
         kracht = f'{q["mag"]:.1f}'.replace('.', ',')
         kaarten.append(
-            f'<article class="bevkaart bk-{niveau or "geen"}"><p class="bk-tijd"><b>{e(T.wanneer_hoofdletter(t, nu))} om {t:%H:%M}</b>'
+            f'<a class="bevkaart bk-{niveau or "geen"}" href="/{q["dorp"]["slug"]}/"><p class="bk-tijd"><b>{e(T.wanneer_hoofdletter(t, nu))} om {t:%H:%M}</b>'
             f'<span class="badge bv-{niveau or "geen"}">{e(woord)}</span></p>'
             f'<h3>Kracht {kracht}, {e(waar)}{e(extra)}</h3>'
             f'<p>{diepte_tekst(q["diepte"])}</p>'
-            f'<p><b>Wat merkten mensen ervan?</b> {e(voel)} {GERUST.get(niveau, GERUST[None])}</p></article>')
+            f'<p><b>Wat merkten mensen ervan?</b> {e(voel)} {GERUST.get(niveau, GERUST[None])}</p>'
+            f'<p class="bk-meer">Bekijk het dichtstbijzijnde dorp, {e(q["dorp"]["naam"])} →</p></a>')
     return (kop + '<p>Afgelopen 7 dagen, in Molukse tijd.</p>' + ''.join(kaarten)
             + (f'<p>Daarnaast waren er deze week {stil} bevingen van kracht 4 of meer die zo diep of zo ver weg lagen dat niemand ze merkte.</p>' if stil > 1 else '')
             + f'<p class="let">{normaal} Wil je weten hoe het in jouw dorp voelde? Zoek je dorp hierboven.</p></section>')
