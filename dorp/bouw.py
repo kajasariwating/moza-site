@@ -105,7 +105,7 @@ def bevingen_bij(d, lijst, nu):
         km = T.km_tussen(d['la'], d['lo'], q['la'], q['lo'])
         if km > 600:
             continue
-        i = T.mmi(q['mag'], km, q['diepte'])
+        i = min(T.mmi(q['mag'], km, q['diepte']), q.get('mmimax') or 99)
         if i >= T.VOELBAAR:
             gevoeld.append(dict(q, km=km, mmi=i))
         elif km < 150:
@@ -865,7 +865,7 @@ def recente_bevingen(rows, lijst, nu, op_land=None, dagen=7, max_n=5):
             if km < dicht_km:
                 dicht, dicht_km = d, km
             if km < 400:
-                best_i = max(best_i, T.mmi(q['mag'], km, q['diepte']))
+                best_i = max(best_i, min(T.mmi(q['mag'], km, q['diepte']), q.get('mmimax') or 99))
         if dicht_km > 250:
             continue  # buiten de Molukken
         if best_i < T.VOELBAAR:
@@ -907,8 +907,8 @@ GERUST = {
     None: 'Schade is niet te verwachten.',
     'licht': 'Schade is bij zo\'n lichte beving niet te verwachten.',
     'stevig': 'Er kunnen spullen zijn omgevallen. Grote schade is niet te verwachten.',
-    'sterk': 'Er kan kleine schade zijn aan huizen. Bel of app je familie als je je zorgen maakt.',
-    'zwaar': 'Er kan schade zijn. Neem contact op met je familie en volg wat de instanties ter plekke zeggen.',
+    'sterk': 'Bel of app je familie als je je zorgen maakt.',
+    'zwaar': 'Volg ook wat de instanties ter plekke zeggen.',
 }
 
 

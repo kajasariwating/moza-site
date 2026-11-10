@@ -195,7 +195,8 @@ def bevingen(dagen=365):
         if p.get('mag') is None:
             continue
         out.append({'mag': float(p['mag']), 'lo': g[0], 'la': g[1], 'diepte': max(0.0, float(g[2] or 0)),
-                    't': datetime.fromtimestamp(p['time'] / 1000, timezone.utc), 'plaats': p.get('place') or ''})
+                    't': datetime.fromtimestamp(p['time'] / 1000, timezone.utc), 'plaats': p.get('place') or '',
+                    'mmimax': float(p['mmi']) if p.get('mmi') is not None else None})
     return out
 
 
