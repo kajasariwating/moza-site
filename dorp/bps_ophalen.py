@@ -59,7 +59,7 @@ def publicaties(dom):
     return alles
 
 
-PAG = re.compile(r'(penduduk|luas)', re.I)
+PAG = re.compile(r'(penduduk|luas|jarak|distance|sekolah|school|puskesmas|posyandu|kesehatan|health)', re.I)
 DESA = re.compile(r'(desa|negeri|kelurahan|village)', re.I)
 WOORD = re.compile(r'<word xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)" yMax="([\d.]+)">(.*?)</word>')
 
