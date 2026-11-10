@@ -626,7 +626,7 @@ def kort_blok(d, kust_dorp, eiland=None):
         km, n = havens[0]
         tegels.append(('Veerhaven', n, T.afstand(km) if km >= 0.4 else 'in het dorp'))
     else:
-        stad, km = dichtste_stad(d['la'], d['lo'])
+        stad, km = stad_voor(d, eiland)
         if not (d.get('kabnaam', '').startswith('Kota ') or km <= 10):  # dorp ligt al in of bij de stad
             tegels.append(('Afstand tot stad', stad, 'je bent er al' if km < 2 else T.afstand(km) if km <= 3 else f'{round(km)} km hemelsbreed'))
     if len(tegels) < 2:
@@ -954,6 +954,33 @@ STEDEN = [('Ambon', -3.6959, 128.1788), ('Masohi', -3.3063, 128.953), ('Piru', -
           ('Sofifi', 0.7348, 127.5761), ('Tidore', 0.6787, 127.4483), ('Jailolo', 1.0766, 127.4748), ('Tobelo', 1.7263, 127.9999),
           ('Daruba', 2.0515, 128.2925), ('Weda', 0.3305, 127.869), ('Maba', 0.6759, 128.2875), ('Labuha', -0.6333, 127.4833),
           ('Laiwui', -1.3367, 127.6364), ('Sanana', -2.0573, 125.9796), ('Bobong', -1.9463, 124.3839)]
+
+
+HOOFDSTAD = {'Maluku Tengah': 'Masohi', 'Seram Bagian Barat': 'Piru', 'Seram Bagian Timur': 'Bula', 'Buru': 'Namlea',
+             'Buru Selatan': 'Namrole', 'Kepulauan Aru': 'Dobo', 'Maluku Tenggara': 'Tual', 'Kepulauan Tanimbar': 'Saumlaki',
+             'Maluku Barat Daya': 'Tiakur', 'Halmahera Barat': 'Jailolo', 'Halmahera Tengah': 'Weda', 'Halmahera Utara': 'Tobelo',
+             'Halmahera Selatan': 'Labuha', 'Halmahera Timur': 'Maba', 'Kepulauan Sula': 'Sanana', 'Pulau Morotai': 'Daruba',
+             'Pulau Taliabu': 'Bobong'}
+
+
+def stad_voor(d, eiland=None):
+    """De stad waar mensen heen gaan: hoofdstad van de kabupaten op hetzelfde eiland,
+    anders de dichtstbijzijnde grote plaats op het eiland, anders de dichtstbijzijnde grote plaats."""
+    la, lo = d['la'], d['lo']
+    if eiland is not None:
+        rond_eiland = eiland.buffer(0.03)
+        op = [(n, a, b) for n, a, b in STEDEN if rond_eiland.contains(Point(b, a))]
+        hs = HOOFDSTAD.get(d.get('kabnaam', ''))
+        for n, a, b in op:
+            if n == hs:
+                return n, T.km_tussen(la, lo, a, b)
+        if op:
+            return min(((n, T.km_tussen(la, lo, a, b)) for n, a, b in op), key=lambda x: x[1])
+    # geen stad op het eiland (zoals Haruku of Saparua): dan de provinciehoofdstad als die dichtbij is
+    for n, a, b in STEDEN:
+        if n in ('Ambon', 'Sofifi', 'Ternate') and T.km_tussen(la, lo, a, b) <= 120:
+            return min(((n2, T.km_tussen(la, lo, a2, b2)) for n2, a2, b2 in STEDEN if n2 in ('Ambon', 'Ternate')), key=lambda x: x[1])
+    return dichtste_stad(la, lo)
 
 
 def dichtste_stad(la, lo):
