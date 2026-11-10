@@ -618,7 +618,7 @@ def kort_blok(d, kust_dorp, eiland=None):
     zelfde = eiland.buffer(0.015) if eiland is not None else None
     havens = sorted(((T.km_tussen(d['la'], d['lo'], a, b), n) for n, a, b in VEERHAVENS
                      if zelfde is None or zelfde.contains(Point(b, a))), key=lambda x: x[0])[:1]
-    if kust_dorp and havens and havens[0][0] <= 30:
+    if False and kust_dorp and havens and havens[0][0] <= 30:  # veerhavens voorlopig uit: overal zijn steigers
         km, n = havens[0]
         tegels.append(('Veerhaven', n, T.afstand(km) if km >= 0.4 else 'in het dorp'))
     else:
