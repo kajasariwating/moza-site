@@ -4,6 +4,7 @@ en bewaart alleen de pagina's over inwoners en oppervlakte per desa.
 Gebruik:  BPS_KEY=... python3 dorp/bps_ophalen.py lijst            -> domeinen van Maluku (81) en Maluku Utara (82) als JSON
           BPS_KEY=... python3 dorp/bps_ophalen.py domein 8103 uitmap  -> uitmap/8103.json
 """
+import html
 import json
 import os
 import re
@@ -60,6 +61,7 @@ def publicaties(dom):
 
 PAG = re.compile(r'(penduduk|luas)', re.I)
 DESA = re.compile(r'(desa|negeri|kelurahan|village)', re.I)
+WOORD = re.compile(r'<word xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)" yMax="([\d.]+)">(.*?)</word>')
 
 
 def verwerk(dom, map_uit):
@@ -83,7 +85,15 @@ def verwerk(dom, map_uit):
                 open(pdf, 'wb').write(data)
                 subprocess.run(['pdftotext', '-layout', pdf, txt], check=True)
                 tekst = open(txt, encoding='utf-8', errors='replace').read()
-            paginas = [pg for pg in tekst.split('\f') if PAG.search(pg) and DESA.search(pg)]
+                alle = tekst.split('\f')
+                nrs = [i + 1 for i, pg in enumerate(alle) if PAG.search(pg) and DESA.search(pg)]
+                paginas = []
+                for nr in nrs:
+                    box = os.path.join(tmp, f'p{nr}.html')
+                    subprocess.run(['pdftotext', '-bbox', '-f', str(nr), '-l', str(nr), pdf, box], check=True)
+                    woorden = [[round(float(a), 1), round(float(b), 1), round(float(c), 1), round(float(d), 1), html.unescape(w)]
+                               for a, b, c, d, w in WOORD.findall(open(box, encoding='utf-8', errors='replace').read())]
+                    paginas.append({'nr': nr, 'tekst': alle[nr - 1], 'woorden': woorden})
             uit[naam] = {'jaar': b['jaar'], 'titel': b['titel'], 'paginas': paginas}
             print(f'  {naam} {b["jaar"]}: {len(paginas)} pagina\'s')
         except Exception as e:  # noqa: BLE001
