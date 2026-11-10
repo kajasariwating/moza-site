@@ -27,6 +27,8 @@ jobs:
         run: python3 dorp/plaatsen.py
       - name: Veerhavens (OpenStreetMap)
         run: python3 dorp/veerhavens.py
+      - name: Vliegvelden (OpenStreetMap)
+        run: python3 dorp/vliegvelden.py
       - name: Bos per dorp (Global Forest Change)
         if: github.event_name == 'workflow_dispatch' && (inputs.wat == 'bos' || inputs.wat == 'allebei')
         run: python3 dorp/bos.py
