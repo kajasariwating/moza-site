@@ -350,3 +350,6 @@ html.moza-dark .overdorp .tg small,html.moza-dark .overdorp .nb{color:#B9BCC6}
 .overdorp .tg small{font-size:13px;line-height:1.3}
 .overdorp .nb{font-size:13px;margin:0}
 @media (min-width:700px){.overdorp .tg b{font-size:22px}.overdorp .tg small{font-size:14px}}
+.overdorp .tegels{grid-template-columns:repeat(auto-fill,minmax(108px,1fr))}
+@media (min-width:700px){.overdorp .tegels{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}}
+.overdorp .tg .label{font-size:10.5px;letter-spacing:.06em;overflow-wrap:anywhere}

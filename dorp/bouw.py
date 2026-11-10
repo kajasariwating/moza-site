@@ -2,7 +2,7 @@
 
 Gebruik:  python3 dorp/bouw.py [--uit _site] [--alleen slug,slug] [--zonder-live]
 """
-import argparse, html, json, math, shutil, sys
+import argparse, html, json, math, re, shutil, sys
 from urllib.parse import quote
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -601,6 +601,10 @@ def rond(x):
     return str(max(1, int(round(x))))
 
 
+def norm_naam(x):
+    return re.sub(r'[^a-z]', '', x.lower())
+
+
 def kort_blok(d, kust_dorp, eiland=None):
     """Blok 'In het kort': inwoners (BPS), grond (BPS), hoogte, veerhaven of grote plaats."""
     tegels = []
@@ -608,12 +612,18 @@ def kort_blok(d, kust_dorp, eiland=None):
     if inw and inw.get('n'):
         tegels.append(('Mensen', f'{inw["n"]:,}'.replace(',', '.'), f'BPS, {inw["jaar"]}'))
     if inw and inw.get('km2'):
-        tegels.append(('Grond', f'{rond(inw["km2"] / 0.00714)} voetbalvelden', 'zo groot is de grond van het dorp'))
+        tegels.append(('Grond', rond(inw['km2'] / 0.00714), 'voetbalvelden groot'))
     h = d.get('hoogte')
     if h is not None:
         waar = ('vlak aan zee' if kust_dorp and h <= 15 else 'aan zee' if kust_dorp else 'laag gelegen' if h < 60
                 else 'in de heuvels' if h < 300 else 'in de bergen')
         tegels.append(('Hoogte', f'{rond(max(h, 1)) if h >= 50 else max(int(h), 1)} meter', waar))
+    if inw and inw.get('hoofd'):
+        hf = inw['hoofd'].title() if inw['hoofd'].isupper() else inw['hoofd']
+        if norm_naam(hf) == norm_naam(d['naam']):
+            tegels.append(('Bestuur', 'Hier', f'van de kecamatan {d["kec"]}'))
+        else:
+            tegels.append(('Bestuur', hf, f'{rond(inw["naar_hoofd"]) if inw["naar_hoofd"] >= 10 else str(inw["naar_hoofd"]).replace(".0", "").replace(".", ",")} km verderop'))
     # alleen veerhavens op hetzelfde eiland (met wat ruimte voor steigers in zee)
     zelfde = eiland.buffer(0.015) if eiland is not None else None
     havens = sorted(((T.km_tussen(d['la'], d['lo'], a, b), n) for n, a, b in VEERHAVENS

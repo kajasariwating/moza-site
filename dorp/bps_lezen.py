@@ -142,6 +142,50 @@ def lees_luas(pagina):
     return uit
 
 
+def lees_jarak(pagina):
+    """Kolom (2) 'Jarak ke Ibukota Kecamatan' (km). Geeft [(naam, km)]."""
+    ws = pagina['woorden']
+    twee = next((w for w in ws if w[4] == '(2)'), None)
+    een = next((w for w in ws if w[4] == '(1)'), None)
+    if not twee or not een:
+        return None
+    c = (twee[0] + twee[2]) / 2
+    links = c - 60
+    eind = kop([w for w in ws if w[1] > twee[3]], r'^(sumber|source|catatan|note)')
+    namen, km = [], []
+    for _, rij in rijen(ws, twee[3], eind[1] if eind else 10_000):
+        naam = ' '.join(w[4] for w in rij if w[2] < links and not w[4].startswith('('))
+        if naam and len(re.sub(r'[^A-Za-z]', '', naam)) >= 3 and not re.search(r'village|desa/|kecamatan dalam|district', naam, re.I):
+            namen.append(naam)
+        for w in rij:
+            t = re.sub(r'^[^\d]+', '', w[4])
+            if t and re.match(r'^\d+([.,]\d+)?$', t) and abs((w[0] + w[2]) / 2 - c) < 50:
+                km.append(float(t.replace(',', '.')))
+    if len(namen) < 2 or len(namen) != len(km):
+        return None
+    return list(zip(namen, km))
+
+
+def jarak_van(kec):
+    for p in kec.get('paginas', []):
+        t = p['tekst']
+        if not re.search(r'jarak ke ibukota kecamatan|distance to (the )?district capital', t, re.I) or not re.search(r'tabel|table', t, re.I) \
+                or re.search(r'DAFTAR TABEL|LIST OF TABLES', t) or re.search(r'^\s*Gambar', t, re.M):
+            continue
+        r = lees_jarak(p)
+        if not r:
+            continue
+        kn = norm(kec.get('_naam', ''))
+        r = [(n, v) for n, v in r if norm(n) != kn and not re.search(r'jumlah|total', n, re.I)]
+        if len(r) < 2:
+            continue
+        laagst = min(v for _, v in r)
+        hoofd = [n for n, v in r if v == laagst]
+        if laagst <= 2 and len(hoofd) == 1:
+            return {norm(n): v for n, v in r}, hoofd[0]
+    return {}, None
+
+
 def luas_van(kec):
     """Oppervlakte per desa (km2), alleen als de desa samen optellen tot het totaal van de kecamatan."""
     for p in kec.get('paginas', []):
@@ -219,6 +263,8 @@ def main(map_in, schrijven=False):
                 verslag.append((dom, naam, kec['jaar'], len(onze), 0, st))
                 continue
             luas = luas_van(kec)
+            kec['_naam'] = naam
+            jarak, hoofd = jarak_van(kec)
             namen = {norm(d['naam']): d for d in onze}
             gekoppeld = 0
             for bnaam, (l, pr, t) in desa:
@@ -233,6 +279,9 @@ def main(map_in, schrijven=False):
                 km2 = luas.get(b)
                 resultaat[d['code']] = {'n': t, 'l': l, 'p': pr, 'jaar': kec['jaar'] - 1, 'km2': km2,
                                         'bron': kec['titel']}
+                if hoofd and b in jarak:
+                    resultaat[d['code']]['hoofd'] = VOORVOEGSEL.sub('', hoofd).strip()
+                    resultaat[d['code']]['naar_hoofd'] = jarak[b]
             verslag.append((dom, naam, kec['jaar'], len(onze), gekoppeld, st))
     tot_dorpen = len(rows)
     print(f'Dorpen met inwoners: {len(resultaat)} van {tot_dorpen}')
