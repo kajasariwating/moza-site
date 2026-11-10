@@ -590,6 +590,16 @@ def samenvatting(d, br, bv, wr, lu, nu):
 
 
 VEERHAVENS = []
+VLIEGVELDEN = []
+VLIEG_NAAM = {'Pattimura': 'Pattimura (Ambon)', 'Karel Sadsuitubun': 'Karel Sadsuitubun (Langgur)',
+              'Mathilda Batlayeri': 'Mathilda Batlayeri (Saumlaki)', 'Sultan Babullah': 'Sultan Babullah (Ternate)',
+              'Oesman Sadik': 'Oesman Sadik (Labuha)', 'Emalamo': 'Emalamo (Sanana)', 'Gamar Malamo': 'Gamar Malamo (Galela)',
+              'Kuabang Kao': 'Kuabang (Kao)', 'John Becker': 'John Becker (Kisar)', 'Pitu Morotai': 'Pitu (Morotai)',
+              'Taliabu Island': 'Taliabu', 'Bandaneira': 'Banda Neira'}
+EXTRA_STEDEN = [('Saparua', 'Maluku Tengah'), ('Elat', 'Maluku Tenggara'), ('Tepa', 'Maluku Barat Daya'),
+                ('Wonreli', 'Maluku Barat Daya'), ('Ilwaki', 'Maluku Barat Daya'), ('Geser', 'Seram Bagian Timur'),
+                ('Kataloka', 'Seram Bagian Timur'), ('Dofa', 'Kepulauan Sula'), ('Benjina', 'Kepulauan Aru'),
+                ('Guruapin', 'Halmahera Selatan')]
 
 
 def rond(x):
@@ -615,9 +625,16 @@ def kort_blok(d, kust_dorp, eiland=None):
         tegels.append(('Grond', rond(inw['km2'] / 0.00714), 'voetbalvelden groot'))
     h = d.get('hoogte')
     if h is not None:
-        waar = ('vlak aan zee' if kust_dorp and h <= 15 else 'aan zee' if kust_dorp else 'laag gelegen' if h < 60
-                else 'in de heuvels' if h < 300 else 'in de bergen')
+        waar = ('laag gelegen' if h < 60 else 'in de heuvels' if h < 300 else 'in de bergen')
         tegels.append(('Hoogte', f'{rond(max(h, 1)) if h >= 50 else max(int(h), 1)} meter', waar))
+    if eiland is not None:
+        zkm = eiland.exterior.distance(Point(d['lo'], d['la'])) * 111.0
+        if not eiland.contains(Point(d['lo'], d['la'])) or zkm <= 0.25:
+            tegels.append(('Zee', 'Aan zee', 'het dorp ligt aan de kust'))
+        elif T.afstand(zkm) == 'vlakbij':
+            tegels.append(('Zee', 'Vlakbij', 'de kust is dichtbij'))
+        else:
+            tegels.append(('Zee', T.afstand(zkm).capitalize() if zkm <= 3 else f'{round(zkm)} km', 'tot de kust'))
     # alleen veerhavens op hetzelfde eiland (met wat ruimte voor steigers in zee)
     zelfde = eiland.buffer(0.015) if eiland is not None else None
     havens = sorted(((T.km_tussen(d['la'], d['lo'], a, b), n) for n, a, b in VEERHAVENS
@@ -629,6 +646,19 @@ def kort_blok(d, kust_dorp, eiland=None):
         stad, km = stad_voor(d, eiland)
         if not (d.get('kabnaam', '').startswith('Kota ') or km <= 10):  # dorp ligt al in of bij de stad
             tegels.append(('Afstand tot stad', stad, 'je bent er al' if km < 2 else T.afstand(km) if km <= 3 else f'{round(km)} km hemelsbreed'))
+    if VLIEGVELDEN:
+        rond_eiland = eiland.buffer(0.03) if eiland is not None else None
+        op = [v for v in VLIEGVELDEN if rond_eiland is not None and rond_eiland.contains(Point(v[2], v[1]))]
+        # geen vliegveld op het eiland: dan het grote vliegveld van Ambon of Ternate als dat in de buurt ligt
+        groot = [v for v in VLIEGVELDEN if v[0].startswith(('Pattimura', 'Sultan Babullah'))
+                 and T.km_tussen(d['la'], d['lo'], v[1], v[2]) <= 150]
+        kand = op or groot or VLIEGVELDEN
+        vkm, vn = min(((T.km_tussen(d['la'], d['lo'], v[1], v[2]), v[0]) for v in kand), key=lambda x: x[0])
+        if vkm < 400:
+            m = re.match(r'^(.*) \((.*)\)$', vn)
+            plaats, veld = (m.group(2), m.group(1)) if m else (vn, '')
+            afst = 'vlakbij' if vkm < 2 else f'{round(vkm)} km'
+            tegels.append(('Vliegveld', plaats, f'{veld}, {afst}' if veld else afst))
     if len(tegels) < 2:
         return ''
     t = ''.join(f'<div class="tg"><span class="label">{e(l)}</span><b>{e(w)}</b><small>{e(sm)}</small></div>' for l, w, sm in tegels)
@@ -953,7 +983,7 @@ STEDEN = [('Ambon', -3.6959, 128.1788), ('Masohi', -3.3063, 128.953), ('Piru', -
           ('Dobo', -5.7608, 134.2335), ('Saumlaki', -7.9742, 131.3049), ('Tiakur', -8.1497, 127.8051), ('Ternate', 0.7852, 127.3832),
           ('Sofifi', 0.7348, 127.5761), ('Tidore', 0.6787, 127.4483), ('Jailolo', 1.0766, 127.4748), ('Tobelo', 1.7263, 127.9999),
           ('Daruba', 2.0515, 128.2925), ('Weda', 0.3305, 127.869), ('Maba', 0.6759, 128.2875), ('Labuha', -0.6333, 127.4833),
-          ('Laiwui', -1.3367, 127.6364), ('Sanana', -2.0573, 125.9796), ('Bobong', -1.9463, 124.3839)]
+          ('Laiwui', -1.3367, 127.6364), ('Larat', -7.1508, 131.7139), ('Sanana', -2.0573, 125.9796), ('Bobong', -1.9463, 124.3839)]
 
 
 HOOFDSTAD = {'Maluku Tengah': 'Masohi', 'Seram Bagian Barat': 'Piru', 'Seram Bagian Timur': 'Bula', 'Buru': 'Namlea',
@@ -1124,6 +1154,19 @@ def main():
     vf = HIER / 'gegevens' / 'veerhavens.json'
     global VEERHAVENS
     VEERHAVENS = json.loads(vf.read_text()) if vf.exists() else []
+    gf = HIER / 'gegevens' / 'vliegvelden.json'
+    global VLIEGVELDEN
+    VLIEGVELDEN = []
+    for n, la, lo, iata in (json.loads(gf.read_text()) if gf.exists() else []):
+        buiten = (n.startswith(('Aeroporto', 'Aeródromo')) or (la > -4.2 and lo > 130.6) or (la > 1.3 and lo < 126)
+                  or (la < -7 and lo < 125.5))
+        if iata and not buiten:
+            VLIEGVELDEN.append((VLIEG_NAAM.get(n, n), la, lo))
+    # extra plaatsen: de hoofdplaats van eilanden zonder kabupaten-hoofdstad
+    for naam, kab in EXTRA_STEDEN:
+        m = [d for d in rows if d['naam'].lower() == naam.lower() and d['kabnaam'] == kab]
+        if m and not any(n == naam for n, _, _ in STEDEN):
+            STEDEN.append((naam, m[0]['la'], m[0]['lo']))
     for d in rows:
         d['inw'] = inwoners.get(d['code'])
         d['hoogte'] = hoogtes.get(d['code'])
