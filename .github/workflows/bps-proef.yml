@@ -49,7 +49,7 @@ jobs:
           wc -c uit/boekje.txt
           echo '=====BEGIN====='
           cat uit/titel.txt; echo
-          grep -n -E 'Tabel [0-9]+\.[0-9]+' -A1 uit/boekje.txt | head -400
+          grep -n -i -E 'menurut (desa|negeri)|per desa|by village' uit/boekje.txt | head -300
           echo '=====EIND====='
           rm uit/boekje.pdf
       - uses: actions/upload-artifact@v4
