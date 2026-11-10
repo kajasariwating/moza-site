@@ -606,7 +606,7 @@ def kort_blok(d, kust_dorp, eiland=None):
     tegels = []
     inw = d.get('inw')
     if inw and inw.get('n'):
-        tegels.append(('Mensen', f'{inw["n"]:,}'.replace(',', '.'), f'volgens BPS, {inw["jaar"]}'))
+        tegels.append(('Mensen', f'{inw["n"]:,}'.replace(',', '.'), f'BPS, {inw["jaar"]}'))
     if inw and inw.get('km2'):
         tegels.append(('Grond', f'{rond(inw["km2"] / 0.00714)} voetbalvelden', 'zo groot is de grond van het dorp'))
     h = d.get('hoogte')
@@ -623,7 +623,7 @@ def kort_blok(d, kust_dorp, eiland=None):
         tegels.append(('Veerhaven', n, T.afstand(km) if km >= 0.4 else 'in het dorp'))
     else:
         stad, km = dichtste_stad(d['la'], d['lo'])
-        tegels.append(('Grote plaats', stad, 'je bent er al' if km < 2 else T.afstand(km) if km <= 3 else f'{round(km)} km hemelsbreed'))
+        tegels.append(('Stad', stad, 'je bent er al' if km < 2 else T.afstand(km) if km <= 3 else f'{round(km)} km hemelsbreed'))
     if len(tegels) < 2:
         return ''
     t = ''.join(f'<div class="tg"><span class="label">{e(l)}</span><b>{e(w)}</b><small>{e(sm)}</small></div>' for l, w, sm in tegels)
@@ -667,7 +667,7 @@ def dorp_html(d, ctx, nu):
 </div></section>
 <div class="streep"><span></span><span></span><span></span></div>''')
 
-    m = []
+    m = [kort_blok(d, ctx.get('kust_dorp'), ctx.get('eiland'))]
     # ---- brand
     lijst = ''
     for i, p in enumerate(br[:9], 1):
@@ -835,7 +835,6 @@ def dorp_html(d, ctx, nu):
         m.append(f'<section aria-labelledby="h-buren"><h2 id="h-buren">Dorpen in de buurt</h2><div class="verder">{rijen}</div>'
                  f'<a href="/eiland/{d["groep"]}/">Alle dorpen in {e(groep)} →</a></section>')
 
-    m.append(kort_blok(d, ctx.get('kust_dorp'), ctx.get('eiland')))
     wa_tekst = f'Hoe is het nu in {d["naam"]}? Brand, weer, zee en aardbevingen, ieder uur bijgewerkt.\n{SITE}/{d["slug"]}/?utm_source=whatsapp&utm_medium=deel'
     m.append(f'<section class="deelblok"><h2>Familie in {e(naam)}?</h2><p>Stuur deze pagina door. Dan weet iedereen waar je kunt kijken als er iets gebeurt.</p>'
              f'<div class="dknop"><a class="wa" href="https://wa.me/?text={quote(wa_tekst)}" target="_blank" rel="noopener">{ic("wa")}Deel via WhatsApp</a>'
