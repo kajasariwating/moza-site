@@ -6,6 +6,9 @@ on:
       provincies:
         description: 'BPS-provincies, bv. 8100,8200'
         default: '8100,8200'
+      domeinen:
+        description: 'Of direct een lijst domeinen, bv. ["8201","8202"]'
+        default: ''
 
 permissions:
   contents: write
@@ -20,7 +23,9 @@ jobs:
       - id: l
         env:
           BPS_KEY: ${{ secrets.BPS_KEY }}
-        run: echo "domeinen=$(python3 dorp/bps_ophalen.py lijst ${{ inputs.provincies }})" >> "$GITHUB_OUTPUT"
+        run: |
+          if [ -n '${{ inputs.domeinen }}' ]; then echo 'domeinen=${{ inputs.domeinen }}' >> "$GITHUB_OUTPUT"
+          else echo "domeinen=$(python3 dorp/bps_ophalen.py lijst ${{ inputs.provincies }})" >> "$GITHUB_OUTPUT"; fi
 
   ophalen:
     needs: lijst
