@@ -621,7 +621,7 @@ def kort_blok(d, kust_dorp, eiland=None):
     if inw and inw.get('naar_hoofd') is not None:
         km = inw['naar_hoofd']
         kmt = rond(km) if km >= 10 else f'{km:g}'.replace('.', ',')
-        tegels.append(('District', d['kec'], f'{kmt} km naar de hoofdplaats'))
+        tegels.append(('District', d['kec'], f'{kmt} km tot de hoofdplaats van het district'))
     # alleen veerhavens op hetzelfde eiland (met wat ruimte voor steigers in zee)
     zelfde = eiland.buffer(0.015) if eiland is not None else None
     havens = sorted(((T.km_tussen(d['la'], d['lo'], a, b), n) for n, a, b in VEERHAVENS
