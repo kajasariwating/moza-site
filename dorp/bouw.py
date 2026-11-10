@@ -652,7 +652,7 @@ def kort_blok(d, kust_dorp, eiland=None):
         # geen vliegveld op het eiland: dan het grote vliegveld van Ambon of Ternate als dat in de buurt ligt
         groot = [v for v in VLIEGVELDEN if v[0].startswith(('Pattimura', 'Sultan Babullah'))
                  and T.km_tussen(d['la'], d['lo'], v[1], v[2]) <= 150]
-        kand = op or groot or VLIEGVELDEN
+        kand = (op + groot) or VLIEGVELDEN  # vliegveld op het eiland, of Pattimura/Babullah als die dichterbij ligt
         vkm, vn = min(((T.km_tussen(d['la'], d['lo'], v[1], v[2]), v[0]) for v in kand), key=lambda x: x[0])
         if vkm < 400:
             m = re.match(r'^(.*) \((.*)\)$', vn)
