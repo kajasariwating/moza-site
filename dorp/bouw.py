@@ -763,15 +763,8 @@ def dorp_html(d, ctx, nu):
 
     # ---- nieuws
     if nw:
-        kaartjes = ''.join(f'<a class="nieuws" href="{e(x["url"])}"><span>{x["t"].astimezone(WIT).day} {T.MAANDEN[x["t"].astimezone(WIT).month - 1]} {x["t"].astimezone(WIT).year}</span><b>{e(x["titel"])}</b></a>' for x in nw)
+        kaartjes = ''.join(f'<a class="nieuws" href="{e(x["url"])}"><span>{x["t"].astimezone(WIT).day} {T.MAANDEN[x["t"].astimezone(WIT).month - 1]} {x["t"].astimezone(WIT).year}</span><b>{e(html.unescape(x["titel"]))}</b></a>' for x in nw)
         m.append(f'<section aria-labelledby="h-nieuws"><h2 id="h-nieuws">Nieuws over {e(naam)}</h2>{kaartjes}</section>')
-
-    # ---- meer op MOZA
-    laatst = [x for x in (ctx.get('laatst') or []) if x['url'] not in {y['url'] for y in (nw or [])}][:3]
-    if laatst:
-        kaartjes = ''.join(f'<a class="nieuws" href="{e(x["url"])}?utm_source=kabar"><span>{x["t"].astimezone(WIT).day} {T.MAANDEN[x["t"].astimezone(WIT).month - 1]}</span><b>{e(x["titel"])}</b></a>' for x in laatst)
-        m.append(f'<section aria-labelledby="h-moza"><p class="label"><span class="tag" style="background:#111;color:#fff">MOZA</span></p><h2 id="h-moza">Nieuw op MOZA</h2>{kaartjes}'
-                 f'<a href="https://www.moza.nu/lezen?utm_source=kabar">Meer verhalen op moza.nu →</a></section>')
 
     # ---- buurdorpen
     if ctx['buurlinks']:
@@ -783,6 +776,13 @@ def dorp_html(d, ctx, nu):
     m.append(f'<section class="deelblok"><h2>Familie in {e(naam)}?</h2><p>Stuur deze pagina door. Dan weet iedereen waar je kunt kijken als er iets gebeurt.</p>'
              f'<div class="dknop"><a class="wa" href="https://wa.me/?text={quote(wa_tekst)}" target="_blank" rel="noopener">{ic("wa")}Deel via WhatsApp</a>'
              f'<button type="button" class="nog" data-deel>{ic("deel")}Andere manier</button></div></section>')
+    # ---- meer op MOZA
+    laatst = [x for x in (ctx.get('laatst') or []) if x['url'] not in {y['url'] for y in (nw or [])}][:3]
+    if laatst:
+        kaartjes = ''.join(f'<a class="nieuws" href="{e(x["url"])}?utm_source=kabar"><span>{x["t"].astimezone(WIT).day} {T.MAANDEN[x["t"].astimezone(WIT).month - 1]}</span><b>{e(html.unescape(x["titel"]))}</b></a>' for x in laatst)
+        m.append(f'<section aria-labelledby="h-moza"><p class="label"><span class="tag" style="background:#111;color:#fff">MOZA</span></p><h2 id="h-moza">Nieuw op MOZA</h2>{kaartjes}'
+                 f'<a href="https://www.moza.nu/lezen?utm_source=kabar">Meer verhalen op moza.nu →</a></section>')
+
     m.append(f'''<section class="weten" aria-labelledby="h-weten">
 <p class="label" id="h-weten">Goed om te weten</p>
 <p>De satelliet ziet van bovenaf waar het heet is. Meestal is dat brand, maar niet altijd. Twijfel je? Bel of app je familie.</p>

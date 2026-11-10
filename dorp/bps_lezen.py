@@ -65,8 +65,17 @@ def lees_penduduk(pagina):
     for _, rij in rijen(ws, y0, eind[1] if eind else 10_000):
         naam = ' '.join(w[4] for w in rij if w[2] < links and not w[4].startswith('('))
         getallen = [None, None, None]
-        for w in rij:
-            if w[0] >= links and GETAL.match(w[4]):
+        # getallen die in stukjes zijn gesplitst ("1." en "144") weer samenvoegen
+        nums = sorted([list(w) for w in rij if w[0] >= links and re.match(r'^[\d.,]+$', w[4])], key=lambda w: w[0])
+        samen = []
+        for w in nums:
+            if samen and (w[0] - samen[-1][2]) < 2.5 and (samen[-1][4].endswith(('.', ',')) or w[4].startswith(('.', ','))):
+                samen[-1][2] = w[2]
+                samen[-1][4] += w[4]
+            else:
+                samen.append(w)
+        for w in samen:
+            if GETAL.match(w[4]):
                 c = (w[0] + w[2]) / 2
                 k = min(range(3), key=lambda i: abs(kol[i] - c))
                 getallen[k] = getal(w[4])
@@ -106,8 +115,10 @@ def boekje(kec):
         som = sum((x[1][2] or 0) for x in desa)
         if tot[1][2] and som == tot[1][2]:
             return desa, tot[1][2], 'ok'
-        if tot[1][2] and abs(som - tot[1][2]) <= max(3, tot[1][2] * 0.002):
-            return desa, tot[1][2], f'bijna (som {som} vs {tot[1][2]})'
+        # anders: alleen rijen waarin mannen + vrouwen = totaal
+        goed = [x for x in desa if None not in x[1] and x[1][0] + x[1][1] == x[1][2]]
+        if len(goed) >= 2 and len(goed) >= 0.6 * len(desa):
+            return goed, tot[1][2], f'per rij ({len(goed)} van {len(desa)} rijen kloppen)'
     return None, None, 'geen kloppende tabel'
 
 
