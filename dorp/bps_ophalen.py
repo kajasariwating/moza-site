@@ -19,7 +19,7 @@ KEY = os.environ['BPS_KEY']
 API = 'https://webapi.bps.go.id/v1/api'
 
 
-def get(url, tries=4):
+def get(url, tries=7):
     for i in range(tries):
         try:
             req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (live.moza.nu)'})
@@ -28,7 +28,7 @@ def get(url, tries=4):
             if i == tries - 1:
                 raise
             print('  opnieuw:', e)
-            time.sleep(5 * (i + 1))
+            time.sleep(30 * (i + 1) if '429' in str(e) else 5 * (i + 1))
 
 
 def api(pad):
