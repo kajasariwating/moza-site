@@ -47,6 +47,10 @@ jobs:
           EOF
           pdftotext -layout uit/boekje.pdf uit/boekje.txt
           wc -c uit/boekje.txt
+          echo '=====BEGIN====='
+          cat uit/titel.txt; echo
+          grep -n -i -B2 -A45 'penduduk' uit/boekje.txt | head -2500
+          echo '=====EIND====='
           rm uit/boekje.pdf
       - uses: actions/upload-artifact@v4
         with:
