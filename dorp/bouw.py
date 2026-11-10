@@ -240,6 +240,17 @@ def land(kust_alle):
     return _LAND['eilanden']
 
 
+def eiland_van(d, kust_alle):
+    """Het eiland waar het dorp op ligt (of het dichtstbijzijnde binnen 2 km)."""
+    eil, boom = land(kust_alle)
+    pt = Point(d['lo'], d['la'])
+    kand = [eil[i] for i in boom.query(pt.buffer(0.02))]
+    if not kand:
+        return None
+    best = min(kand, key=lambda g: g.distance(pt))
+    return best if best.distance(pt) < 0.02 else None
+
+
 def aan_kust(d, kust_alle, geo):
     """Dorp ligt aan zee als de huizen binnen 1,5 km van de kust staan
     (of, zonder plek van de huizen, als de grond van het dorp tot aan zee loopt)."""
@@ -590,7 +601,7 @@ def rond(x):
     return str(max(1, int(round(x))))
 
 
-def kort_blok(d, kust_dorp):
+def kort_blok(d, kust_dorp, eiland=None):
     """Blok 'In het kort': inwoners (BPS), grond (BPS), hoogte, veerhaven of grote plaats."""
     tegels = []
     inw = d.get('inw')
@@ -603,8 +614,11 @@ def kort_blok(d, kust_dorp):
         waar = ('vlak aan zee' if kust_dorp and h <= 15 else 'aan zee' if kust_dorp else 'laag gelegen' if h < 60
                 else 'in de heuvels' if h < 300 else 'in de bergen')
         tegels.append(('Hoogte', f'{rond(max(h, 1)) if h >= 50 else max(int(h), 1)} meter', waar))
-    havens = sorted(((T.km_tussen(d['la'], d['lo'], a, b), n) for n, a, b in VEERHAVENS), key=lambda x: x[0])[:1]
-    if kust_dorp and havens and havens[0][0] <= 15:
+    # alleen veerhavens op hetzelfde eiland (met wat ruimte voor steigers in zee)
+    zelfde = eiland.buffer(0.015) if eiland is not None else None
+    havens = sorted(((T.km_tussen(d['la'], d['lo'], a, b), n) for n, a, b in VEERHAVENS
+                     if zelfde is None or zelfde.contains(Point(b, a))), key=lambda x: x[0])[:1]
+    if kust_dorp and havens and havens[0][0] <= 30:
         km, n = havens[0]
         tegels.append(('Veerhaven', n, T.afstand(km) if km >= 0.4 else 'in het dorp'))
     else:
@@ -821,7 +835,7 @@ def dorp_html(d, ctx, nu):
         m.append(f'<section aria-labelledby="h-buren"><h2 id="h-buren">Dorpen in de buurt</h2><div class="verder">{rijen}</div>'
                  f'<a href="/eiland/{d["groep"]}/">Alle dorpen in {e(groep)} →</a></section>')
 
-    m.append(kort_blok(d, ctx.get('kust_dorp')))
+    m.append(kort_blok(d, ctx.get('kust_dorp'), ctx.get('eiland')))
     wa_tekst = f'Hoe is het nu in {d["naam"]}? Brand, weer, zee en aardbevingen, ieder uur bijgewerkt.\n{SITE}/{d["slug"]}/?utm_source=whatsapp&utm_medium=deel'
     m.append(f'<section class="deelblok"><h2>Familie in {e(naam)}?</h2><p>Stuur deze pagina door. Dan weet iedereen waar je kunt kijken als er iets gebeurt.</p>'
              f'<div class="dknop"><a class="wa" href="https://wa.me/?text={quote(wa_tekst)}" target="_blank" rel="noopener">{ic("wa")}Deel via WhatsApp</a>'
@@ -1170,7 +1184,7 @@ def main():
             'laatst': sorted(items or [], key=lambda x: x['t'], reverse=True)[:5],
             'bos': bosdata.get(d['code']), 'bosjaar': int(str(bosdata.get('_versie', 'GFC-2001')).split('-')[1]),
             'buren': buren, 'kust': kust.get(d['kab'], []), 'buurlinks': buurlinks,
-            'kust_dorp': aan_kust(d, kust, g),
+            'kust_dorp': aan_kust(d, kust, g), 'eiland': eiland_van(d, kust),
         }
         f = uit / d['slug'] / 'index.html'
         f.parent.mkdir(parents=True, exist_ok=True)
