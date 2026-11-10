@@ -1163,6 +1163,7 @@ def start_html(groepen, brandlijst, nu, bevlijst=None):
 <section aria-labelledby="h-kaart"><h2 id="h-kaart">Of kies op de kaart</h2><p>Zoom in, tik op een dorp en kies <b>Wat speelt er nu</b>.</p></section>
 </main>
 <div id="mzn-plek"></div>
+<script>window.MZN_STEDEN={json.dumps([[n, round(a, 4), round(b, 4)] for n, a, b in STEDEN], ensure_ascii=False)};</script>
 <script>window.MZN_SLUG={{}};fetch('/slugs.json').then(function(r){{return r.json()}}).then(function(j){{Object.assign(window.MZN_SLUG,j)}}).catch(function(){{}});</script>
 <script src="/atlas/atlas-maluku.js?v={VERSIE}" defer></script>
 <script>(function(){{var q=document.getElementById('q'),res=document.getElementById('res'),L=null;
@@ -1311,8 +1312,13 @@ def main():
         return any(geos[j].contains(pt) for j in boom.query(pt))
     bevlijst = recente_bevingen(rows, bev, nu, op_land)
 
+    alle_namen = {x['naam'].lower() for x in rows}
     for i, d in enumerate(rows):
-        zoek.append({'n': d['naam'], 'o': d['officieel'] if d['officieel'] != d['naam'] else '', 's': d['slug'],
+        ook = d['officieel'] if d['officieel'] != d['naam'] else ''
+        for stad, _, _ in STEDEN:  # stad zonder eigen desa (bv. Masohi): vindbaar via de kelurahan
+            if stad.lower() in d['kec'].lower() and stad.lower() not in alle_namen:
+                ook = (ook + ' ' + stad).strip()
+        zoek.append({'n': d['naam'], 'o': ook, 's': d['slug'],
                      'c': d['kec'], 'g': D.GROEPEN.get(d['groep'], ''), 'b': 1 if d['code'] in brandset else 0})
         if alleen and d['slug'] not in alleen:
             continue

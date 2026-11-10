@@ -119,6 +119,7 @@
   '#mzn .vm.sel.t .lb{top:-28px}',
   '#mzn .vm.sel .dot{width:11px;height:11px;left:-5.5px;top:-5.5px;background:var(--rood)}',
   '#mzn .ctxl{font:italic 600 14px var(--fa);color:var(--ctx-ink);white-space:nowrap;pointer-events:none;transform:translate(-50%,-50%)}',
+  '#mzn .stadlb{font:900 13px/1 var(--f);color:#111;background:#fff;border:2px solid #111;box-shadow:2px 2px 0 #FF4D2E;padding:3px 6px;white-space:nowrap;transform:translate(-50%,-50%);pointer-events:none;text-transform:uppercase;letter-spacing:.05em}',
   '#mzn .seal{font:italic 600 15px var(--fa);color:rgba(255,255,255,.55);white-space:nowrap;pointer-events:none;letter-spacing:.18em;transform:translate(-50%,-50%)}',
   '#mzn .mzn-busy{position:absolute;z-index:1000;left:50%;top:16px;transform:translateX(-50%);background:#111;color:#E9F25A;font:800 12px var(--f);letter-spacing:.08em;text-transform:uppercase;padding:6px 10px;border:2px solid #E9F25A;pointer-events:none}',
   '#mzn .mzn-busy[hidden]{display:none}',
@@ -231,6 +232,9 @@
 
     [['LAUT BANDA',-5.6,127.6],['LAUT SERAM',-2.35,128.9],['LAUT MALUKU',0.9,125.7],['LAUT HALMAHERA',-0.35,129.4],['LAUT ARAFURA',-7.9,134.2],['SAMUDRA PASIFIK',2.9,130.2]].forEach(function(a){
       L.marker([a[1],a[2]],{interactive:false,keyboard:false,icon:L.divIcon({className:'',html:'<div class="seal">'+a[0]+'</div>',iconSize:[0,0]})}).addTo(map)});
+    if(window.MZN_STEDEN){var stl=L.layerGroup();
+      window.MZN_STEDEN.forEach(function(a){L.marker([a[1],a[2]],{interactive:false,keyboard:false,zIndexOffset:900,icon:L.divIcon({className:'',html:'<div class="stadlb">'+esc(a[0])+'</div>',iconSize:[0,0]})}).addTo(stl)});
+      var stz=function(){var z=map.getZoom();if(z>=7&&!map.hasLayer(stl))stl.addTo(map);if(z<7&&map.hasLayer(stl))map.removeLayer(stl)};map.on('zoomend',stz);stz();}
 
     var visible={};G.forEach(function(g){visible[g]=true});
     var selected=null;
