@@ -1178,7 +1178,7 @@ def start_html(groepen, brandlijst, nu, bevlijst=None):
 <p class="label">Kabar Maluku Live · powered by MOZA</p><h1>Wat speelt er bij jouw dorp?</h1>
 <p class="accent">brand, beving, lucht en weer</p>
 <label for="q" class="sr">Zoek je dorp of eiland</label>
-<div class="zoek">{ICON_ZOEK}<input id="q" type="search" autocomplete="off" placeholder="Bijvoorbeeld Ullath of Seram" aria-controls="res"></div>
+<div class="zoek">{ICON_ZOEK}<input id="q" type="text" inputmode="search" enterkeyhint="search" role="searchbox" autocomplete="off" autocapitalize="words" placeholder="Bijvoorbeeld Ullath of Seram" aria-controls="res"></div>
 <div id="res" class="verder" aria-live="polite"></div>
 </div></section>
 <div class="streep"><span></span><span></span><span></span></div>

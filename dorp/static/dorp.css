@@ -395,3 +395,6 @@ html.is-ios .vast-and,html.is-ios .vast-pc,html.is-and .vast-ios,html.is-and .va
 
 .vast-start{margin-top:10px;border:2px solid var(--rand);background:var(--papier);padding:0 14px}
 .vast-start[open]{padding-bottom:6px}
+/* iPhone/Safari: geen eigen vergrootglas of kruisje in zoekvelden (we hebben ons eigen icoon) */
+input[type=search]{-webkit-appearance:none;appearance:none}
+input[type=search]::-webkit-search-decoration,input[type=search]::-webkit-search-cancel-button,input[type=search]::-webkit-search-results-button,input[type=search]::-webkit-search-results-decoration{-webkit-appearance:none;display:none}
