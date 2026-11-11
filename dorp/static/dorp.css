@@ -392,3 +392,6 @@ html.is-ios .vast-and,html.is-ios .vast-pc,html.is-and .vast-ios,html.is-and .va
 .meer-rij b{font-weight:900;font-size:15px}
 .meer-rij span{font-size:13px;line-height:1.35;color:var(--mut)}
 .meer-rij a:hover b{text-decoration:underline}
+
+.vast-start{margin-top:10px;border:2px solid var(--rand);background:var(--papier);padding:0 14px}
+.vast-start[open]{padding-bottom:6px}

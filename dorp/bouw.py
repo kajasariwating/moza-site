@@ -1182,7 +1182,14 @@ def start_html(groepen, brandlijst, nu, bevlijst=None):
 <li><b>Zoek je dorp</b><span>Typ de naam hierboven. Een oude naam of andere schrijfwijze werkt vaak ook.</span></li>
 <li><b>Lees wat er speelt</b><span>Brand, weer, lucht, zee en aardbevingen, in gewone woorden en elk uur bijgewerkt.</span></li>
 <li><b>Deel en zet vast</b><span>Stuur je dorp naar familie via WhatsApp, of zet het als icoontje op je telefoon.</span></li>
-</ol></section>
+</ol>
+<script>(function(){{var u=navigator.userAgent,h=document.documentElement;h.classList.add(/iPhone|iPad|iPod/.test(u)||(/Macintosh/.test(u)&&'ontouchend' in document)?'is-ios':/Android/.test(u)?'is-and':'is-pc')}})();</script>
+<details class="vast-uitleg vast-start"><summary>Hoe zet je je dorp vast?</summary>
+<p>Open eerst de pagina van je dorp (zoek hierboven). Dan:</p>
+<div class="vast-ios"><p><b>iPhone (Safari)</b></p><ol><li>Tik onderaan op de deelknop (het vierkantje met het pijltje omhoog).</li><li>Kies <b>Zet op beginscherm</b>.</li><li>Tik op <b>Voeg toe</b>. Je dorp staat nu als icoontje tussen je apps.</li></ol></div>
+<div class="vast-and"><p><b>Android (Chrome)</b></p><ol><li>Tik rechtsboven op de drie puntjes.</li><li>Kies <b>Toevoegen aan startscherm</b>.</li><li>Tik op <b>Toevoegen</b>. Je dorp staat nu als icoontje tussen je apps.</li></ol></div>
+<div class="vast-pc"><p><b>Computer</b></p><p>Maak een bladwijzer: druk op Ctrl+D (Windows) of Cmd+D (Mac).</p></div>
+</details></section>
 <section><h2>Of kies een eilandgroep</h2><div class="knoppen">{knoppen}</div></section>
 {bevingen_blok(bevlijst, nu)}
 {brand}
