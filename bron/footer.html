@@ -207,7 +207,8 @@
       glossary = glossary.slice().sort(function (a, b) { return b.term.length - a.term.length; });
       glossary.forEach(function (g) {
         if (/^\/kennisbank\//.test(location.pathname) && mzTitle.indexOf(String(g.term).toLowerCase()) !== -1) return; /* alleen in de kennisbank: begrip uit de titel niet onderstrepen */
-        var re = new RegExp('(^|[^\\p{L}\\p{N}])(' + esc(g.term) + ')(?![\\p{L}\\p{N}])', 'iu');
+        var pat = esc(g.term), fl = 'iu'; if (/^belang$/i.test(g.term)) { pat = 'belang(?=-bo)|Belang'; fl = 'u'; } /* belang is ook een gewoon Nederlands woord: alleen Belang met hoofdletter of belang-boot(en) */
+        var re = new RegExp('(^|[^\\p{L}\\p{N}])(' + pat + ')(?![\\p{L}\\p{N}])', fl);
         linkFirst(root, re, function (w) {
           var btn = document.createElement('button'); btn.type = 'button'; btn.className = 'moza-term';
           btn.textContent = w; btn.setAttribute('aria-expanded', 'false'); btn.setAttribute('aria-controls', 'moza-pop');
