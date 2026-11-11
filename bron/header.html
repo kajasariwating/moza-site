@@ -16,8 +16,8 @@ if(!window.MutationObserver)setInterval(plan,1000);
 <script id="mz-pagewait">(function(){var p=location.pathname,H=document.documentElement,s=null;if(/^\/(events|evenementen)\/?$/i.test(p))s="#mzag";else if(/^\/store\/?$/i.test(p))s="#tk";else if(/^\/evenementen\/[^\/]+\/?$/i.test(p))s="#mzev";else if(/^\/organisaties\/?$/i.test(p))s="#mzorg";else if(/^\/nieuws\/maluku\/?$/i.test(p))s="#mzmal";else if(/^\/oral-history-scholenproject\/?$/i.test(p))s="#mzoh";if(!s)return;H.classList.add("mz-pw");var t0=Date.now();(function c(){if(document.querySelector(s)||Date.now()-t0>2500){H.classList.remove("mz-pw");return}setTimeout(c,25)})()})();</script>
 <script id="mz-selfignore">
 /* Eigen bezoeken en robots niet meetellen in Plausible (11-11-2026).
-   - Geheime pagina: moza.nu/#CODE. Alleen de eigenaar kent de code; hier staat alleen de SHA-256 ervan. Daar zie je of je meetelt en zet je het aan of uit.
-     (Het stuk na # gaat nooit naar Squarespace of Plausible.)
+   - Geheime pagina: een adres dat alleen de eigenaar kent (hier staat alleen een vingerafdruk ervan, geen tekst). Daar zie je of je meetelt en zet je het aan of uit.
+     Die pagina zelf telt nooit mee.
    - Vanzelf: de browser in de Claude-app, Claude-robots en geautomatiseerde browsers.
    Onthouden in opslag + cookie op .moza.nu (geldt ook voor live.moza.nu) en bij elk bezoek ververst. */
 (function(){var d=document,L=location,ua=navigator.userAgent||'';
@@ -26,17 +26,17 @@ function ck(){return /(?:^|; )mz_noc=1/.test(d.cookie)}
 function ls(){try{return localStorage.getItem('plausible_ignore')==='true'}catch(e){return false}}
 function setAll(){try{localStorage.setItem('plausible_ignore','true');localStorage.setItem('skipgc','t')}catch(e){}try{d.cookie='mz_noc=1; max-age=34560000; path=/; domain=.moza.nu; SameSite=Lax; Secure'}catch(e){}}
 function clrAll(){try{localStorage.removeItem('plausible_ignore');localStorage.removeItem('skipgc')}catch(e){}try{d.cookie='mz_noc=; max-age=0; path=/; domain=.moza.nu'}catch(e){}}
-var GEHEIM='9332e2c89b40cadc935636510f21af4b10405c622371bba2000bf42dce521d06';
+var GEHEIM=222043172;
+function fnv(t){var h=2166136261;for(var i=0;i<t.length;i++){h^=t.charCodeAt(i);h=Math.imul(h,16777619)>>>0}return h}
+var opGeheim=false;try{opGeheim=fnv(decodeURIComponent(L.pathname).toLowerCase().replace(/\/+$/,''))===GEHEIM}catch(e){}
 if(robot||ls()||ck())setAll();
 function uit(){return robot||ls()||ck()}
-window.mzNietMeetellen=uit;
+function nietTellen(){return uit()||opGeheim}
+window.mzNietMeetellen=nietTellen;
 var F='font-family:"Hanken Grotesk",system-ui,sans-serif;';
 function zodra(f){if(d.body)f();else d.addEventListener('DOMContentLoaded',f)}
-function schoon(){try{history.replaceState(null,'',L.pathname+L.search)}catch(e){}}
-/* De geheime pagina: een venster over de site heen. Alleen als de code achter # klopt. */
-function geheim(){var c=L.hash.slice(1);if(c.length<12||!(window.crypto&&crypto.subtle&&window.TextEncoder))return;
- crypto.subtle.digest('SHA-256',new TextEncoder().encode(c)).then(function(b){var x=[].map.call(new Uint8Array(b),function(n){return(n<16?'0':'')+n.toString(16)}).join('');if(x===GEHEIM)zodra(venster)}).catch(function(){})}
-geheim();window.addEventListener('hashchange',geheim);
+/* De geheime pagina: een venster over de site heen. Alleen op het geheime adres. */
+if(opGeheim)zodra(venster);
 function venster(){if(d.getElementById('mz-mijnbezoeken'))return;
  var w=d.createElement('div');w.id='mz-mijnbezoeken';w.setAttribute('role','dialog');w.setAttribute('aria-modal','true');w.setAttribute('aria-labelledby','mz-mb-h');
  w.style.cssText='position:fixed;inset:0;z-index:2147483000;background:rgba(17,17,17,.7);display:flex;align-items:center;justify-content:center;padding:16px';
@@ -45,7 +45,7 @@ function venster(){if(d.getElementById('mz-mijnbezoeken'))return;
   +'<h2 id="mz-mb-h" style=\''+F+'margin:0 0 12px;font-size:26px;line-height:1.15;font-weight:900;color:#111\'>Tellen jouw bezoeken <em style="font-family:Fraunces,Georgia,serif;font-style:italic;font-weight:600">mee?</em></h2>'
   +'<p id="mz-mb-s" style="margin:0 0 16px;font-size:17px;line-height:1.45;padding:10px 12px;border:2px solid #111"></p>'
   +'<button type="button" id="mz-mb-b" style=\''+F+'display:block;width:100%;background:#E9F25A;color:#111;border:3px solid #111;box-shadow:4px 4px 0 #111;padding:14px;font-size:17px;font-weight:800;cursor:pointer;border-radius:0\'></button>'
-  +'<p style="margin:18px 0 0;font-size:15px;line-height:1.5">Dit geldt alleen voor deze browser. Open deze pagina dus ook op je telefoon en in de browser van WhatsApp en Instagram. Bewaar deze link als bladwijzer en deel hem met niemand.</p>'
+  +'<p style="margin:18px 0 0;font-size:15px;line-height:1.5">Dit geldt alleen voor deze browser. Open deze pagina dus ook op je telefoon en in de browser van WhatsApp en Instagram. Bewaar deze pagina als bladwijzer en deel het adres met niemand.</p>'
   +'<button type="button" id="mz-mb-x" style=\''+F+'margin-top:14px;background:none;border:0;padding:0;font-size:15px;font-weight:700;text-decoration:underline;color:#111;cursor:pointer\'>Sluiten</button></div>';
  d.body.appendChild(w);
  var st=w.querySelector('#mz-mb-s'),b=w.querySelector('#mz-mb-b');
@@ -55,7 +55,7 @@ function venster(){if(d.getElementById('mz-mijnbezoeken'))return;
   b.style.display=robot?'none':'block';b.textContent=u?'Weer meetellen':'Niet meer meetellen'}
  toon();
  b.addEventListener('click',function(){if(uit())clrAll();else setAll();toon()});
- function dicht(){w.remove();schoon()}
+ function dicht(){w.remove();try{location.href='/'}catch(e){}}
  w.querySelector('#mz-mb-x').addEventListener('click',dicht);
  w.addEventListener('click',function(e){if(e.target===w)dicht()});
  d.addEventListener('keydown',function(e){if(e.key==='Escape'&&d.getElementById('mz-mijnbezoeken'))dicht()});
