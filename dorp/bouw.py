@@ -510,6 +510,7 @@ window.mzThema=function(){{var dk=!d.classList.contains('moza-dark');d.classList
 <meta name="description" content="{e(omschrijving)}">
 <link rel="canonical" href="{SITE}{pad}">
 <meta name="robots" content="{robots}">
+<meta name="google-site-verification" content="d_LFz6BhzOvggjPcIRrdEZJacTM0pHkf1FeWmQoROfk">
 <meta property="og:title" content="{e(titel)}">
 <meta property="og:description" content="{e(omschrijving)}">
 <meta property="og:url" content="{SITE}{pad}">
