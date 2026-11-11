@@ -355,7 +355,8 @@ def kaart_svg(d, geo, buren, kust, brandpunten, wrichting):
 ICON_ZOEK = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>'
 
 PLAUSIBLE = ('<script>(function(){if(!/(^|\\.)moza\\.nu$/.test(location.hostname))return;'
-             'if(/(?:^|; )mz_noc=1/.test(document.cookie))return;try{if(localStorage.getItem("plausible_ignore")==="true")return}catch(e){}'
+             'if(/\\bClaude\\/\\d|ClaudeBot|Claude-(User|SearchBot|Web)|anthropic|HeadlessChrome|Lighthouse/i.test(navigator.userAgent||"")||navigator.webdriver===true)return;'
+             'if(/(?:^|; )mz_noc=1/.test(document.cookie)){try{document.cookie="mz_noc=1; max-age=34560000; path=/; domain=.moza.nu; SameSite=Lax; Secure"}catch(e){}return}try{if(localStorage.getItem("plausible_ignore")==="true")return}catch(e){}'
              'var s=document.createElement("script");s.defer=true;s.setAttribute("data-domain","moza.nu");'
              's.src="https://plausible.io/js/script.js";document.head.appendChild(s)})();</script>')
 
