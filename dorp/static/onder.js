@@ -33,3 +33,8 @@
   [].forEach.call(document.querySelectorAll('[data-meer]'),function(b){b.addEventListener('click',function(){if(!meer)return;if(meer.hidden)meerOpen();else meerDicht()})});
   document.addEventListener('keydown',function(e){if(e.key==='Escape'){if(deel)dicht(deel);meerDicht()}});
 })();
+
+/* klikken op Blijf op de hoogte en het openen van de uitleg Zet vast tellen (11-11-2026) */
+(function(){function p(n){try{if(window.plausible)window.plausible(n)}catch(e){}}
+document.addEventListener('click',function(ev){var a=ev.target.closest&&ev.target.closest('[data-ev]');if(a)p(a.getAttribute('data-ev'))});
+document.addEventListener('toggle',function(ev){var d=ev.target;if(d&&d.classList&&d.classList.contains('vast-uitleg')&&d.open)p('Kabar: uitleg vastzetten')},true);})();

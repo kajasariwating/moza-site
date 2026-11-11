@@ -353,3 +353,43 @@ html.moza-dark .overdorp .tg small,html.moza-dark .overdorp .nb{color:#B9BCC6}
 .overdorp .tegels{grid-template-columns:repeat(auto-fill,minmax(108px,1fr))}
 @media (min-width:700px){.overdorp .tegels{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}}
 .overdorp .tg .label{font-size:10.5px;letter-spacing:.06em;overflow-wrap:anywhere}
+
+/* zet je dorp vast en blijf op de hoogte (11-11-2026) */
+.vast{border:2px solid var(--rand);padding:16px;margin:0 0 28px}
+.vast h2{margin:0 0 6px;font-size:20px;font-weight:900;letter-spacing:-.01em}
+.vast>p{margin:0 0 10px}
+.vast-uitleg summary{cursor:pointer;font-weight:900;min-height:44px;display:flex;align-items:center;color:var(--blauw)}
+.moza-dark .vast-uitleg summary{color:#9fb0ff}
+.vast-uitleg ol{margin:0 0 12px;padding-left:22px}
+.vast-uitleg li{margin:4px 0}
+.vast-uitleg p{margin:8px 0 4px}
+html.is-ios .vast-and,html.is-ios .vast-pc,html.is-and .vast-ios,html.is-and .vast-pc,html.is-pc .vast-ios,html.is-pc .vast-and{display:none}
+.hoogte{margin:0 0 28px}
+.hoogte h2{margin:0 0 10px;font-size:20px;font-weight:900}
+.hoogte-rij{display:grid;gap:10px}
+@media(min-width:640px){.hoogte-rij{grid-template-columns:1fr 1fr}}
+.hoogte-k{display:flex;gap:12px;align-items:flex-start;border:2px solid var(--rand);padding:14px;text-decoration:none;color:var(--inkt)!important;background:var(--papier)}
+.hoogte-k svg{width:24px;height:24px;flex:none;margin-top:2px}
+.hoogte-k b{display:block;font-weight:900;margin-bottom:2px}
+.hoogte-k span{font-size:15px;line-height:1.45}
+.wa-k svg{color:#1f8f4e}
+.nb-k svg{color:var(--blauw)}
+.hoogte-k:hover b{text-decoration:underline}
+
+/* startpagina: uitleg en meer op MOZA (11-11-2026) */
+.uitleg,.meer-moza{margin:0 0 28px}
+.uitleg h2,.meer-moza h2{margin:0 0 10px;font-size:22px;font-weight:900;letter-spacing:-.02em}
+.stappen{list-style:none;counter-reset:st;margin:0 0 10px;padding:0;display:grid;gap:10px}
+@media(min-width:760px){.stappen{grid-template-columns:repeat(3,1fr)}}
+.stappen li{counter-increment:st;position:relative;border:2px solid var(--rand);background:var(--papier);padding:14px 14px 14px 58px;display:flex;flex-direction:column;gap:4px}
+.stappen li::before{content:counter(st);position:absolute;left:14px;top:14px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;background:var(--geel);color:#111;border:2px solid #111;font-weight:900}
+.stappen b{font-size:17px;font-weight:900}
+.stappen span{font-size:15px;line-height:1.45}
+.uitleg .klein{font-size:14px;color:var(--mut);margin:0}
+.meer-moza>p{margin:0 0 12px}
+.meer-rij{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(min-width:760px){.meer-rij{grid-template-columns:repeat(4,1fr)}}
+.meer-rij a{display:flex;flex-direction:column;gap:3px;border:2px solid var(--rand);background:var(--papier);color:var(--inkt)!important;text-decoration:none;padding:12px;min-height:44px}
+.meer-rij b{font-weight:900;font-size:15px}
+.meer-rij span{font-size:13px;line-height:1.35;color:var(--mut)}
+.meer-rij a:hover b{text-decoration:underline}

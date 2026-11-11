@@ -369,6 +369,7 @@ _IC = {
     'meer': '<path d="M4 6h16M4 12h16M4 18h16"/>',
     'deel': '<circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.8l7.6-4.4M8.2 13.2l7.6 4.4"/>',
     'wa': '<path d="M4 20l1.4-4.2A8 8 0 1 1 8.4 19z"/>',
+    'post': '<rect x="3" y="5" width="18" height="14"/><path d="M3 7l9 6 9-6"/>',
     'x': '<path d="M6 6l12 12M18 6L6 18"/>',
 }
 
@@ -495,7 +496,7 @@ def mozakop_desktop():
     return f'<div id="mzd" data-nosnippet>{r1}</div>'
 
 
-def pagina(titel, omschrijving, pad, body, extra_head='', robots='index,follow', deel=DEEL_STANDAARD):
+def pagina(titel, omschrijving, pad, body, extra_head='', robots='index,follow', deel=DEEL_STANDAARD, app_titel='Kabar'):
     return f'''<!doctype html>
 <html lang="nl">
 <head>
@@ -523,6 +524,8 @@ window.mzThema=function(){{var dk=!d.classList.contains('moza-dark');d.classList
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;700;800;900&family=Fraunces:ital,wght@1,600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/dorp.css?v={VERSIE}">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="{e(app_titel)}">
 {extra_head}{PLAUSIBLE}
 </head>
 <body>
@@ -944,6 +947,22 @@ def dorp_html(d, ctx, nu):
     m.append(f'<section class="deelblok"><h2>Familie in {e(naam)}?</h2><p>Stuur deze pagina door. Dan weet iedereen waar je kunt kijken als er iets gebeurt.</p>'
              f'<div class="dknop"><a class="wa" href="https://wa.me/?text={quote(wa_tekst)}" target="_blank" rel="noopener">{ic("wa")}Deel via WhatsApp</a>'
              f'<button type="button" class="nog" data-deel>{ic("deel")}Andere manier</button></div></section>')
+    # ---- zet je dorp vast (op het beginscherm van de telefoon)
+    m.append(f'''<section class="vast" aria-labelledby="h-vast"><h2 id="h-vast">Zet {e(naam)} vast op je telefoon</h2>
+<p>Dan staat {e(naam)} als icoontje tussen je apps en kijk je met één tik hoe het daar is.</p>
+<script>(function(){{var u=navigator.userAgent,h=document.documentElement;h.classList.add(/iPhone|iPad|iPod/.test(u)||(/Macintosh/.test(u)&&'ontouchend' in document)?'is-ios':/Android/.test(u)?'is-and':'is-pc')}})();</script>
+<details class="vast-uitleg"><summary>Zo doe je het</summary>
+<div class="vast-ios"><p><b>iPhone (Safari)</b></p><ol><li>Tik onderaan op de deelknop (het vierkantje met het pijltje omhoog).</li><li>Kies <b>Zet op beginscherm</b>.</li><li>Tik op <b>Voeg toe</b>.</li></ol></div>
+<div class="vast-and"><p><b>Android (Chrome)</b></p><ol><li>Tik rechtsboven op de drie puntjes.</li><li>Kies <b>Toevoegen aan startscherm</b>.</li><li>Tik op <b>Toevoegen</b>.</li></ol></div>
+<div class="vast-pc"><p><b>Computer</b></p><p>Maak een bladwijzer: druk op Ctrl+D (Windows) of Cmd+D (Mac).</p></div>
+</details></section>''')
+    # ---- blijf op de hoogte: WhatsApp-kanaal en nieuwsbrief van MOZA
+    m.append('<section class="hoogte" aria-labelledby="h-hoogte"><h2 id="h-hoogte">Blijf op de hoogte</h2><div class="hoogte-rij">'
+             '<a class="hoogte-k wa-k" href="https://whatsapp.com/channel/0029VaA4StPIt5rs5FadnH1d" target="_blank" rel="noopener" data-ev="Kabar: WhatsApp-kanaal">'
+             f'{ic("wa")}<span><b>Volg MOZA op WhatsApp</b>Het laatste Molukse nieuws op je telefoon. Gebeurt er iets groots op de Molukken, dan lees je het daar.</span></a>'
+             '<a class="hoogte-k nb-k" href="https://www.moza.nu/lezen?utm_source=kabar&amp;utm_medium=nieuwsbrief#mzf-nb" data-ev="Kabar: nieuwsbrief">'
+             f'{ic("post")}<span><b>Elke donderdag de nieuwsbrief</b>Het belangrijkste over Molukkers in Nederland, inclusief wat er speelde op de Molukken.</span></a>'
+             '</div></section>')
     # ---- meer op MOZA
     laatst = [x for x in (ctx.get('laatst') or []) if x['url'] not in {y['url'] for y in (nw or [])}][:3]
     if laatst:
@@ -981,7 +1000,8 @@ def dorp_html(d, ctx, nu):
     ld = json.dumps(graaf, ensure_ascii=False)
     return pagina(titel, omschrijving, f'/{d["slug"]}/', ''.join(delen) + klok_js(verschil),
                   f'<script type="application/ld+json">{ld}</script>\n',
-                  deel=(f'Hoe is het nu in {d["naam"]}?', f'Brand, weer, zee en aardbevingen in {d["naam"]} op {plek}. Ieder uur bijgewerkt.'))
+                  deel=(f'Hoe is het nu in {d["naam"]}?', f'Brand, weer, zee en aardbevingen in {d["naam"]} op {plek}. Ieder uur bijgewerkt.'),
+                  app_titel=naam)
 
 
 # ---------------------------------------------------------------- eiland en start
@@ -1163,6 +1183,31 @@ def start_html(groepen, brandlijst, nu, bevlijst=None):
 <section aria-labelledby="h-kaart"><h2 id="h-kaart">Of kies op de kaart</h2><p>Zoom in, tik op een dorp en kies <b>Wat speelt er nu</b>.</p></section>
 </main>
 <div id="mzn-plek"></div>
+<main class="w">
+<section class="uitleg" aria-labelledby="h-uitleg"><h2 id="h-uitleg">Zo werkt Kabar Maluku Live</h2>
+<ol class="stappen">
+<li><b>Zoek je dorp</b><span>Typ de naam bovenaan, kies een eilandgroep of tik op de kaart. Ken je alleen de oude naam of een andere schrijfwijze? Probeer die ook.</span></li>
+<li><b>Lees wat er speelt</b><span>Bovenaan staat het belangrijkste in één zin. Daaronder: brand, weer voor 7 dagen, de lucht, de zee en aardbevingen. Alles in gewone woorden, elk uur bijgewerkt.</span></li>
+<li><b>Deel en zet vast</b><span>Stuur de pagina naar je familie via WhatsApp. Zet je dorp vast op je telefoon, dan kijk je voortaan met één tik.</span></li>
+</ol>
+<p class="klein">De satelliet ziet waar het heet is. Meestal is dat brand, maar niet altijd. Twijfel je? Bel of app je familie.</p></section>
+<section class="meer-moza" aria-labelledby="h-meer"><p class="label"><span class="tag" style="background:#111;color:#fff">MOZA</span></p><h2 id="h-meer">Meer op MOZA</h2>
+<p>Kabar Maluku Live is een dienst van MOZA, het platform voor, door en met Molukkers. Op moza.nu vind je ook:</p>
+<div class="meer-rij">
+<a href="https://www.moza.nu/lezen?utm_source=kabar&amp;utm_medium=start"><b>Nieuws en verhalen</b><span>Over Molukkers in Nederland en op de Molukken</span></a>
+<a href="https://www.moza.nu/kaarten?utm_source=kabar&amp;utm_medium=start"><b>Kaarten</b><span>Bosbranden, weer, talen, Molukse wijken en meer</span></a>
+<a href="https://www.moza.nu/weten?utm_source=kabar&amp;utm_medium=start"><b>Kennisbank</b><span>Antwoorden op vragen over cultuur, geschiedenis en reizen</span></a>
+<a href="https://www.moza.nu/begrippen?utm_source=kabar&amp;utm_medium=start"><b>Begrippenlijst</b><span>Molukse woorden uitgelegd</span></a>
+<a href="https://www.moza.nu/jaartallen?utm_source=kabar&amp;utm_medium=start"><b>Jaartallen</b><span>Molukse geschiedenis van de VOC tot nu</span></a>
+<a href="https://www.moza.nu/organisaties?utm_source=kabar&amp;utm_medium=start"><b>Organisaties</b><span>Wie doet wat in de gemeenschap</span></a>
+<a href="https://www.moza.nu/evenementen?utm_source=kabar&amp;utm_medium=start"><b>Agenda</b><span>Molukse activiteiten in Nederland</span></a>
+<a href="https://www.moza.nu/store?utm_source=kabar&amp;utm_medium=start"><b>Toko Buku</b><span>Boeken en prints over de Molukken</span></a>
+</div></section>
+<section class="hoogte" aria-labelledby="h-hoogte"><h2 id="h-hoogte">Blijf op de hoogte</h2><div class="hoogte-rij">
+<a class="hoogte-k wa-k" href="https://whatsapp.com/channel/0029VaA4StPIt5rs5FadnH1d" target="_blank" rel="noopener" data-ev="Kabar: WhatsApp-kanaal">{ic("wa")}<span><b>Volg MOZA op WhatsApp</b>Het laatste Molukse nieuws op je telefoon. Gebeurt er iets groots op de Molukken, dan lees je het daar.</span></a>
+<a class="hoogte-k nb-k" href="https://www.moza.nu/lezen?utm_source=kabar&amp;utm_medium=nieuwsbrief#mzf-nb" data-ev="Kabar: nieuwsbrief">{ic("post")}<span><b>Elke donderdag de nieuwsbrief</b>Het belangrijkste over Molukkers in Nederland, inclusief wat er speelde op de Molukken.</span></a>
+</div></section>
+</main>
 <script>window.MZN_STEDEN={json.dumps([[n, round(a, 4), round(b, 4)] for n, a, b in STEDEN], ensure_ascii=False)};</script>
 <script>window.MZN_SLUG={{}};fetch('/slugs.json').then(function(r){{return r.json()}}).then(function(j){{Object.assign(window.MZN_SLUG,j)}}).catch(function(){{}});</script>
 <script src="/atlas/atlas-maluku.js?v={VERSIE}" defer></script>
@@ -1362,6 +1407,7 @@ def main():
     shutil.copy(HIER / 'static' / 'kop.js', uit / 'kop.js')
     shutil.copy(HIER / 'static' / 'og.png', uit / 'og.png')
     shutil.copy(HIER / 'static' / 'favicon.svg', uit / 'favicon.svg')
+    shutil.copy(HIER / 'static' / 'apple-touch-icon.png', uit / 'apple-touch-icon.png')
     for f in (HIER / 'static').glob('google*.html'):  # verificatie Google Search Console
         shutil.copy(f, uit / f.name)
     (uit / 'CNAME').write_text('live.moza.nu\n')
