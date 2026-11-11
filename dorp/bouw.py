@@ -529,6 +529,8 @@ window.mzThema=function(){{var dk=!d.classList.contains('moza-dark');d.classList
 <link rel="stylesheet" href="/dorp.css?v={VERSIE}">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#1F3BD1">
 <meta name="apple-mobile-web-app-title" content="{e(app_titel)}">
 {extra_head}{PLAUSIBLE}
 </head>
@@ -772,6 +774,7 @@ def dorp_html(d, ctx, nu):
 <nav class="label kruim" aria-label="Kruimelpad"><i></i><a href="/">Kabar Maluku Live</a> › <a href="/eiland/{d["groep"]}/">{e(groep)}</a></nav>
 <h1 id="h1">{e(naam)}</h1>
 <p class="sub">{sub}</p>
+<button type="button" class="pin" data-pin data-s="{d["slug"]}" data-n="{e(naam)}" data-c="{e(d["kec"])}" aria-pressed="false"><span class="pin-i" aria-hidden="true">☆</span><span class="pin-t">Bewaar dit dorp</span></button>
 <p class="intro">Brand, weer, zee en aardbevingen bij {e(naam)}{" (officieel " + e(d["officieel"]) + ")" if d["officieel"] != naam else ""} in {e(d["kec"])}, {e(d["kabnaam"])}. Elk uur bijgewerkt.</p>
 <div class="chips">{''.join(chips)}</div>{zon}
 <p class="samen">{samen}</p>
@@ -1183,6 +1186,8 @@ def start_html(groepen, brandlijst, nu, bevlijst=None):
 </div></section>
 <div class="streep"><span></span><span></span><span></span></div>
 <main class="w">
+<section id="mijn" class="mijn" hidden aria-labelledby="h-mijn"><h2 id="h-mijn">Jouw dorpen</h2><div class="verder"></div>
+<p class="nb">Je bewaarde dorpen blijven op deze telefoon of computer staan. <b>Tip:</b> zet Kabar Maluku ook op je beginscherm. iPhone: tik op de deelknop en kies <i>Zet op beginscherm</i>. Android: tik op ⋮ en kies <i>Toevoegen aan startscherm</i>.</p></section>
 <section class="uitleg" aria-labelledby="h-uitleg"><h2 id="h-uitleg">Zo werkt het</h2>
 <ol class="stappen">
 <li><b>Zoek je dorp</b><span>Typ de naam hierboven. Een oude naam of andere schrijfwijze werkt vaak ook.</span></li>
@@ -1420,6 +1425,8 @@ def main():
     OG.maak(uit, D.CACHE, rows, eilandnamen, D.GROEPEN, alleen)
     shutil.copy(HIER / 'static' / 'favicon.svg', uit / 'favicon.svg')
     shutil.copy(HIER / 'static' / 'apple-touch-icon.png', uit / 'apple-touch-icon.png')
+    for f in ('manifest.webmanifest', 'icon-192.png', 'icon-512.png'):
+        shutil.copy(HIER / 'static' / f, uit / f)
     for f in (HIER / 'static').glob('google*.html'):  # verificatie Google Search Console
         shutil.copy(f, uit / f.name)
     (uit / 'CNAME').write_text('live.moza.nu\n')

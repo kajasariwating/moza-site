@@ -38,3 +38,32 @@
 (function(){function p(n){try{if(window.plausible)window.plausible(n)}catch(e){}}
 document.addEventListener('click',function(ev){var a=ev.target.closest&&ev.target.closest('[data-ev]');if(a)p(a.getAttribute('data-ev'))});
 document.addEventListener('toggle',function(ev){var d=ev.target;if(d&&d.classList&&d.classList.contains('vast-uitleg')&&d.open)p('Kabar: uitleg vastzetten')},true);})();
+/* Bewaarde dorpen: knop op de dorpspagina, lijst op de startpagina. Alleen in deze browser. */
+(function(){
+  var KEY='mzk-dorpen';
+  function lees(){try{var x=JSON.parse(localStorage.getItem(KEY)||'[]');return Array.isArray(x)?x:[]}catch(e){return[]}}
+  function schrijf(l){try{localStorage.setItem(KEY,JSON.stringify(l.slice(0,12)))}catch(e){}}
+  function pl(n){try{if(window.plausible)window.plausible(n)}catch(e){}}
+  [].forEach.call(document.querySelectorAll('[data-pin]'),function(b){
+    var s=b.getAttribute('data-s');
+    function zet(){var op=lees().some(function(x){return x.s===s});b.setAttribute('aria-pressed',op?'true':'false');
+      b.querySelector('.pin-i').textContent=op?'★':'☆';b.querySelector('.pin-t').textContent=op?'Bewaard bij jouw dorpen':'Bewaar dit dorp'}
+    zet();
+    b.addEventListener('click',function(){var l=lees(),i=-1;l.forEach(function(x,k){if(x.s===s)i=k});
+      if(i>=0){l.splice(i,1);pl('Kabar dorp vergeten')}else{l.unshift({s:s,n:b.getAttribute('data-n'),c:b.getAttribute('data-c')});pl('Kabar dorp bewaard')}
+      schrijf(l);zet()});
+  });
+  var m=document.getElementById('mijn');if(!m)return;
+  function toon(brand){var l=lees();if(!l.length){m.hidden=true;return}
+    var box=m.querySelector('.verder');box.innerHTML='';
+    l.forEach(function(x){var a=document.createElement('a');a.className='rij';a.href='/'+x.s+'/';
+      var b=document.createElement('b');b.textContent=x.n;var sm=document.createElement('small');sm.textContent=x.c||'';b.appendChild(sm);a.appendChild(b);
+      if(brand&&brand[x.s]){var bd=document.createElement('span');bd.className='badge';bd.textContent='BRAND';a.appendChild(bd)}
+      else{var p=document.createElement('span');p.className='pijl';p.setAttribute('aria-hidden','true');p.textContent='→';a.appendChild(p)}
+      var w=document.createElement('button');w.type='button';w.className='weg';w.setAttribute('aria-label',x.n+' niet meer bewaren');w.textContent='×';
+      w.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();schrijf(lees().filter(function(y){return y.s!==x.s}));toon(brand)});
+      a.appendChild(w);box.appendChild(a)});
+    m.hidden=false}
+  toon(null);
+  if(lees().length)fetch('/zoek.json').then(function(r){return r.json()}).then(function(z){var b={};z.forEach(function(x){if(x.b)b[x.s]=1});toon(b)}).catch(function(){});
+})();

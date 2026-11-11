@@ -398,3 +398,13 @@ html.is-ios .vast-and,html.is-ios .vast-pc,html.is-and .vast-ios,html.is-and .va
 /* iPhone/Safari: geen eigen vergrootglas of kruisje in zoekvelden (we hebben ons eigen icoon) */
 input[type=search]{-webkit-appearance:none;appearance:none}
 input[type=search]::-webkit-search-decoration,input[type=search]::-webkit-search-cancel-button,input[type=search]::-webkit-search-results-button,input[type=search]::-webkit-search-results-decoration{-webkit-appearance:none;display:none}
+/* Bewaar dit dorp */
+.pin{display:inline-flex;align-items:center;gap:8px;min-height:44px;margin:4px 0 14px;padding:0 14px;background:#fff;color:#111;border:2px solid #111;box-shadow:3px 3px 0 #111;font:800 15px/1 "Hanken Grotesk",system-ui,sans-serif;cursor:pointer}
+.pin .pin-i{font-size:18px;line-height:1}
+.pin[aria-pressed=true]{background:var(--geel)}
+.mijn{margin:24px 0 8px}
+.mijn .rij{position:relative;padding-right:52px}
+.mijn .weg{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:40px;height:40px;border:0;background:none;color:inherit;font:400 26px/1 system-ui;cursor:pointer}
+.mijn .pijl{margin-left:auto}
+.mijn .nb{font-size:14px;color:#555}
+html.moza-dark .mijn .nb{color:#B9BCC6}
