@@ -379,13 +379,12 @@ html.is-ios .vast-and,html.is-ios .vast-pc,html.is-and .vast-ios,html.is-and .va
 /* startpagina: uitleg en meer op MOZA (11-11-2026) */
 .uitleg,.meer-moza{margin:0 0 28px}
 .uitleg h2,.meer-moza h2{margin:0 0 10px;font-size:22px;font-weight:900;letter-spacing:-.02em}
-.stappen{list-style:none;counter-reset:st;margin:0 0 10px;padding:0;display:grid;gap:10px}
+.stappen{list-style:none;counter-reset:st;margin:0;padding:0;display:grid;gap:8px}
 @media(min-width:760px){.stappen{grid-template-columns:repeat(3,1fr)}}
-.stappen li{counter-increment:st;position:relative;border:2px solid var(--rand);background:var(--papier);padding:14px 14px 14px 58px;display:flex;flex-direction:column;gap:4px}
-.stappen li::before{content:counter(st);position:absolute;left:14px;top:14px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;background:var(--geel);color:#111;border:2px solid #111;font-weight:900}
-.stappen b{font-size:17px;font-weight:900}
-.stappen span{font-size:15px;line-height:1.45}
-.uitleg .klein{font-size:14px;color:var(--mut);margin:0}
+.stappen li{counter-increment:st;display:grid;grid-template-columns:32px 1fr;column-gap:12px;row-gap:2px;align-items:center;border:2px solid var(--rand);background:var(--papier);padding:12px 14px}
+.stappen li::before{content:counter(st);grid-row:1;grid-column:1;width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:var(--geel);color:#111;border:2px solid #111;font-weight:900;box-sizing:border-box}
+.stappen b{grid-row:1;grid-column:2;font-size:17px;font-weight:900;line-height:1.2}
+.stappen span{grid-row:2;grid-column:1 / -1;font-size:15px;line-height:1.45;margin-top:6px}
 .meer-moza>p{margin:0 0 12px}
 .meer-rij{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 @media(min-width:760px){.meer-rij{grid-template-columns:repeat(4,1fr)}}

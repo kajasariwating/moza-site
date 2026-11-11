@@ -1177,37 +1177,34 @@ def start_html(groepen, brandlijst, nu, bevlijst=None):
 </div></section>
 <div class="streep"><span></span><span></span><span></span></div>
 <main class="w">
+<section class="uitleg" aria-labelledby="h-uitleg"><h2 id="h-uitleg">Zo werkt het</h2>
+<ol class="stappen">
+<li><b>Zoek je dorp</b><span>Typ de naam hierboven. Een oude naam of andere schrijfwijze werkt vaak ook.</span></li>
+<li><b>Lees wat er speelt</b><span>Brand, weer, lucht, zee en aardbevingen, in gewone woorden en elk uur bijgewerkt.</span></li>
+<li><b>Deel en zet vast</b><span>Stuur je dorp naar familie via WhatsApp, of zet het als icoontje op je telefoon.</span></li>
+</ol></section>
 <section><h2>Of kies een eilandgroep</h2><div class="knoppen">{knoppen}</div></section>
 {bevingen_blok(bevlijst, nu)}
 {brand}
-<section aria-labelledby="h-kaart"><h2 id="h-kaart">Of kies op de kaart</h2><p>Zoom in, tik op een dorp en kies <b>Wat speelt er nu</b>.</p></section>
-</main>
-<div id="mzn-plek"></div>
-<main class="w">
-<section class="uitleg" aria-labelledby="h-uitleg"><h2 id="h-uitleg">Zo werkt Kabar Maluku Live</h2>
-<ol class="stappen">
-<li><b>Zoek je dorp</b><span>Typ de naam bovenaan, kies een eilandgroep of tik op de kaart. Ken je alleen de oude naam of een andere schrijfwijze? Probeer die ook.</span></li>
-<li><b>Lees wat er speelt</b><span>Bovenaan staat het belangrijkste in één zin. Daaronder: brand, weer voor 7 dagen, de lucht, de zee en aardbevingen. Alles in gewone woorden, elk uur bijgewerkt.</span></li>
-<li><b>Deel en zet vast</b><span>Stuur de pagina naar je familie via WhatsApp. Zet je dorp vast op je telefoon, dan kijk je voortaan met één tik.</span></li>
-</ol>
-<p class="klein">De satelliet ziet waar het heet is. Meestal is dat brand, maar niet altijd. Twijfel je? Bel of app je familie.</p></section>
+<section class="hoogte" aria-labelledby="h-hoogte"><h2 id="h-hoogte">Blijf op de hoogte</h2><div class="hoogte-rij">
+<a class="hoogte-k wa-k" href="https://whatsapp.com/channel/0029VaA4StPIt5rs5FadnH1d" target="_blank" rel="noopener" data-ev="Kabar: WhatsApp-kanaal">{ic("wa")}<span><b>Volg MOZA op WhatsApp</b>Het laatste Molukse nieuws op je telefoon. Gebeurt er iets groots op de Molukken, dan lees je het daar.</span></a>
+<a class="hoogte-k nb-k" href="https://www.moza.nu/lezen?utm_source=kabar&amp;utm_medium=nieuwsbrief#mzf-nb" data-ev="Kabar: nieuwsbrief">{ic("post")}<span><b>Elke donderdag de nieuwsbrief</b>Het belangrijkste over Molukkers in Nederland, inclusief wat er speelde op de Molukken.</span></a>
+</div></section>
 <section class="meer-moza" aria-labelledby="h-meer"><p class="label"><span class="tag" style="background:#111;color:#fff">MOZA</span></p><h2 id="h-meer">Meer op MOZA</h2>
 <p>Kabar Maluku Live is een dienst van MOZA, het platform voor, door en met Molukkers. Op moza.nu vind je ook:</p>
 <div class="meer-rij">
 <a href="https://www.moza.nu/lezen?utm_source=kabar&amp;utm_medium=start"><b>Nieuws en verhalen</b><span>Over Molukkers in Nederland en op de Molukken</span></a>
 <a href="https://www.moza.nu/kaarten?utm_source=kabar&amp;utm_medium=start"><b>Kaarten</b><span>Bosbranden, weer, talen, Molukse wijken en meer</span></a>
-<a href="https://www.moza.nu/weten?utm_source=kabar&amp;utm_medium=start"><b>Kennisbank</b><span>Antwoorden op vragen over cultuur, geschiedenis en reizen</span></a>
+<a href="https://www.moza.nu/weten?utm_source=kabar&amp;utm_medium=start"><b>Kennisbank</b><span>Antwoorden over cultuur, geschiedenis en reizen</span></a>
 <a href="https://www.moza.nu/begrippen?utm_source=kabar&amp;utm_medium=start"><b>Begrippenlijst</b><span>Molukse woorden uitgelegd</span></a>
 <a href="https://www.moza.nu/jaartallen?utm_source=kabar&amp;utm_medium=start"><b>Jaartallen</b><span>Molukse geschiedenis van de VOC tot nu</span></a>
 <a href="https://www.moza.nu/organisaties?utm_source=kabar&amp;utm_medium=start"><b>Organisaties</b><span>Wie doet wat in de gemeenschap</span></a>
 <a href="https://www.moza.nu/evenementen?utm_source=kabar&amp;utm_medium=start"><b>Agenda</b><span>Molukse activiteiten in Nederland</span></a>
 <a href="https://www.moza.nu/store?utm_source=kabar&amp;utm_medium=start"><b>Toko Buku</b><span>Boeken en prints over de Molukken</span></a>
 </div></section>
-<section class="hoogte" aria-labelledby="h-hoogte"><h2 id="h-hoogte">Blijf op de hoogte</h2><div class="hoogte-rij">
-<a class="hoogte-k wa-k" href="https://whatsapp.com/channel/0029VaA4StPIt5rs5FadnH1d" target="_blank" rel="noopener" data-ev="Kabar: WhatsApp-kanaal">{ic("wa")}<span><b>Volg MOZA op WhatsApp</b>Het laatste Molukse nieuws op je telefoon. Gebeurt er iets groots op de Molukken, dan lees je het daar.</span></a>
-<a class="hoogte-k nb-k" href="https://www.moza.nu/lezen?utm_source=kabar&amp;utm_medium=nieuwsbrief#mzf-nb" data-ev="Kabar: nieuwsbrief">{ic("post")}<span><b>Elke donderdag de nieuwsbrief</b>Het belangrijkste over Molukkers in Nederland, inclusief wat er speelde op de Molukken.</span></a>
-</div></section>
+<section aria-labelledby="h-kaart"><h2 id="h-kaart">Of kies op de kaart</h2><p>Zoom in, tik op een dorp en kies <b>Wat speelt er nu</b>.</p></section>
 </main>
+<div id="mzn-plek"></div>
 <script>window.MZN_STEDEN={json.dumps([[n, round(a, 4), round(b, 4)] for n, a, b in STEDEN], ensure_ascii=False)};</script>
 <script>window.MZN_SLUG={{}};fetch('/slugs.json').then(function(r){{return r.json()}}).then(function(j){{Object.assign(window.MZN_SLUG,j)}}).catch(function(){{}});</script>
 <script src="/atlas/atlas-maluku.js?v={VERSIE}" defer></script>
