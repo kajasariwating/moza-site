@@ -11,6 +11,7 @@ from zoneinfo import ZoneInfo
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import data as D  # noqa: E402
 import taal as T  # noqa: E402
+import og as OG  # noqa: E402
 from shapely.geometry import Polygon, MultiPolygon, Point, box  # noqa: E402
 from shapely.strtree import STRtree  # noqa: E402
 from shapely.ops import unary_union  # noqa: E402
@@ -497,7 +498,8 @@ def mozakop_desktop():
     return f'<div id="mzd" data-nosnippet>{r1}</div>'
 
 
-def pagina(titel, omschrijving, pad, body, extra_head='', robots='index,follow', deel=DEEL_STANDAARD, app_titel='Kabar'):
+def pagina(titel, omschrijving, pad, body, extra_head='', robots='index,follow', deel=DEEL_STANDAARD, app_titel='Kabar',
+           og='/og.png', og_alt='Kabar Maluku Live, powered by MOZA. Wat speelt er bij jouw dorp?'):
     return f'''<!doctype html>
 <html lang="nl">
 <head>
@@ -517,9 +519,9 @@ window.mzThema=function(){{var dk=!d.classList.contains('moza-dark');d.classList
 <meta property="og:url" content="{SITE}{pad}">
 <meta property="og:site_name" content="Kabar Maluku Live">
 <meta property="og:type" content="website">
-<meta property="og:image" content="{SITE}/og.png">
+<meta property="og:image" content="{SITE}{og}">
 <meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Kabar Maluku Live, powered by MOZA. Wat speelt er bij jouw dorp?">
+<meta property="og:image:alt" content="{e(og_alt)}">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#1F3BD1">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1003,7 +1005,8 @@ def dorp_html(d, ctx, nu):
     return pagina(titel, omschrijving, f'/{d["slug"]}/', ''.join(delen) + klok_js(verschil),
                   f'<script type="application/ld+json">{ld}</script>\n',
                   deel=(f'Hoe is het nu in {d["naam"]}?', f'Brand, weer, zee en aardbevingen in {d["naam"]} op {plek}. Ieder uur bijgewerkt.'),
-                  app_titel=naam)
+                  app_titel=naam, og=f'/og/{d["slug"]}.png',
+                  og_alt=f'Kabar Maluku Live: wat speelt er in {d["naam"]}' + (f' op {ctx["eilandnaam"]}' if ctx.get('eilandnaam') else '') + '?')
 
 
 # ---------------------------------------------------------------- eiland en start
@@ -1030,7 +1033,8 @@ def eiland_html(g, lijst, nu, brandset):
             {'@type': 'ListItem', 'position': 2, 'name': D.GROEPEN[g], 'item': url}]}]}, ensure_ascii=False)
     return pagina(f'Dorpen in {D.GROEPEN[g]}: brand, weer en aardbevingen | Kabar Maluku Live',
                   f'Alle {len(lijst)} dorpen in {D.GROEPEN[g]} ({D.GROEP_SUB[g]}). Zie per dorp of er brand is, wat voor weer het wordt en of de aarde beefde.',
-                  f'/eiland/{g}/', body, f'<script type="application/ld+json">{ld}</script>\n')
+                  f'/eiland/{g}/', body, f'<script type="application/ld+json">{ld}</script>\n',
+                  og=f'/og/eiland-{g}.png', og_alt=f'Kabar Maluku Live: wat speelt er in de eilandgroep {D.GROEPEN[g]}?')
 
 
 def recente_bevingen(rows, lijst, nu, op_land=None, dagen=7, max_n=5):
@@ -1365,6 +1369,7 @@ def main():
     bevlijst = recente_bevingen(rows, bev, nu, op_land)
 
     alle_namen = {x['naam'].lower() for x in rows}
+    eilandnamen = OG.eilandnamen(rows, lambda x: eiland_van(x, kust), D.GROEPEN)
     for i, d in enumerate(rows):
         ook = d['officieel'] if d['officieel'] != d['naam'] else ''
         for stad, _, _ in STEDEN:  # stad zonder eigen desa (bv. Masohi): vindbaar via de kelurahan
@@ -1393,7 +1398,7 @@ def main():
             'laatst': sorted(items or [], key=lambda x: x['t'], reverse=True)[:5],
             'bos': bosdata.get(d['code']), 'bosjaar': int(str(bosdata.get('_versie', 'GFC-2001')).split('-')[1]),
             'buren': buren, 'kust': kust.get(d['kab'], []), 'buurlinks': buurlinks,
-            'kust_dorp': aan_kust(d, kust, g), 'eiland': eiland_van(d, kust),
+            'kust_dorp': aan_kust(d, kust, g), 'eiland': eiland_van(d, kust), 'eilandnaam': eilandnamen.get(d['code']),
         }
         f = uit / d['slug'] / 'index.html'
         f.parent.mkdir(parents=True, exist_ok=True)
@@ -1412,7 +1417,7 @@ def main():
     shutil.copy(HIER / 'static' / 'dorp.css', uit / 'dorp.css')
     shutil.copy(HIER / 'static' / 'onder.js', uit / 'onder.js')
     shutil.copy(HIER / 'static' / 'kop.js', uit / 'kop.js')
-    shutil.copy(HIER / 'static' / 'og.png', uit / 'og.png')
+    OG.maak(uit, D.CACHE, rows, eilandnamen, D.GROEPEN, alleen)
     shutil.copy(HIER / 'static' / 'favicon.svg', uit / 'favicon.svg')
     shutil.copy(HIER / 'static' / 'apple-touch-icon.png', uit / 'apple-touch-icon.png')
     for f in (HIER / 'static').glob('google*.html'):  # verificatie Google Search Console

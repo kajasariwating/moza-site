@@ -7,6 +7,7 @@ Een pagina per dorp op de Molukken (2.420 dorpen): brand, weer, lucht, zee, aard
 - `data.py` haalt de gegevens op. Faalt een bron, dan valt dat blok weg en blijft de rest staan.
 - `taal.py` bevat alle vertaalregels van data naar gewone taal. Grenzen aanpassen? Alleen hier.
 - `static/dorp.css` is de vormgeving (MOZA-huisstijl, licht en nacht).
+- `og.py` maakt de deelbeelden (og:image) per pagina, zoals "Ema of Ambon" in het zoekveld. Ze staan in de cache en worden alleen opnieuw gemaakt als `og.py` of de lettertypen in `static/fonts/` veranderen.
 - De workflow `.github/workflows/dorp.yml` bouwt elk uur en zet de site op GitHub Pages.
   Brand en bevingen worden elk uur opgehaald, weer, lucht en zee elke 3 uur, nieuws elke 6 uur.
 
@@ -25,6 +26,6 @@ Een pagina per dorp op de Molukken (2.420 dorpen): brand, weer, lucht, zee, aard
 
 ## Lokaal testen
 ```
-pip install shapely mapbox-vector-tile
+pip install shapely mapbox-vector-tile pillow
 python3 dorp/bouw.py --uit _site --alleen ullath,aboru
 ```
