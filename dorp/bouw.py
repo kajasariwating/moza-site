@@ -1218,8 +1218,9 @@ var a=L.filter(function(x){{return x.k.indexOf(v)===0}}),b=L.filter(function(x){
 res.innerHTML=gh+r.map(function(x){{return '<a class="rij" href="/'+x.s+'/"><b>'+esc(x.n)+'<small>'+esc(x.c)+' · '+esc(x.g)+'</small></b>'+(x.b?'<span class="badge">BRAND</span>':'<span aria-hidden="true">→</span>')+'</a>'}}).join('')||'<p>Geen dorp gevonden. Probeer een andere schrijfwijze.</p>'}})}}
 q.addEventListener('input',show);try{{var u=new URLSearchParams(location.search).get('q');if(u)q.value=u}}catch(e){{}}if(q.value)show()}})();</script>'''
     ld = json.dumps({'@context': 'https://schema.org', '@graph': [
-        {'@type': 'WebSite', '@id': SITE + '/#site', 'url': SITE + '/', 'name': 'Kabar Maluku Live', 'inLanguage': 'nl',
-         'publisher': {'@type': 'Organization', 'name': 'MOZA', 'url': 'https://www.moza.nu'},
+        {'@type': 'WebSite', '@id': SITE + '/#site', 'url': SITE + '/', 'name': 'Kabar Maluku Live',
+         'alternateName': ['Kabar Maluku', 'live.moza.nu'], 'inLanguage': 'nl',
+         'publisher': {'@type': 'NewsMediaOrganization', '@id': 'https://www.moza.nu/#organization', 'name': 'MOZA', 'url': 'https://www.moza.nu/'},
          'potentialAction': {'@type': 'SearchAction', 'target': SITE + '/?q={search_term_string}', 'query-input': 'required name=search_term_string'}}]}, ensure_ascii=False)
     return pagina('Kabar Maluku Live: brand, weer en aardbevingen bij jouw dorp op de Molukken',
                   'Zoek je dorp op de Molukken en zie of er brand is, of de lucht gezond is, wat voor weer het wordt en of de aarde beefde. Voor alle 2.420 dorpen, elk uur bijgewerkt.',
