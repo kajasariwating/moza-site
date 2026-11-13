@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ['dorp/**', 'kaarten/atlas-maluku/**', '.github/workflows/dorp.yml']
+    paths: ['dorp/**', 'kaarten/atlas-maluku/**', 'preacher-man/**', '.github/workflows/dorp.yml']
 
 permissions:
   contents: read
@@ -35,6 +35,8 @@ jobs:
           restore-keys: dorp-cache-
       - name: Bouwen
         run: python3 dorp/bouw.py --uit _site
+      - name: Preacher-man-site meenemen
+        run: mkdir -p _site/preacher-man && cp -r preacher-man/. _site/preacher-man/
       - name: Gegevens bewaren
         if: always()
         uses: actions/cache/save@v4

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Husband, father, son of a preacher man</title>
+<meta name="description" content="Husband, father, son of a preacher man.">
+<meta property="og:title" content="Husband, father, son of a preacher man">
+<meta property="og:description" content="Husband, father, son of a preacher man.">
+<meta property="og:image" content="og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0d0d0d; --paper:#f1efeb; --mute:#6f6c67; --line:#d8d4cd;
+    --serif:"Cormorant Garamond", Georgia, serif;
+    --sans:"Inter", system-ui, sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-weight:300;-webkit-font-smoothing:antialiased}
+  img{display:block;max-width:100%}
+
+  /* HERO */
+  .hero{position:relative;min-height:100svh;overflow:hidden;background:#e9e7e3}
+  .hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:62% 30%;
+    animation:settle 2.4s cubic-bezier(.2,.7,.2,1) both}
+  @keyframes settle{from{transform:scale(1.06);opacity:0}to{transform:scale(1);opacity:1}}
+  .hero::after{content:"";position:absolute;inset:0;
+    background:linear-gradient(90deg,rgba(241,239,235,.92) 0%,rgba(241,239,235,.55) 30%,rgba(241,239,235,0) 52%)}
+  .hero-copy{position:relative;z-index:2;min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;
+    padding:clamp(1.5rem,5vw,5rem);max-width:44rem}
+  .eyebrow{font-size:.72rem;letter-spacing:.32em;text-transform:uppercase;color:var(--mute);margin-bottom:1.6rem;
+    animation:rise 1.2s .6s both}
+  h1{font-family:var(--serif);font-weight:400;line-height:.95;font-size:clamp(3rem,8.5vw,7.5rem);letter-spacing:-.02em}
+  h1 span{display:block;animation:rise 1.2s both}
+  h1 span:nth-child(1){animation-delay:.8s}
+  h1 span:nth-child(2){animation-delay:1s}
+  h1 span:nth-child(3){animation-delay:1.2s;font-style:italic;font-size:.5em;margin-top:.3em;color:#2a2826}
+  @keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+  .scroll{margin-top:3rem;font-size:.7rem;letter-spacing:.3em;text-transform:uppercase;color:var(--mute);
+    text-decoration:none;display:inline-flex;align-items:center;gap:.8rem;animation:rise 1.2s 1.6s both}
+  .scroll::before{content:"";width:3rem;height:1px;background:currentColor}
+
+  /* TRIPTYCH */
+  .three{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line)}
+  .three article{padding:clamp(2.5rem,6vw,6rem) clamp(1.5rem,4vw,4rem);border-right:1px solid var(--line)}
+  .three article:last-child{border-right:0}
+  .num{font-family:var(--serif);font-style:italic;color:var(--mute);font-size:1.1rem}
+  .three h2{font-family:var(--serif);font-weight:400;font-size:clamp(2.2rem,4vw,3.4rem);margin:.6rem 0 1.4rem;line-height:1}
+  .three p{line-height:1.8;color:#3a3835;max-width:26rem}
+
+  /* QUOTE */
+  .quote{background:var(--ink);color:var(--paper);padding:clamp(5rem,12vw,10rem) clamp(1.5rem,8vw,8rem);text-align:center}
+  .quote blockquote{font-family:var(--serif);font-style:italic;font-size:clamp(1.8rem,4.2vw,3.6rem);line-height:1.2;max-width:52rem;margin:0 auto}
+  .quote cite{display:block;margin-top:2.2rem;font-style:normal;font-family:var(--sans);font-size:.72rem;letter-spacing:.32em;text-transform:uppercase;color:#9a968f}
+
+  /* FOOTER */
+  footer{display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem;padding:2rem clamp(1.5rem,5vw,5rem);
+    font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--mute)}
+
+  .reveal{opacity:0;transform:translateY(24px);transition:opacity 1s ease,transform 1s ease}
+  .reveal.in{opacity:1;transform:none}
+
+  @media (max-width:820px){
+    .hero img{height:68%;object-position:52% 0}
+    .hero::after{background:linear-gradient(0deg,rgba(241,239,235,.96) 0%,rgba(241,239,235,.7) 38%,rgba(241,239,235,0) 62%)}
+    .three{grid-template-columns:1fr}
+    .three article{border-right:0;border-bottom:1px solid var(--line)}
+  }
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <img src="portrait.jpg" alt="Black-and-white portrait of a man in a black turtleneck, leaning on the back of a wooden chair" fetchpriority="high">
+  <div class="hero-copy">
+    <p class="eyebrow">A portrait in three words</p>
+    <h1>
+      <span>Husband,</span>
+      <span>father,</span>
+      <span>son of a preacher man.</span>
+    </h1>
+    <a class="scroll" href="#three">Read on</a>
+  </div>
+</header>
+
+<section class="three" id="three">
+  <article class="reveal">
+    <span class="num">i.</span>
+    <h2>Husband</h2>
+    <p>Partner first. Two people choosing each other every day, through ordinary mornings and hard seasons alike. A home built on patience, laughter and the promise kept.</p>
+  </article>
+  <article class="reveal">
+    <span class="num">ii.</span>
+    <h2>Father</h2>
+    <p>The title that matters most. Present at the breakfast table, at the sideline, at the door when they come home late. Teaching by showing up, again and again.</p>
+  </article>
+  <article class="reveal">
+    <span class="num">iii.</span>
+    <h2>Son</h2>
+    <p>Raised between the pews and the kitchen table, on Sunday sermons and weekday grace. A preacher’s kid who carries the lessons forward — not always from the pulpit, but always by example.</p>
+  </article>
+</section>
+
+<section class="quote">
+  <blockquote class="reveal">“Live in such a way that the people who know you best are the ones who believe in you most.”</blockquote>
+  <cite class="reveal">— Something my father taught me</cite>
+</section>
+
+<footer>
+  <span>Husband · Father · Son</span>
+  <span>© <span id="y"></span></span>
+</footer>
+
+<script>
+  document.getElementById('y').textContent = new Date().getFullYear();
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), {threshold:.15});
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+</body>
+</html>
