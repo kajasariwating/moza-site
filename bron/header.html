@@ -4159,11 +4159,3 @@ d.querySelector('.nb').addEventListener('click',function(e){ev('Aanmeldblok arti
 d.querySelector('.wa').addEventListener('click',function(){ev('Aanmeldblok artikel: WhatsApp')});return true}
 var n=0;(function w(){if(zet()||++n>40)return;setTimeout(w,250)})();})();
 </script>
-<script id="mz-heropin-js">/* Vaste hero op de voorpagina. Normaal kiest mzx-js het best gelezen recente artikel.
-   Staat hier een artikel met een einddatum, dan is dat t/m die datum de hero.
-   Werkt door de keuze van mzx-js vooraf in sessionStorage te zetten (sleutel mzx-hero2:<datum>). Leeg laten = normaal gedrag. */
-(function(){var PIN={u:'/lezen/jazirah-2026-ambon-in-eigen-woorden',tot:'2026-11-16'};
-if(!PIN.u||(location.pathname.replace(/\/+$/,'')||'/')!=='/')return;
-var d;try{d=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Amsterdam',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date())}catch(e){d=new Date().toISOString().slice(0,10)}
-if(d>PIN.tot)return;try{sessionStorage.setItem('mzx-hero2:'+d,JSON.stringify({t:Date.now(),u:PIN.u}))}catch(e){}})();
-</script>
