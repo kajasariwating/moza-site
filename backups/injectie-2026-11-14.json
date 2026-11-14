@@ -1,0 +1,6 @@
+{
+  "datum": "2026-11-14",
+  "uitleg": "Code-injectie voor de wijziging van 14 november 2026. Alleen de footer-commit is veranderd (naar 4fcf662224a296428d8fe3ba3704ff49feac40f8). Terugzetten: zet de footer-link terug op deze commit.",
+  "header": "moza-site@d72a8c0ba46a06445708e0d7ac5334b6e6c575c3/dist/header.js",
+  "footer": "moza-site@f78cd16d1bb3ce25bef3e576672c4873a88c9087/dist/footer.js"
+}
