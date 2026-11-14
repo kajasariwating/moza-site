@@ -1176,9 +1176,10 @@ html.moza-dark #mzwk{--bg:#14151B;--fg:#ECECF1;--soft:#1E2029;--mute:#C9CBD3;--l
 (function(){
 var WK='/welkom-bij-moza';
 /* Laatste nieuwsbrief: komt uit data/nieuwsbrief.json in GitHub (wordt automatisch bijgewerkt). Dit is de reserve. */
-var NB_URL='https://www.moza.nu/campaigns/view-campaign/7IqclJBAqOlkO0lsuDBVhGWrk08su75JR-CsjE_WR562BJXn52RHQatFtGkrmWyYRverJXkFnXYuLdFHCXve1hKgPs1IGqx0';
-var NB_TITLE='MOZA-nieuwsbrief van 5 november 2026';
-var NB_JSON='https://raw.githubusercontent.com/kajasariwating/moza-site/main/data/nieuwsbrief.json';
+var NB_URL='https://www.moza.nu/campaigns/view-campaign/zjBinrnF6jsX21fLq9-46DcbRNfU6A0FeQhvrq0AS7b_CflM4bdOXlAAznpzkRFT-L-tdjkryyq2k2esaFQUuy6WjIq8HbJQ';
+var NB_TITLE='MOZA-nieuwsbrief van 12 november 2026';
+/* Eerst GitHub zelf; lukt dat niet (bijv. geblokkeerd door een adblocker), dan dezelfde file via jsDelivr. */
+var NB_JSON=['https://raw.githubusercontent.com/kajasariwating/moza-site/main/data/nieuwsbrief.json','https://cdn.jsdelivr.net/gh/kajasariwating/moza-site@main/data/nieuwsbrief.json'];
 var HOURS=48;
 var KEY='mz-nb-signup';
 var P=location.pathname.replace(/\/+$/,'')||'/';
@@ -1269,7 +1270,7 @@ function build(){
  body+='<section class="sec" id="mzwk-nieuwsbrief"><div class="in"><div class="sh" style="--acc:#1F3BD1"><h2><i aria-hidden="true"></i>De laatste nieuwsbrief</h2><p>Zo ziet de MOZA-nieuwsbrief eruit. Scroll erdoorheen.</p></div><div class="nb"><div class="nb-h"><b>'+esc(NB_TITLE)+'</b><a href="'+esc(NB_URL)+'" target="_blank" rel="noopener">Open in nieuw tabblad ↗</a></div><iframe src="'+esc(NB_URL)+'" title="'+esc(NB_TITLE)+'" loading="lazy"></iframe></div></div></section>';
  body+='<section class="end"><div class="in"><div class="box"><b>Begin waar je wilt.</b><a href="/">Naar de voorpagina →</a></div></div></section>';
  w.insertAdjacentHTML('beforeend',body);
- try{fetch(NB_JSON,{cache:'no-cache'}).then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(j){if(!j||!/^https:\/\/www\.moza\.nu\/campaigns\/view-campaign\//.test(j.url||'')||j.url===NB_URL)return;var nb=w.querySelector('#mzwk-nieuwsbrief');if(!nb)return;var t=String(j.titel||'De laatste nieuwsbrief');nb.querySelector('.nb-h b').textContent=t;var a=nb.querySelector('.nb-h a');a.href=j.url;var f=nb.querySelector('iframe');f.title=t;f.src=j.url}).catch(function(){})}catch(e){}
+ try{var nbGet=function(i){return fetch(NB_JSON[i],{cache:'no-cache'}).then(function(r){if(!r.ok)throw 0;return r.json()}).catch(function(e){if(i+1<NB_JSON.length)return nbGet(i+1);throw e})};nbGet(0).then(function(j){if(!j||!/^https:\/\/www\.moza\.nu\/campaigns\/view-campaign\//.test(j.url||'')||j.url===NB_URL)return;var nb=w.querySelector('#mzwk-nieuwsbrief');if(!nb)return;var t=String(j.titel||'De laatste nieuwsbrief');nb.querySelector('.nb-h b').textContent=t;var a=nb.querySelector('.nb-h a');a.href=j.url;var f=nb.querySelector('iframe');f.title=t;f.src=j.url}).catch(function(){})}catch(e){}
  sw.insertBefore(w,page);
  document.documentElement.classList.add('mzwk-on');
  document.title='Welkom bij MOZA — bevestig je inschrijving';
