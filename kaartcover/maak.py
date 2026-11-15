@@ -14,7 +14,7 @@ from matplotlib.collections import PatchCollection
 # midden (lng, lat) en hoogte in graden
 GEBIEDEN = {
     'Tanimbar': (131.33, -7.55, 1.75), 'Aru': (134.45, -6.2, 1.9), 'Kei': (132.75, -5.75, 1.3),
-    'Seram': (129.6, -3.15, 1.7), 'Buru': (126.6, -3.4, 1.3), 'Ambon': (128.2, -3.65, 0.6),
+    'Seram': (129.6, -3.15, 1.7), 'Buru': (126.6, -3.4, 1.3), 'Ambon': (128.2, -3.65, 0.6), 'Ambon-Seram': (128.75, -3.3, 1.35),
     'Halmahera': (128.0, 1.0, 2.6), 'Molukken': (129.5, -4.0, 9.0), 'Zuid-Molukken': (130.3, -5.3, 6.6),
 }
 KLEUR = {0: '#FF4D2E', 1: '#FF7AB6', 2: '#E9F25A'}
