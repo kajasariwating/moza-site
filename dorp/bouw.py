@@ -2,7 +2,7 @@
 
 Gebruik:  python3 dorp/bouw.py [--uit _site] [--alleen slug,slug] [--zonder-live]
 """
-import argparse, html, json, math, re, shutil, sys
+import argparse, heapq, html, json, math, re, shutil, sys
 from urllib.parse import quote
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -374,6 +374,13 @@ _IC = {
     'post': '<rect x="3" y="5" width="18" height="14"/><path d="M3 7l9 6 9-6"/>',
     'x': '<path d="M6 6l12 12M18 6L6 18"/>',
 }
+
+
+def km_kort(km):
+    """Afstand tussen twee dorpen, kort: '800 m', '3 km', '12 km'."""
+    if km < 1:
+        return f'{max(100, round(km * 10) * 100)} m'
+    return f'{round(km)} km'
 
 
 def ic(n, w='2.2'):
@@ -946,9 +953,15 @@ def dorp_html(d, ctx, nu):
 
     # ---- buurdorpen
     if ctx['buurlinks']:
-        rijen = ''.join(f'<a class="rij" href="/{b["slug"]}/"><b>{e(b["naam"])}<small>{e(b["kec"])}</small></b>{"<span class=badge>BRAND</span>" if b.get("brand") else "<span aria-hidden=true>→</span>"}</a>' for b in ctx['buurlinks'])
+        rijen = ''.join(f'<a class="rij" href="/{b["slug"]}/"><b>{e(b["naam"])}<small>{e(b["kec"])} · {km_kort(b["km"])}</small></b>{"<span class=badge>BRAND</span>" if b.get("brand") else "<span aria-hidden=true>→</span>"}</a>' for b in ctx['buurlinks'])
         m.append(f'<section aria-labelledby="h-buren"><h2 id="h-buren">Dorpen in de buurt</h2><div class="verder">{rijen}</div>'
                  f'<a href="/eiland/{d["groep"]}/">Alle dorpen in {e(groep)} →</a></section>')
+    al = {b['code'] for b in ctx['buurlinks']}
+    rest = [x for x in ctx.get('zelfde_kec') or [] if x['code'] not in al]
+    if rest:
+        namen = ''.join(f'<li><a href="/{x["slug"]}/">{e(x["naam"])}</a></li>' for x in rest)
+        m.append(f'<section aria-labelledby="h-kec"><h2 id="h-kec">Meer dorpen in {e(d["kec"])}</h2>'
+                 f'<ul class="namen">{namen}</ul></section>')
 
     wa_tekst = f'Hoe is het nu in {d["naam"]}? Brand, weer, zee en aardbevingen, ieder uur bijgewerkt.\n{SITE}/{d["slug"]}/?utm_source=whatsapp&utm_medium=deel'
     m.append(f'<section class="deelblok"><h2>Familie in {e(naam)}?</h2><p>Stuur deze pagina door. Dan weet iedereen waar je kunt kijken als er iets gebeurt.</p>'
@@ -1374,6 +1387,9 @@ def main():
     bevlijst = recente_bevingen(rows, bev, nu, op_land)
 
     alle_namen = {x['naam'].lower() for x in rows}
+    per_kec = {}
+    for x in rows:
+        per_kec.setdefault((x['kab'], x['kec']), []).append(x)
     eilandnamen = OG.eilandnamen(rows, lambda x: eiland_van(x, kust), D.GROEPEN)
     for i, d in enumerate(rows):
         ook = d['officieel'] if d['officieel'] != d['naam'] else ''
@@ -1388,8 +1404,13 @@ def main():
         vak = g.buffer(0.06)
         buren_idx = [j for j in boom.query(vak) if j != i]
         buren = [rows[j] for j in buren_idx if rows[j]['grens']]
-        dichtst = sorted((rows[j] for j in buren_idx), key=lambda b: T.km_tussen(d['la'], d['lo'], b['la'], b['lo']))[:4]
-        buurlinks = [dict(b, brand=b['code'] in brandset) for b in dichtst]
+        # 8 dichtstbijzijnde dorpen (over alle dorpen, ook op een ander eiland als er niets dichterbij is)
+        cos0 = math.cos(math.radians(d['la']))
+        dichtst = heapq.nsmallest(8, (j for j in range(len(rows)) if j != i),
+                                  key=lambda j: (rows[j]['la'] - d['la']) ** 2 + ((rows[j]['lo'] - d['lo']) * cos0) ** 2)
+        buurlinks = [dict(rows[j], brand=rows[j]['code'] in brandset,
+                          km=T.km_tussen(d['la'], d['lo'], rows[j]['la'], rows[j]['lo'])) for j in dichtst]
+        zelfde_kec = sorted((x for x in per_kec[(d['kab'], d['kec'])] if x['code'] != d['code']), key=lambda x: x['naam'].lower())
         wr_raw = wcel.get(per_w[d['code']]) if wcel else None
         nu_d = nu
         wr = weer_bij(wr_raw, nu_d)
@@ -1402,7 +1423,7 @@ def main():
             'nw': nieuws_bij(d, items),
             'laatst': sorted(items or [], key=lambda x: x['t'], reverse=True)[:5],
             'bos': bosdata.get(d['code']), 'bosjaar': int(str(bosdata.get('_versie', 'GFC-2001')).split('-')[1]),
-            'buren': buren, 'kust': kust.get(d['kab'], []), 'buurlinks': buurlinks,
+            'buren': buren, 'kust': kust.get(d['kab'], []), 'buurlinks': buurlinks, 'zelfde_kec': zelfde_kec,
             'kust_dorp': aan_kust(d, kust, g), 'eiland': eiland_van(d, kust), 'eilandnaam': eilandnamen.get(d['code']),
         }
         f = uit / d['slug'] / 'index.html'
