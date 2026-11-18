@@ -789,7 +789,7 @@ var box=[].filter.call(sw.children,function(c){return /^mz/.test(c.id)&&c.offset
 var info=box.querySelector(':scope > .info'),more=box.querySelector('#mz-kmore');if(!info&&!more&&n<12)return false;
 var w=document.createElement('section');w.id='mz-ksteun';w.setAttribute('aria-label','Steun MOZA');
 w.innerHTML='<div class="ksb"><div><span class="ksl">Steun MOZA</span><h2>'+((location.pathname.replace(/\/+$/,'')==='/kaarten')?'Deze kaarten zijn gratis':'Deze kaart is gratis')+'</h2><p>MOZA maakt deze kaarten met open data. Iedereen kan ze gratis gebruiken. Het bouwen en bijhouden kost wel tijd en geld. Help je mee om de kaarten gratis te houden?</p></div>'+
-'<div class="ksa"><a class="ksgo" href="/store/p/doneer-aan-moza#bedrag-eigen-5" data-g="kaart-steun-eenmalig">Geef € 5 →</a><a class="ksm" href="/maandelijks-doneren#bedrag-5" data-g="kaart-steun-maandelijks">Of € 5 per maand</a><button type="button" class="ksn">Niet nu</button></div></div>';
+'<div class="ksa"><a class="ksgo" href="/store/p/doneer-aan-moza#bedrag-eigen-5" data-g="kaart-steun-eenmalig">Geef € 5 →</a><a class="ksm" href="/store/p/doneer-aan-moza#bedrag-eigen-20" data-g="kaart-steun-kawan">Of word vriend: € 20 per jaar</a><button type="button" class="ksn">Niet nu</button></div></div>';
 if(info)info.parentNode.insertBefore(w,info.nextSibling);else if(more)more.parentNode.insertBefore(w,more);else box.appendChild(w);
 w.addEventListener('click',function(e){var a=e.target.closest('[data-g]');if(a){gc(a.getAttribute('data-g'));return}
 if(e.target.closest('.ksn')){try{localStorage.setItem(KEY,String(Date.now()))}catch(x){}gc('kaart-steun-niet-nu');w.parentNode.removeChild(w)}});

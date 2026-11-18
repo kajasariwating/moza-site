@@ -580,6 +580,55 @@ window.addEventListener('message',function(e){if(e.origin!==location.origin)retu
 })();
 </script>
 <!-- ===== /moza-v3f ===== -->
+<!-- ===== mz-donstand: donatieteller (voorraad van het donatieproduct + data/donaties.json), geen maandelijks doneren meer ===== -->
+<style id="mz-donstand-css">
+#moza-doneer .mdk-stand{display:flex;flex-direction:column;gap:4px;margin-top:18px;padding:14px 18px;background:#E9F25A;color:#111;border:3px solid #111;box-shadow:6px 6px 0 #FF7AB6;max-width:440px}
+#moza-doneer .mdk-stand-l{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+#moza-doneer .mdk-stand b{font-size:clamp(40px,7vw,56px);font-weight:900;line-height:1;letter-spacing:-.03em}
+#moza-doneer .mdk-stand-t{font-size:15px;line-height:1.4}
+#moza-doneer .mdk-kawan{display:grid;gap:4px;padding:18px 20px;margin-bottom:22px;background:#1F3BD1;color:#fff!important;border:3px solid #111;box-shadow:6px 6px 0 #E9F25A;text-decoration:none;position:relative;transition:transform .1s,box-shadow .1s}
+#moza-doneer .mdk-kawan:hover{transform:translate(-2px,-2px);box-shadow:8px 8px 0 #E9F25A}
+#moza-doneer .mdk-kawan b{font-size:24px;font-weight:900;letter-spacing:-.02em;color:#E9F25A}
+#moza-doneer .mdk-tag{position:absolute;top:-12px;right:14px;background:#FF7AB6;color:#111;border:2px solid #111;font-size:11px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;padding:2px 8px}
+#moza-doneer .mdk-pr{font-size:34px;font-weight:900;line-height:1.05}
+#moza-doneer .mdk-pr small{font-size:16px;font-weight:800}
+#moza-doneer .mdk-uit{font-size:15px;line-height:1.45;max-width:46ch}
+#moza-doneer .mdk-go{font-weight:900;margin-top:6px}
+#moza-doneer .mdk-of{font-weight:800;margin:0 0 10px!important}
+#moza-doneer .mdk-amounts{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+#moza-doneer .mdk-alt{margin-top:26px;padding:16px 18px;border:2px solid var(--line,#111);background:var(--card,#fff);color:var(--fg,#111)}
+#moza-doneer .mdk-alt b{font-weight:900;font-size:17px}
+#moza-doneer .mdk-alt p{margin:4px 0 12px!important;font-size:15px;line-height:1.45;color:var(--fg,#111)}
+#moza-doneer .mdk-alt-row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+#moza-doneer .mdk-bunq{display:inline-flex;align-items:center;min-height:44px;padding:10px 14px;background:#E9F25A;color:#111!important;border:2px solid #111;box-shadow:3px 3px 0 #111;font-weight:900;text-decoration:none}
+#moza-doneer .mdk-iban{display:inline-flex;flex-wrap:wrap;align-items:center;gap:6px 10px;font-size:15px}
+#moza-doneer .mdk-iban>span{font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+#moza-doneer .mdk-iban b{font-size:17px;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+#moza-doneer .mdk-copy{min-height:36px;padding:6px 10px;border:2px solid var(--line,#111);background:transparent;color:var(--fg,#111);font:inherit;font-weight:800;cursor:pointer;border-radius:0}
+@media (max-width:600px){#moza-doneer .mdk-amounts{grid-template-columns:repeat(2,minmax(0,1fr))}#moza-doneer .mdk-pr{font-size:30px}}
+</style>
+<script id="mz-donstand-js">
+/* Donatieteller. Giften via de site: elke variant van het donatieproduct heeft voorraad START; verkocht = START - voorraad.
+   Basis en handmatige giften (bunq.me, bank) staan in data/donaties.json in GitHub. Aanpassen kan daar zonder nieuwe injectie. */
+(function(){
+window.MZ=window.MZ||{};
+var P=location.pathname.replace(/\/+$/,'');
+if(P==='/maandelijks-doneren'){location.replace('/doneer#mdn-doneer');return}
+var D={jaar:2026,basis:277,handmatig:0,start:100000};
+var RAW='https://raw.githubusercontent.com/kajasariwating/moza-site/main/data/donaties.json';
+var job=null;
+function eur(n){return '€ '+Math.round(n).toLocaleString('nl-NL')}
+function bereken(){if(job)return job;
+ var a=fetch(RAW+'?t='+Math.floor(Date.now()/3e5)).then(function(r){return r.ok?r.json():{}}).catch(function(){return {}});
+ var b=fetch('/store/p/doneer-aan-moza?format=json&t='+Date.now(),{credentials:'same-origin'}).then(function(r){if(!r.ok)throw 0;return r.json()});
+ job=Promise.all([a,b]).then(function(x){var d={};for(var k in D)d[k]=D[k];for(var k2 in x[0])d[k2]=x[0][k2];
+  var web=0;((x[1].item||{}).variants||[]).forEach(function(v){if(v.unlimited||typeof v.qtyInStock!=='number')return;var n=d.start-v.qtyInStock;if(n>0)web+=n*(+v.price||0)/100});
+  return {jaar:d.jaar,totaal:(+d.basis||0)+(+d.handmatig||0)+web}});
+ return job}
+MZ.donStand=function(root){bereken().then(function(s){[].forEach.call((root||document).querySelectorAll('[data-mz-stand]'),function(el){el.textContent=eur(s.totaal)})}).catch(function(){})};
+})();
+</script>
+<!-- ===== /mz-donstand ===== -->
 <!-- ===== moza-v3g: auteurs bij boeken, leesbare boekenplank, nieuwe doneerpagina ===== -->
 <style id="moza-v3g-css">#moza-doneer{--b:#1F3BD1;--y:#E9F25A;--s:#EDDDB8;--p:#E0B3B6;--r:#FF4D2E;--k:#111;--bg:#fff;--fg:#111;--mute:#444;--line:#111;--card:#fff}html.moza-dark #moza-doneer{--bg:#12151F;--fg:#F1F1EC;--mute:#C9CBD3;--line:#F1F1EC;--card:#1A1E2B;--s:#3B3226;--p:#3E2D31}</style>
 <script id="moza-v3g-js">
@@ -663,7 +712,7 @@ window.addEventListener('message',function(e){if(e.origin!==location.origin)retu
     star:'<svg viewBox="0 0 24 24"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.5 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/></svg>',
     web:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18"/></svg>'
   };
-  var IMPACT={'eigen':'Met een <b>eigen bedrag</b> geef je ons een steuntje in de rug. Je kiest zelf hoeveel. Wil je bij € 100 of meer een bedankje? Kies dan € 100+.','25':'<b>€ 25</b> betaalt een reportage van een correspondent op de Molukken.','100':'<b>€ 100 of meer</b> helpt ons nieuwe dingen te ontwikkelen en evenementen te organiseren, zoals Tanda Mata en Tahuri Festival. Als bedankje kies je zelf: de prent <i>Ale Rasa Beta Rasa</i> van Dominique Latoel op A5-formaat, of <i>Tanda Mata</i>, gesigneerd door de auteurs.'};
+  var IMPACT={'3':'<b>€ 3</b> is een kop koffie. Geven 100 lezers dat, dan betalen we 12 reportages uit Maluku.','5':'<b>€ 5</b> helpt echt. Geven 100 lezers dat, dan betalen we 20 reportages uit Maluku.','10':'<b>€ 10</b> betaalt bijna de helft van een reportage uit Maluku.','eigen':'Kies zelf je bedrag, vanaf € 1. Geef je € 100 of meer? Dan kies je een bedankje.'};
   var PROD={once:'/store/p/doneer-aan-moza',year:'/store/p/jaarsteun-moza',books:'/store/p/boekenabonnement-een-jaar'};
   function doneer(){
     if(!/^\/doneer\/?$/.test(location.pathname))return;
@@ -672,20 +721,26 @@ window.addEventListener('message',function(e){if(e.origin!==location.origin)retu
     sec.innerHTML='<div id="moza-doneer">'+
     '<header class="mdn-hero"><div class="mdn-in"><span class="mdn-lbl">Steun MOZA</span><h1>Houd Molukse verhalen gratis en onafhankelijk</h1><span class="mdn-serif">voor en door Molukkers</span>'+
       '<p>MOZA is gratis te lezen, voor iedereen. Dat kan alleen dankzij lezers die ons steunen. Met jouw bijdrage betalen we correspondenten op Maluku, schrijven we nieuwe kennisartikelen en houden we de website in de lucht.</p>'+
-      '<div class="mdn-ctas"><a class="mdn-btn" href="#mdn-eenmalig">Doneer eenmalig</a><a class="mdn-btn ghost" href="/store">Naar de Toko Buku</a></div></div></header>'+
+      '<div class="mdn-ctas"><a class="mdn-btn" href="#mdn-doneer">Doneer nu</a><a class="mdn-btn ghost" href="/store">Naar de Toko Buku</a></div><div class="mdk-stand"><span class="mdk-stand-l">Binnen in 2026</span><b data-mz-stand>€ 277</b><span class="mdk-stand-t">Dat is weinig. MOZA is een kleine stichting, geen rijke organisatie. Elke euro telt.</span></div></div></header>'+
     '<div class="mdn-in">'+
-      '<section class="mdn-sec" id="mdn-eenmalig" aria-labelledby="mdn-h1"><div class="mdn-head"><div><span class="mdn-lbl">Eenmalig</span><h2 id="mdn-h1">Doneer in twee klikken</h2></div><p>Kies een bedrag. Je rekent af in de Toko Buku, net als bij een boek.</p></div>'+
-        '<div class="mdn-once"><div><div class="mdn-amounts" role="group" aria-label="Kies een bedrag">'+['eigen','25','100'].map(function(a){return '<button type="button" class="mdn-amt" data-a="'+a+'" aria-pressed="'+(a==='25')+'">'+(a==='eigen'?'Eigen bedrag':(a==='100'?'€ 100+':'€ '+a))+'</button>';}).join('')+'</div>'+
-          '<p class="mdn-impact" aria-live="polite">'+IMPACT['25']+'</p>'+
-          '<a class="mdn-btn dark mdn-go" data-prod="once" href="'+PROD.once+'#bedrag-25">Doneer <span class="mdn-amt-l">€ 25</span> →</a>'+
-          '<p class="mdn-note">Op de volgende pagina staat je keuze al klaar. Je rekent af in de Toko Buku. Vanaf € 100 hoort er een bedankje bij.</p></div>'+
+      '<section class="mdn-sec" id="mdn-doneer" aria-labelledby="mdn-h1"><div class="mdn-head"><div><span class="mdn-lbl">Doneren</span><h2 id="mdn-h1">Elke euro telt</h2></div><p>Je hoeft niet veel te geven. Als veel lezers een klein bedrag geven, kan MOZA blijven bestaan.</p></div>'+
+        '<div class="mdn-once"><div>'+
+          '<a class="mdk-kawan" href="'+PROD.once+'#bedrag-eigen-20"><span class="mdk-tag">Nieuw</span><b>Word vriend van MOZA.nu</b><span class="mdk-pr">€ 20 <small>per jaar</small></span><span class="mdk-uit">Minder dan € 2 per maand. Je betaalt één keer. Er wordt niets automatisch afgeschreven.</span><span class="mdk-go">Word vriend →</span></a>'+
+          '<p class="mdk-of">Of geef een ander bedrag</p>'+
+          '<div class="mdn-amounts mdk-amounts" role="group" aria-label="Kies een bedrag">'+['3','5','10','eigen'].map(function(a){return '<button type="button" class="mdn-amt" data-a="'+a+'" aria-pressed="'+(a==='5')+'">'+(a==='eigen'?'Eigen bedrag':'€ '+a)+'</button>';}).join('')+'</div>'+
+          '<p class="mdn-impact" aria-live="polite">'+IMPACT['5']+'</p>'+
+          '<a class="mdn-btn dark mdn-go" data-prod="once" href="'+PROD.once+'#bedrag-eigen-5">Doneer <span class="mdn-amt-l">€ 5</span> →</a>'+
+          '<p class="mdn-note">Op de volgende pagina staat je bedrag al klaar. Je rekent af in de Toko Buku, net als bij een boek.</p>'+
+          '<div class="mdk-alt"><b>Liever direct?</b><p>Doneer via bunq.me of maak het over. Zet er “Donatie” bij.</p>'+
+            '<div class="mdk-alt-row"><a class="mdk-bunq" href="https://bunq.me/o/6SjV30aOyWE00CC0ZwhVNL" target="_blank" rel="noopener">Doneer via bunq.me →</a>'+
+            '<span class="mdk-iban"><span>Rekeningnummer</span><b>NL27 BUNQ 2075 3880 08</b><button type="button" class="mdk-copy" data-iban="NL27BUNQ2075388008">Kopieer</button></span></div></div></div>'+
           '<aside class="mdn-why"><h3>Waar je geld naartoe gaat</h3><ul>'+
             '<li><span class="mdn-ic">'+IC.cam+'</span><span><b>Reportages uit Maluku</b>Correspondenten maken foto’s en verhalen, zoals over de Mardika-ramp en de opruimactie van The Mulung in Latuhalat.</span></li>'+
             '<li><span class="mdn-ic">'+IC.book+'</span><span><b>Eigen boeken en projecten</b>Zoals Tanda Mata, ons boek over traditionele lichaamsversiering. Daar was ook eigen geld voor nodig.</span></li>'+
             '<li><span class="mdn-ic">'+IC.star+'</span><span><b>Evenementen</b>Met grotere giften kunnen we sneller nieuwe evenementen en projecten organiseren.</span></li>'+
             '<li><span class="mdn-ic">'+IC.web+'</span><span><b>Een gratis website</b>Nieuws, achtergrond en de Kennisbank, zonder betaalmuur.</span></li>'+
           '</ul></aside></div></section>'+
-      '<section class="mdn-sec mdn-gifts" aria-labelledby="mdn-hg"><div class="mdn-head"><div><span class="mdn-lbl">Ons bedankje</span><h2 id="mdn-hg">Een bedankje bij een gift vanaf € 100</h2></div><p>Geef je eenmalig € 100 of meer, of maandelijks in totaal € 100? Dan kies je zelf je bedankje.</p></div><div class="mdn-gl">'+'<a class="mdn-g" href="'+PROD.once+'#bedrag-100-prent"><span class="mdn-g-img"><img src="https://images.squarespace-cdn.com/content/v1/628d431ddfd99d21e74e153d/e15cc7ec-8797-4d8b-8c66-9cba5e821105/ale-rasa-beta-rasa-dominique-latoel.j'+'pg?format=500w" alt="Prent Ale Rasa Beta Rasa van Dominique Latoel: witte penseelstreken en symbolen op blauw en paars" loading="lazy"></span><span class="mdn-g-amt">Vanaf € 100</span><b>De prent <i>Ale Rasa Beta Rasa</i> van Dominique Latoel, op A5-formaat</b><span class="mdn-g-why">Kies je bij € 100 of meer voor de prent, dan sturen we je deze.</span><span class="mdn-g-go">Doneer € 100, kies de prent →</span></a>'+'<a class="mdn-g" href="'+PROD.once+'#bedrag-100-tm"><span class="mdn-g-img"><img src="https://images.squarespace-cdn.com/content/v1/628d431ddfd99d21e74e153d/8feb66fb-f285-4597-bebf-6ac13d72cf1c/1.p'+'ng?format=500w" alt="Omslag van het boek Tanda Mata" loading="lazy"></span><span class="mdn-g-amt">Vanaf € 100</span><b>Of: <i>Tanda Mata</i>, gesigneerd door de auteurs</b><span class="mdn-g-why">Kies je bij € 100 of meer voor het boek, dan signeren de auteurs het voor je.</span><span class="mdn-g-go">Doneer € 100, kies het boek →</span></a>'+'</div></section>'+
+      '<section class="mdn-sec mdn-gifts" aria-labelledby="mdn-hg"><div class="mdn-head"><div><span class="mdn-lbl">Ons bedankje</span><h2 id="mdn-hg">Een bedankje bij een gift vanaf € 100</h2></div><p>Geef je € 100 of meer? Dan kies je zelf je bedankje.</p></div><div class="mdn-gl">'+'<a class="mdn-g" href="'+PROD.once+'#bedrag-100-prent"><span class="mdn-g-img"><img src="https://images.squarespace-cdn.com/content/v1/628d431ddfd99d21e74e153d/e15cc7ec-8797-4d8b-8c66-9cba5e821105/ale-rasa-beta-rasa-dominique-latoel.j'+'pg?format=500w" alt="Prent Ale Rasa Beta Rasa van Dominique Latoel: witte penseelstreken en symbolen op blauw en paars" loading="lazy"></span><span class="mdn-g-amt">Vanaf € 100</span><b>De prent <i>Ale Rasa Beta Rasa</i> van Dominique Latoel, op A5-formaat</b><span class="mdn-g-why">Kies je bij € 100 of meer voor de prent, dan sturen we je deze.</span><span class="mdn-g-go">Doneer € 100, kies de prent →</span></a>'+'<a class="mdn-g" href="'+PROD.once+'#bedrag-100-tm"><span class="mdn-g-img"><img src="https://images.squarespace-cdn.com/content/v1/628d431ddfd99d21e74e153d/8feb66fb-f285-4597-bebf-6ac13d72cf1c/1.p'+'ng?format=500w" alt="Omslag van het boek Tanda Mata" loading="lazy"></span><span class="mdn-g-amt">Vanaf € 100</span><b>Of: <i>Tanda Mata</i>, gesigneerd door de auteurs</b><span class="mdn-g-why">Kies je bij € 100 of meer voor het boek, dan signeren de auteurs het voor je.</span><span class="mdn-g-go">Doneer € 100, kies het boek →</span></a>'+'</div></section>'+
       '<section class="mdn-sec" aria-labelledby="mdn-h3"><div class="mdn-head"><div><span class="mdn-lbl">Wat we doen</span><h2 id="mdn-h3">MOZA in cijfers</h2></div><p>We zijn een kleine stichting. Zo staan we ervoor.</p></div>'+
         '<span class="mdn-year">2025</span><div class="mdn-stats">'+
           '<div class="mdn-stat"><strong>€ 10.000</strong><span>omzet uit de verkoop van boeken in de Toko Buku</span></div>'+
@@ -693,13 +748,14 @@ window.addEventListener('message',function(e){if(e.origin!==location.origin)retu
           '<div class="mdn-stat"><strong>€ 40.000</strong><span>subsidie voor Tanda Mata, volledig besteed aan het project</span></div>'+
           '<div class="mdn-stat"><strong>1 boek</strong><span>uitgegeven: Tanda Mata, over traditionele lichaamsversiering</span></div>'+
         '</div>'+
-        '<div class="mdn-split"><div class="mdn-box"><span class="mdn-year">2026 tot nu toe</span><h3>€ 1.949 aan donaties</h3><p>Die donaties houden de website in de lucht en maken het mogelijk om alles gratis aan te bieden. Elke gift telt mee.</p></div>'+
+        '<div class="mdn-split"><div class="mdn-box"><span class="mdn-year">2026 tot nu toe</span><h3><span data-mz-stand>€ 277</span> aan donaties</h3><p>Die donaties houden de website in de lucht en maken het mogelijk om alles gratis aan te bieden. De teller loopt vanzelf mee met elke gift via de site.</p></div>'+
           '<div class="mdn-box"><span class="mdn-year">Liever een boek?</span><h3>Elke aankoop steunt MOZA</h3><p>In de <a href="/store">Toko Buku</a> vind je boeken over Molukse geschiedenis, verhalen en keuken. De opbrengst gaat naar MOZA.</p></div></div>'+
       '</section>'+
       '<section class="mdn-sec mdn-faq" aria-labelledby="mdn-h4"><div class="mdn-head"><div><span class="mdn-lbl">Vragen</span><h2 id="mdn-h4">Goed om te weten</h2></div></div>'+
-        faq('Hoe betaal ik?','Je rekent af in de Toko Buku, met dezelfde betaalmethoden als bij een boek. Je krijgt meteen een bevestiging per e-mail.')+
-        faq('Zit ik ergens aan vast?','Nee. Een donatie is eenmalig. Je zit nergens aan vast.')+
-        faq('Wanneer krijg ik een bedankje?','Bij een eenmalige gift vanaf € 100 kies je zelf: de A5-prent van Dominique Latoel of Tanda Mata, gesigneerd door de auteurs. Doneer je maandelijks? Dan kies je je bedankje zodra je in totaal € 100 hebt gegeven. We mailen je dan.')+
+        faq('Hoe betaal ik?','Je rekent af in de Toko Buku, met dezelfde betaalmethoden als bij een boek. Je krijgt meteen een bevestiging per e-mail. Je kunt ook doneren via <a href="https://bunq.me/o/6SjV30aOyWE00CC0ZwhVNL" target="_blank" rel="noopener">bunq.me</a> of overmaken naar NL27 BUNQ 2075 3880 08.')+
+        faq('Zit ik ergens aan vast?','Nee. Elke donatie is eenmalig, ook als je vriend wordt. Er wordt nooit iets automatisch afgeschreven.')+
+        faq('Hoe werkt de teller?','De teller laat zien hoeveel we dit jaar aan donaties kregen. Een gift via de site komt er meteen bij. Giften via bunq.me of de bank tellen we zelf bij.')+
+        faq('Wanneer krijg ik een bedankje?','Bij een eenmalige gift vanaf € 100 kies je zelf: de A5-prent van Dominique Latoel of Tanda Mata, gesigneerd door de auteurs.')+
         faq('Wie is MOZA?','MOZA is een stichting (KvK 87417030) die informatie toegankelijk maakt voor en door Molukkers, met nieuws, achtergrond, de Kennisbank en de Toko Buku.')+
       '</section>'+
     '</div></div>';
@@ -708,7 +764,10 @@ window.addEventListener('message',function(e){if(e.origin!==location.origin)retu
     var root=sec.querySelector('#moza-doneer');
     root.addEventListener('click',function(e){var b=e.target.closest('.mdn-amt');if(!b)return;
       [].forEach.call(root.querySelectorAll('.mdn-amt'),function(x){x.setAttribute('aria-pressed',x===b?'true':'false');});
-      var a=b.getAttribute('data-a');root.querySelector('.mdn-impact').innerHTML=IMPACT[a];root.querySelector('.mdn-amt-l').textContent=a==='eigen'?'een eigen bedrag':(a==='100'?'€ 100 of meer':'€ '+a);var go=root.querySelector('.mdn-go');if(go&&go.getAttribute('href'))go.setAttribute('href',PROD.once+'#bedrag-'+a);});
+      var a=b.getAttribute('data-a');root.querySelector('.mdn-impact').innerHTML=IMPACT[a];root.querySelector('.mdn-amt-l').textContent=a==='eigen'?'een eigen bedrag':'€ '+a;var go=root.querySelector('.mdn-go');if(go&&go.getAttribute('href'))go.setAttribute('href',PROD.once+(a==='eigen'?'#bedrag-eigen':'#bedrag-eigen-'+a));});
+    root.addEventListener('click',function(e){var c=e.target.closest('.mdk-copy');if(!c)return;var t=c.getAttribute('data-iban');function ok(){c.textContent='Gekopieerd';setTimeout(function(){c.textContent='Kopieer';},2000);}try{navigator.clipboard.writeText(t).then(ok,function(){});}catch(x){}MZ.gc('doneer-iban-kopie');});
+    [].forEach.call(root.querySelectorAll('.mdk-bunq,.mdk-kawan'),function(x){x.addEventListener('click',function(){MZ.gc(x.classList.contains('mdk-bunq')?'doneer-bunq':'doneer-kawan');});});
+    if(MZ.donStand)MZ.donStand(root);
     /* boekomslagen in het abonnement-blok */
     store().then(function(list){var vis=root.querySelector('.mdn-books-vis');if(!vis)return;var tm=list.filter(function(x){return /^tanda mata$/i.test(x.t)&&x.img;})[0];var bk=list.filter(function(x){return x.isbn&&x.img&&x!==tm;}).slice(0,2);if(tm)bk.splice(1,0,tm);
       if(bk.length===3)vis.innerHTML=bk.map(function(b){return '<img src="'+esc(b.img)+'?format=300w" alt="" loading="lazy">';}).join('');});
@@ -1421,7 +1480,7 @@ window.__mzoMain=function(PRE){
     h+='<section class="mzo-card mzo-acct"><h2>Al je bestellingen op één plek</h2><p class="sub">In Mijn MOZA vind je al je bestellingen terug, met je facturen en track &amp; trace. Log in met het e-mailadres waarmee je hebt besteld, of maak met dat adres een account aan.</p><a class="mzo-btn geel" href="/account">Naar Mijn MOZA \u2192</a></section>';
     h+='<div class="mzo-grid"><section class="mzo-card"><h2>Je factuur</h2>'+(INV?'<p class="sub">Download je factuur '+esc(INV)+' als PDF, bijvoorbeeld voor je administratie.</p><button type="button" class="mzo-btn" id="mzo-inv">'+DOC+' Download factuur (PDF)</button>':'<p class="sub">Je factuur staat hier binnen één werkdag voor je klaar. Kom dan even terug via de knop Bekijk je bestelling in je mail.</p>')+'</section><section class="mzo-card"><h2>Vragen?</h2><p class="sub">Klopt er iets niet of duurt het lang? Mail naar <a href="mailto:info@moza.nu">info@moza.nu</a> en noem je bestelnummer <b>#'+esc(O.orderNumber)+'</b>. Of <a href="/contact">neem contact op</a>.</p></section></div>';
     if(digital)h+='<section class="mzo-card mzo-note"><h3>Zo mag je de foto gebruiken</h3><p>Eenmalig rechtenvrij, bijvoorbeeld in een boek, kalender, scriptie, op een website of bij een artikel.</p><h3>Niet toegestaan</h3><p>De foto reproduceren, zoals t-shirts laten bedrukken. Lees de <a href="'+LIC+'" target="_blank" rel="noopener">licentievoorwaarden</a>.</p><h3>Fotocredit</h3><p style="margin:0">Vermeld bij gebruik altijd de fotograaf, bijvoorbeeld “Beeld: Kaja Sariwating”.</p></section>';
-    h+='<section class="mzo-card"><h2>Blijf bij MOZA</h2><p class="sub">Verhalen, kennis en perspectieven voor, door en met Molukkers.</p><div class="mzo-links"><a href="https://whatsapp.com/channel/0029VaA4StPIt5rs5FadnH1d" target="_blank" rel="noopener"><b>WhatsApp-kanaal →</b><span>Het laatste nieuws van MOZA direct op je telefoon</span></a><a href="https://www.linkedin.com/company/82284537/" target="_blank" rel="noopener"><b>LinkedIn →</b><span>Volg MOZA voor nieuws, onderzoek en projecten</span></a><a href="/lezen#mzf-nb"><b>Nieuwsbrief →</b><span>Elke week het belangrijkste in je mailbox</span></a><a href="/maandelijks-doneren"><b>Word vaste donateur →</b><span>Met € 5 per maand maak je nieuwe verhalen mogelijk</span></a></div></section>';
+    h+='<section class="mzo-card"><h2>Blijf bij MOZA</h2><p class="sub">Verhalen, kennis en perspectieven voor, door en met Molukkers.</p><div class="mzo-links"><a href="https://whatsapp.com/channel/0029VaA4StPIt5rs5FadnH1d" target="_blank" rel="noopener"><b>WhatsApp-kanaal →</b><span>Het laatste nieuws van MOZA direct op je telefoon</span></a><a href="https://www.linkedin.com/company/82284537/" target="_blank" rel="noopener"><b>LinkedIn →</b><span>Volg MOZA voor nieuws, onderzoek en projecten</span></a><a href="/lezen#mzf-nb"><b>Nieuwsbrief →</b><span>Elke week het belangrijkste in je mailbox</span></a><a href="/doneer"><b>Steun MOZA →</b><span>Word vriend voor € 20 per jaar, of geef een klein bedrag</span></a></div></section>';
     w.innerHTML=h;
     root.parentNode.insertBefore(w,root);
     var lastS=w.lastElementChild;if(lastS){var af=document.createElement('div');af.id='mzo-after';af.appendChild(lastS);root.parentNode.insertBefore(af,root.nextSibling);}
@@ -2273,9 +2332,9 @@ var p=location.pathname.replace(/\/$/,''),m=/^\/(lezen|kennisbank)\/([^\/]+)$/.e
 if(!m||/^(tag|category)$/.test(m[2]))return;
 var kb=m[1]==='kennisbank';
 function gc(x){MZ.gc(x)}
-var T=kb?{l:'Steun de Kennisbank',h:'Deze antwoorden zijn gratis, voor iedereen',p:'We zoeken het uit, schrijven het op en houden het actueel. Help mee met € 5 per maand.'}:{l:'Steun MOZA',h:'Een reportage uit Maluku kost ons ongeveer € 25',p:'MOZA is gratis te lezen. Met € 5 per maand maak je dus iedere vijf maanden een nieuwe reportage mogelijk.'};
-function html(){return '<div class="tx"><span class="l">'+T.l+'</span><h3>'+T.h+'</h3><p>'+T.p+'</p></div><div class="bt"><a class="go" href="/doneer">Word vaste donateur →</a><a class="alt" href="/doneer#mdn-eenmalig">Of geef één keer</a><small>Vanaf € 100 in totaal kies je een bedankje.</small></div>'}
-function mk(cls){var a=document.createElement('aside');a.className='mzda '+cls;a.setAttribute('aria-label',T.l);a.innerHTML=html();a.addEventListener('click',function(e){var x=e.target.closest('a');if(x)gc((kb?'doneer-kb-':'doneer-lezen-')+(x.classList.contains('go')?'maandelijks':'eenmalig')+(cls==='mzda-side'?'-zij':'-tekst'))});return a}
+var T=kb?{l:'Steun de Kennisbank',h:'Deze antwoorden zijn gratis, voor iedereen',p:'We zoeken het uit, schrijven het op en houden het actueel. Help mee met een klein bedrag. Elke euro helpt, ook € 3.'}:{l:'Steun MOZA',h:'Een reportage uit Maluku kost ons ongeveer € 25',p:'MOZA is gratis te lezen. Geven vijf lezers € 5, dan kan er een nieuwe reportage komen.'};
+function html(){return '<div class="tx"><span class="l">'+T.l+'</span><h3>'+T.h+'</h3><p>'+T.p+'</p></div><div class="bt"><a class="go" href="/store/p/doneer-aan-moza#bedrag-eigen-20">Word vriend: € 20 per jaar →</a><a class="alt" href="/doneer#mdn-doneer">Of geef € 3, € 5 of € 10</a><small>Binnen in 2026: <b data-mz-stand>€ 277</b></small></div>'}
+function mk(cls){var a=document.createElement('aside');a.className='mzda '+cls;a.setAttribute('aria-label',T.l);a.innerHTML=html();if(MZ.donStand)MZ.donStand(a);a.addEventListener('click',function(e){var x=e.target.closest('a');if(x)gc((kb?'doneer-kb-':'doneer-lezen-')+(x.classList.contains('go')?'kawan':'klein')+(cls==='mzda-side'?'-zij':'-tekst'))});return a}
 var side=null,inl=null,ready=false;
 function place(){if(!ready)return;var left=document.querySelector(kb?'.mkb-left':'.moza-left');if(left&&!side){side=mk('mzda-side');side.hidden=true;left.appendChild(side)}var bcx=document.querySelector('.blog-item-content');var desk=!!(left&&left.offsetWidth>0&&bcx&&left.getBoundingClientRect().right<=bcx.getBoundingClientRect().left+5);
  if(side)side.hidden=!desk;if(inl)inl.hidden=!!desk;
@@ -2826,7 +2885,7 @@ function skin(f){var d,w;try{d=f.contentDocument;w=f.contentWindow}catch(e){retu
  if(items.length<3||!leaf(d,/^\s*Hallo\b/)){[].forEach.call(d.querySelectorAll('.mz-x'),function(x){x.remove()})}
  if(all.length){[].forEach.call(items,function(a){tag(a,'item')});var list=all[0].parentElement;tag(list,'list');
   var pan=null,e=list;while(e&&e!==d.body){if(w.getComputedStyle(e).backgroundColor==='rgb(255, 255, 255)'||e.getAttribute('data-mz')==='drawer'){pan=e;break}e=e.parentElement}tag(pan,'drawer');
-  if(items.length>=3&&!list.querySelector('.mz-x')&&leaf(d,/^\s*Hallo\b/)){(function(){var nS=0;try{nS=(JSON.parse(localStorage.getItem('mz-saved')||'[]')||[]).length}catch(e){}return [['/opgeslagen','Opgeslagen',nS?(nS===1?'1 ding bewaard op dit apparaat':nS+' dingen bewaard op dit apparaat'):'Artikelen, kaarten en boeken die je bewaart','k-save'],['/lezen#mzf-nb','Blijf op de hoogte','Nieuwsbrief en ons WhatsApp-kanaal','k-news'],['/maandelijks-doneren','Word vaste donateur','Met \u20ac 5 per maand houd je MOZA gratis','k-don'],['/retourneren','Retourneren','Iets terugsturen uit de Toko Buku','k-ret']]})().forEach(function(x){var a=d.createElement('a');a.href=x[0];a.target='_top';a.className='mz-x '+x[3];a.setAttribute('data-mz','item');a.innerHTML='<div><div></div><div></div></div>';a.firstChild.firstChild.textContent=x[1];a.firstChild.lastChild.textContent=x[2];list.appendChild(a)})}}
+  if(items.length>=3&&!list.querySelector('.mz-x')&&leaf(d,/^\s*Hallo\b/)){(function(){var nS=0;try{nS=(JSON.parse(localStorage.getItem('mz-saved')||'[]')||[]).length}catch(e){}return [['/opgeslagen','Opgeslagen',nS?(nS===1?'1 ding bewaard op dit apparaat':nS+' dingen bewaard op dit apparaat'):'Artikelen, kaarten en boeken die je bewaart','k-save'],['/lezen#mzf-nb','Blijf op de hoogte','Nieuwsbrief en ons WhatsApp-kanaal','k-news'],['/doneer','Steun MOZA','Word vriend voor \u20ac 20 per jaar','k-don'],['/retourneren','Retourneren','Iets terugsturen uit de Toko Buku','k-ret']]})().forEach(function(x){var a=d.createElement('a');a.href=x[0];a.target='_top';a.className='mz-x '+x[3];a.setAttribute('data-mz','item');a.innerHTML='<div><div></div><div></div></div>';a.firstChild.firstChild.textContent=x[1];a.firstChild.lastChild.textContent=x[2];list.appendChild(a)})}}
  var cl=leaf(d,/^\s*Sluiten\s*$/);var cb=cl&&cl.closest('button');if(cb){tag(cb,'close');tag(cb.parentElement,'dhead')}
  var nt=leaf(d,/niet geverifieerd/i);if(nt){var nb=nt.parentElement;while(nb&&nb!==d.body&&!nb.querySelector('button'))nb=nb.parentElement;if(nb&&nb!==d.body)tag(nb,'notice')}
  var hl=leaf(d,/^\s*Hallo\b/);if(hl){var hb=hl.parentElement;while(hb&&hb!==d.body&&!hb.querySelector('button'))hb=hb.parentElement;if(hb&&hb!==d.body)tag(hb,'hello')}
@@ -3002,7 +3061,7 @@ var G=[['Lezen','/lezen','#1F3BD1','#1F3BD1','krant',[['Net binnen','/lezen'],['
 ['Kaarten','/kaarten','#D7381A','#FF4D2E','kaart',[['Kabar Maluku: check jouw dorp','https://live.moza.nu/?utm_source=moza&utm_medium=menu'],['Bosbranden','/kaarten/bosbranden'],['Weer en zee','/kaarten/weer-en-zee'],['Aardbevingen','/kaarten/aardbevingen'],['Luchtkwaliteit','/kaarten/luchtkwaliteit'],['Bos en ontbossing','/kaarten/bos-en-ontbossing'],['Rampen','/kaarten/rampen'],['Zeewater','/kaarten/zeewater'],['Satellietbeeld','/kaarten/satelliet'],['Vulkanen','/kaarten/vulkanen'],['Regen','/kaarten/regen'],['Eb en vloed','/kaarten/getij'],['Koraalriffen','/kaarten/koraal'],['Forten en specerijen','/kaarten/forten'],['Talen van de Molukken','/kaarten/talen-molukken'],['Overtochten 1951','/kaarten/overtochten-1951'],['Vluchten','/kaarten/vluchten'],['Molukse wijken','/kaarten/molukse-wijken'],['Grafstatus','/kaarten/grafstatus']]],
 ['Agenda','/evenementen','#D7381A','#FF4D2E','kal',[['Alle evenementen','/evenementen'],['Evenement aanmelden','/uploaden']]],
 ['Doe mee','/podium','#111','#E9F25A','kal',[['Agenda','/evenementen'],['Podium','/podium'],['Insturen','/uploaden'],['Beeldbank','/beeldbank']]],
-['Winkel en steun','/store','#111','#111','tas',[['Toko Buku','/store'],['Boekenplank','/boekenplank'],['Doneer','/doneer'],['Maandelijks doneren','/maandelijks-doneren']]],
+['Winkel en steun','/store','#111','#111','tas',[['Toko Buku','/store'],['Boekenplank','/boekenplank'],['Doneer','/doneer']]],
 ['Over MOZA','/over-moza','#111','#EDDCB8','info',[['Over MOZA','/over-moza'],['Team','/team'],['Verantwoording','/verantwoording']]]];
 function cur(h){return (h==='/'&&HOME)||(h==='/lezen'&&p==='/lezen')||(h==='/nieuws/maluku'&&p==='/nieuws/maluku')?' aria-current="page"':''}
 function tiles(){return '<div class="tl" aria-label="Snel naar">'+
@@ -3144,7 +3203,7 @@ var PAYL=[
 var PAY='<div class="mzf-pay"><span class="mzf-pay-t"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Veilig betalen</span><span class="mzf-pms">'+PAYL.map(function(s){return '<span class="mzf-pm">'+s+'</span>'}).join('')+'</span></div>';
 function ext(h){return /^https?:/.test(h)?' target="_blank" rel="noopener"':''}
 function html(withForm){
- var nav='<a class="mzf-dbtn mzf-dbtn-v" href="/maandelijks-doneren">Word vaste donateur</a><a class="mzf-dbtn mzf-dbtn-e" href="/doneer">Eenmalig doneren</a>';
+ var nav='<a class="mzf-dbtn mzf-dbtn-v" href="/store/p/doneer-aan-moza#bedrag-eigen-20">Word vriend · € 20 per jaar</a><a class="mzf-dbtn mzf-dbtn-e" href="/doneer#mdn-doneer">Geef een klein bedrag</a>';
  var KABAR='<a class="mzf-kabar" href="https://live.moza.nu/?utm_source=moza&amp;utm_medium=footer" aria-label="Kabar Maluku Live: check jouw dorp" style="display:inline-flex;align-items:stretch;gap:5px;margin-top:14px;text-decoration:none"><span style="display:flex;flex-direction:column;padding:2px 6px 3px;background:#E9F25A;color:#111;border:2px solid #111;box-shadow:2px 2px 0 #1F3BD1;font-size:14px;line-height:1;font-weight:900;letter-spacing:-.03em">KABAR<span style="display:flex;justify-content:space-between;margin-top:2px;font-size:7px"><span>M</span><span>A</span><span>L</span><span>U</span><span>K</span><span>U</span></span></span><span style="display:inline-flex;align-items:center;padding:0 5px;background:#111;color:#fff;font-size:9px;font-weight:900;letter-spacing:.1em">LIVE</span></a>';
  var cols=COLS.map(function(c,i){return '<div class="mzf-col"><span class="mzf-h">'+c[0]+'</span>'+c[1].map(function(l){return '<a class="mzf-l" href="'+l[1]+'"'+ext(l[1])+'>'+l[0]+'</a>'}).join('')+(i===2?KABAR:'')+'</div>'}).join('');
  var soc=SOC.map(function(s){return '<a href="'+s[1]+'" target="_blank" rel="noopener" aria-label="MOZA op '+s[0]+'" title="'+s[0]+'">'+s[2]+'</a>'}).join('');
