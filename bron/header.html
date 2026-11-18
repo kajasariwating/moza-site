@@ -611,21 +611,23 @@ window.addEventListener('message',function(e){if(e.origin!==location.origin)retu
 @media (max-width:600px){#moza-doneer .mdk-amounts{grid-template-columns:repeat(2,minmax(0,1fr))}#moza-doneer .mdk-pr{font-size:30px}}
 </style>
 <script id="mz-donstand-js">
-/* Donatieteller. Giften via de site: elke variant van het donatieproduct heeft voorraad START; verkocht = START - voorraad.
+/* Donatieteller. Giften via de site: elke variant van het donatieproduct en van Vriend van MOZA.nu heeft voorraad START; verkocht = START - voorraad.
    Basis en handmatige giften (bunq.me, bank) staan in data/donaties.json in GitHub. Aanpassen kan daar zonder nieuwe injectie. */
 (function(){
 window.MZ=window.MZ||{};
 var P=location.pathname.replace(/\/+$/,'');
 if(P==='/maandelijks-doneren'){location.replace('/doneer#mdn-doneer');return}
 var D={jaar:2026,basis:277,handmatig:0,start:100000};
+var PRODS=['/store/p/doneer-aan-moza','/store/p/vriend-van-mozanu'];
 var RAW='https://raw.githubusercontent.com/kajasariwating/moza-site/main/data/donaties.json';
 var job=null;
 function eur(n){return '€ '+Math.round(n).toLocaleString('nl-NL')}
 function bereken(){if(job)return job;
  var a=fetch(RAW+'?t='+Math.floor(Date.now()/3e5)).then(function(r){return r.ok?r.json():{}}).catch(function(){return {}});
- var b=fetch('/store/p/doneer-aan-moza?format=json&t='+Date.now(),{credentials:'same-origin'}).then(function(r){if(!r.ok)throw 0;return r.json()});
+ function prod(u){return fetch(u+'?format=json&t='+Date.now(),{credentials:'same-origin'}).then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(j){return (j.item||{}).variants||[]}).catch(function(){return []})}
+ var b=Promise.all(PRODS.map(prod)).then(function(l){var all=[].concat.apply([],l);if(!all.length)throw 0;return all});
  job=Promise.all([a,b]).then(function(x){var d={};for(var k in D)d[k]=D[k];for(var k2 in x[0])d[k2]=x[0][k2];
-  var web=0;((x[1].item||{}).variants||[]).forEach(function(v){if(v.unlimited||typeof v.qtyInStock!=='number')return;var n=d.start-v.qtyInStock;if(n>0)web+=n*(+v.price||0)/100});
+  var web=0;x[1].forEach(function(v){if(v.unlimited||typeof v.qtyInStock!=='number')return;var n=d.start-v.qtyInStock;if(n>0)web+=n*(+v.price||0)/100});
   return {jaar:d.jaar,totaal:(+d.basis||0)+(+d.handmatig||0)+web}});
  return job}
 MZ.donStand=function(root){bereken().then(function(s){[].forEach.call((root||document).querySelectorAll('[data-mz-stand]'),function(el){el.textContent=eur(s.totaal)})}).catch(function(){})};
@@ -728,7 +730,7 @@ MZ.donStand=function(root){bereken().then(function(s){[].forEach.call((root||doc
     '<div class="mdn-in">'+
       '<section class="mdn-sec" id="mdn-doneer" aria-labelledby="mdn-h1"><div class="mdn-head"><div><span class="mdn-lbl">Doneren</span><h2 id="mdn-h1">Elke euro telt</h2></div><p>Je hoeft niet veel te geven. Als veel lezers een klein bedrag geven, kan MOZA blijven bestaan.</p></div>'+
         '<div class="mdn-once"><div>'+
-          '<a class="mdk-kawan" href="'+PROD.once+'#bedrag-eigen-20"><span class="mdk-tag">Nieuw</span><b>Word vriend van MOZA.nu</b><span class="mdk-pr">€ 20 <small>per jaar</small></span><span class="mdk-uit">Minder dan € 2 per maand. Je betaalt één keer. Er wordt niets automatisch afgeschreven.</span><span class="mdk-go">Word vriend →</span></a>'+
+          '<a class="mdk-kawan" href="/store/p/vriend-van-mozanu"><span class="mdk-tag">Nieuw</span><b>Word vriend van MOZA.nu</b><span class="mdk-pr">€ 20 <small>per jaar</small></span><span class="mdk-uit">Minder dan € 2 per maand. Je betaalt één keer. Er wordt niets automatisch afgeschreven.</span><span class="mdk-go">Word vriend →</span></a>'+
           '<p class="mdk-of">Of geef een ander bedrag</p>'+
           '<div class="mdn-amounts mdk-amounts" role="group" aria-label="Kies een bedrag">'+['3','5','10','eigen'].map(function(a){return '<button type="button" class="mdn-amt" data-a="'+a+'" aria-pressed="'+(a==='5')+'">'+(a==='eigen'?'Eigen bedrag':'€ '+a)+'</button>';}).join('')+'</div>'+
           '<p class="mdn-impact" aria-live="polite">'+IMPACT['5']+'</p>'+
@@ -2336,7 +2338,7 @@ if(!m||/^(tag|category)$/.test(m[2]))return;
 var kb=m[1]==='kennisbank';
 function gc(x){MZ.gc(x)}
 var T=kb?{l:'Steun de Kennisbank',h:'Deze antwoorden zijn gratis, voor iedereen',p:'We zoeken het uit, schrijven het op en houden het actueel. Help mee met een klein bedrag. Elke euro helpt, ook € 3.'}:{l:'Steun MOZA',h:'Een reportage uit Maluku kost ons ongeveer € 25',p:'MOZA is gratis te lezen. Geven vijf lezers € 5, dan kan er een nieuwe reportage komen.'};
-function html(){return '<div class="tx"><span class="l">'+T.l+'</span><h3>'+T.h+'</h3><p>'+T.p+'</p></div><div class="bt"><a class="go" href="/store/p/doneer-aan-moza#bedrag-eigen-20">Word vriend: € 20 per jaar →</a><a class="alt" href="/doneer#mdn-doneer">Of geef € 3, € 5 of € 10</a><small>Binnen in 2026: <b data-mz-stand>€ 277</b></small></div>'}
+function html(){return '<div class="tx"><span class="l">'+T.l+'</span><h3>'+T.h+'</h3><p>'+T.p+'</p></div><div class="bt"><a class="go" href="/store/p/vriend-van-mozanu">Word vriend: € 20 per jaar →</a><a class="alt" href="/doneer#mdn-doneer">Of geef € 3, € 5 of € 10</a><small>Binnen in 2026: <b data-mz-stand>€ 277</b></small></div>'}
 function mk(cls){var a=document.createElement('aside');a.className='mzda '+cls;a.setAttribute('aria-label',T.l);a.innerHTML=html();if(MZ.donStand)MZ.donStand(a);a.addEventListener('click',function(e){var x=e.target.closest('a');if(x)gc((kb?'doneer-kb-':'doneer-lezen-')+(x.classList.contains('go')?'kawan':'klein')+(cls==='mzda-side'?'-zij':'-tekst'))});return a}
 var side=null,inl=null,ready=false;
 function place(){if(!ready)return;var left=document.querySelector(kb?'.mkb-left':'.moza-left');if(left&&!side){side=mk('mzda-side');side.hidden=true;left.appendChild(side)}var bcx=document.querySelector('.blog-item-content');var desk=!!(left&&left.offsetWidth>0&&bcx&&left.getBoundingClientRect().right<=bcx.getBoundingClientRect().left+5);
@@ -3206,7 +3208,7 @@ var PAYL=[
 var PAY='<div class="mzf-pay"><span class="mzf-pay-t"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Veilig betalen</span><span class="mzf-pms">'+PAYL.map(function(s){return '<span class="mzf-pm">'+s+'</span>'}).join('')+'</span></div>';
 function ext(h){return /^https?:/.test(h)?' target="_blank" rel="noopener"':''}
 function html(withForm){
- var nav='<a class="mzf-dbtn mzf-dbtn-v" href="/store/p/doneer-aan-moza#bedrag-eigen-20">Word vriend · € 20 per jaar</a><a class="mzf-dbtn mzf-dbtn-e" href="/doneer#mdn-doneer">Geef een klein bedrag</a>';
+ var nav='<a class="mzf-dbtn mzf-dbtn-v" href="/store/p/vriend-van-mozanu">Word vriend · € 20 per jaar</a><a class="mzf-dbtn mzf-dbtn-e" href="/doneer#mdn-doneer">Geef een klein bedrag</a>';
  var KABAR='<a class="mzf-kabar" href="https://live.moza.nu/?utm_source=moza&amp;utm_medium=footer" aria-label="Kabar Maluku Live: check jouw dorp" style="display:inline-flex;align-items:stretch;gap:5px;margin-top:14px;text-decoration:none"><span style="display:flex;flex-direction:column;padding:2px 6px 3px;background:#E9F25A;color:#111;border:2px solid #111;box-shadow:2px 2px 0 #1F3BD1;font-size:14px;line-height:1;font-weight:900;letter-spacing:-.03em">KABAR<span style="display:flex;justify-content:space-between;margin-top:2px;font-size:7px"><span>M</span><span>A</span><span>L</span><span>U</span><span>K</span><span>U</span></span></span><span style="display:inline-flex;align-items:center;padding:0 5px;background:#111;color:#fff;font-size:9px;font-weight:900;letter-spacing:.1em">LIVE</span></a>';
  var cols=COLS.map(function(c,i){return '<div class="mzf-col"><span class="mzf-h">'+c[0]+'</span>'+c[1].map(function(l){return '<a class="mzf-l" href="'+l[1]+'"'+ext(l[1])+'>'+l[0]+'</a>'}).join('')+(i===2?KABAR:'')+'</div>'}).join('');
  var soc=SOC.map(function(s){return '<a href="'+s[1]+'" target="_blank" rel="noopener" aria-label="MOZA op '+s[0]+'" title="'+s[0]+'">'+s[2]+'</a>'}).join('');
