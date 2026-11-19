@@ -98,7 +98,16 @@ html.moza-dark .merk .kb{border-color:#ECECF1}html.moza-dark .merk .lv{backgroun
 .thema .zon-i{display:none}html.moza-dark .thema .zon-i{display:block}html.moza-dark .thema .maan-i{display:none}
 @media (max-width:420px){.kop .knop .kt{display:none}.kop .knop{width:44px;padding:0;justify-content:center}}
 html.moza-dark .knop{color:var(--inkt)}
-.kruim{display:flex;flex-wrap:wrap;align-items:center;gap:6px}.kruim a{color:#fff;text-decoration:none}.kruim a:hover{text-decoration:underline}.intro{margin:0;font-size:14px;line-height:1.45;opacity:.9}
+.kruim{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 14px}
+.kruim a{display:inline-flex;align-items:center;gap:5px;min-height:44px;padding:0 12px;background:#fff;color:#111;border:2px solid #111;box-shadow:3px 3px 0 var(--geel);font-size:15px;font-weight:800;line-height:1.2;text-decoration:none}
+.kruim a svg{width:16px;height:16px;flex:none}
+.kruim a:hover,.kruim a:focus-visible{background:var(--geel)}
+.kruim a:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--geel)}
+.kruim .kr-s{color:#fff;font-weight:800;font-size:18px}
+.kruim .kr-nu{color:#fff;font-size:15px;font-weight:800;opacity:.85}
+.kruim .kr-mob{display:inline-flex}
+@media (max-width:767px){.kruim .kr-pc{display:none}}
+@media (min-width:768px){.kruim .kr-mob{display:none}}.intro{margin:0;font-size:14px;line-height:1.45;opacity:.9}
 .mozabalk{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 16px;background:#111;color:#fff;font-size:13px;font-weight:800}.mozabalk a{color:#fff;text-decoration:none;min-height:32px;display:inline-flex;align-items:center}.mozabalk a:hover{text-decoration:underline}.mozabalk nav{display:flex;gap:14px}.mozabalk .terug{color:var(--geel)}
 /* ---------- Menubalk onderin, zoals op moza.nu (telefoon en tablet) ---------- */
 #mz-onder{display:none}
@@ -413,6 +422,5 @@ html.moza-dark .mijn .nb{color:#B9BCC6}
 .namen a{display:inline-block;min-height:44px;line-height:40px;padding:0 12px;background:var(--papier);border:2px solid var(--rand);color:var(--inkt);font-weight:800;text-decoration:none}
 .namen a:hover,.namen a:focus-visible{background:var(--geel);color:#111}
 /* broodkruimel: huidige pagina en anker per kecamatan */
-.kruim [aria-current]{opacity:.8}
 .kec{scroll-margin-top:16px}
 .kec:target h3{background:var(--geel);color:#111;display:inline-block;padding:0 6px}

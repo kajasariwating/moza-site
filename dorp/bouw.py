@@ -373,6 +373,7 @@ _IC = {
     'wa': '<path d="M4 20l1.4-4.2A8 8 0 1 1 8.4 19z"/>',
     'post': '<rect x="3" y="5" width="18" height="14"/><path d="M3 7l9 6 9-6"/>',
     'x': '<path d="M6 6l12 12M18 6L6 18"/>',
+    'terug': '<path d="M19 12H5M11 6l-6 6 6 6"/>',
 }
 
 
@@ -772,7 +773,6 @@ def dorp_html(d, ctx, nu):
         klein = wr['regenzin'] if regent else f'{T.weer_woord(wr["code"])}. {wr["regenzin"]}'
         chips.append(f'<div class="chip"><span class="label">Weer nu</span><b>{round(wr["temp"])}°</b>'
                      f'<small>{e(klein)}</small></div>')
-    sub = f'{e(d["kec"])} · {e(groep)}'
     zon = ''
     if wr and wr['dagen'] and wr['dagen'][0].get('op'):
         z0 = wr['dagen'][0]
@@ -783,9 +783,8 @@ def dorp_html(d, ctx, nu):
                f'<b>Zon onder {z0["onder"]:%H:%M}</b><small>in Nederland {nl(z0["onder"])}</small></span></div>')
     samen = samenvatting(d, br, bv, wr, lu, nu)
     delen.append(f'''<section class="hero" aria-labelledby="h1"><div class="w">
-<nav class="label kruim" aria-label="Kruimelpad"><i></i><a href="/">Kabar Maluku Live</a> › <a href="/eiland/{d["groep"]}/">{e(groep)}</a> › <a href="/eiland/{d["groep"]}/#{kec_id(d["kec"])}">{e(d["kec"])}</a> › <span aria-current="page">{e(naam)}</span></nav>
+<nav class="kruim" aria-label="Kruimelpad"><a class="kr-pc" href="/">{ic("home")}Kabar</a><span class="kr-s kr-pc" aria-hidden="true">›</span><a href="/eiland/{d["groep"]}/"><span class="kr-mob">{ic("terug")}</span>{e(groep)}</a><span class="kr-s" aria-hidden="true">›</span><a href="/eiland/{d["groep"]}/#{kec_id(d["kec"])}">{e(d["kec"])}</a><span class="kr-s kr-pc" aria-hidden="true">›</span><span class="kr-pc kr-nu" aria-current="page">{e(naam)}</span></nav>
 <h1 id="h1">{e(naam)}</h1>
-<p class="sub">{sub}</p>
 <button type="button" class="pin" data-pin data-s="{d["slug"]}" data-n="{e(naam)}" data-c="{e(d["kec"])}" aria-pressed="false"><span class="pin-i" aria-hidden="true">☆</span><span class="pin-t">Bewaar dit dorp</span></button>
 <p class="intro">Brand, weer, zee en aardbevingen bij {e(naam)}{" (officieel " + e(d["officieel"]) + ")" if d["officieel"] != naam else ""} in {e(d["kec"])}, {e(d["kabnaam"])}. Elk uur bijgewerkt.</p>
 <div class="chips">{''.join(chips)}</div>{zon}
@@ -1042,7 +1041,7 @@ def eiland_html(g, lijst, nu, brandset):
         f'<div class="kec" id="{kec_id(k)}"><h3>{e(k)}</h3><ul>' + ''.join(
             f'<li><a href="/{d["slug"]}/">{"<i aria-label=brand></i>" if d["code"] in brandset else ""}{e(d["naam"])}</a></li>' for d in ds) + '</ul></div>'
         for k, ds in per.items())
-    body = f'''<section class="hero"><div class="w"><nav class="label kruim" aria-label="Kruimelpad"><a href="/">Kabar Maluku Live</a> › <span aria-current="page">{e(D.GROEPEN[g])}</span></nav><h1>{e(D.GROEPEN[g])}</h1>
+    body = f'''<section class="hero"><div class="w"><nav class="kruim" aria-label="Kruimelpad"><a href="/">{ic("terug")}Kabar Maluku Live</a><span class="kr-s kr-pc" aria-hidden="true">›</span><span class="kr-pc kr-nu" aria-current="page">{e(D.GROEPEN[g])}</span></nav><h1>{e(D.GROEPEN[g])}</h1>
 <p class="sub">{e(D.GROEP_SUB[g])} · {len(lijst)} dorpen</p>
 <p class="samen">{f'Deze week zag de satelliet brand bij <b>{nbrand} {"dorp" if nbrand == 1 else "dorpen"}</b>. Die zijn gemarkeerd met een rode stip.' if nbrand else 'Deze week zag de satelliet <b>geen brand</b> bij de dorpen hier.'}</p></div></section>
 <div class="streep"><span></span><span></span><span></span></div>
