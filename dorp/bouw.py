@@ -376,6 +376,11 @@ _IC = {
 }
 
 
+def kec_id(kec):
+    """Anker voor een kecamatan op de eilandpagina, bv. 'kec-leitimur-selatan'."""
+    return 'kec-' + D.slugify(kec)
+
+
 def km_kort(km):
     """Afstand tussen twee dorpen, kort: '800 m', '3 km', '12 km'."""
     if km < 1:
@@ -778,7 +783,7 @@ def dorp_html(d, ctx, nu):
                f'<b>Zon onder {z0["onder"]:%H:%M}</b><small>in Nederland {nl(z0["onder"])}</small></span></div>')
     samen = samenvatting(d, br, bv, wr, lu, nu)
     delen.append(f'''<section class="hero" aria-labelledby="h1"><div class="w">
-<nav class="label kruim" aria-label="Kruimelpad"><i></i><a href="/">Kabar Maluku Live</a> › <a href="/eiland/{d["groep"]}/">{e(groep)}</a></nav>
+<nav class="label kruim" aria-label="Kruimelpad"><i></i><a href="/">Kabar Maluku Live</a> › <a href="/eiland/{d["groep"]}/">{e(groep)}</a> › <a href="/eiland/{d["groep"]}/#{kec_id(d["kec"])}">{e(d["kec"])}</a> › <span aria-current="page">{e(naam)}</span></nav>
 <h1 id="h1">{e(naam)}</h1>
 <p class="sub">{sub}</p>
 <button type="button" class="pin" data-pin data-s="{d["slug"]}" data-n="{e(naam)}" data-c="{e(d["kec"])}" aria-pressed="false"><span class="pin-i" aria-hidden="true">☆</span><span class="pin-t">Bewaar dit dorp</span></button>
@@ -1015,7 +1020,8 @@ def dorp_html(d, ctx, nu):
         {'@type': 'BreadcrumbList', '@id': url + '#kruim', 'itemListElement': [
             {'@type': 'ListItem', 'position': 1, 'name': 'Kabar Maluku Live', 'item': SITE + '/'},
             {'@type': 'ListItem', 'position': 2, 'name': groep, 'item': f'{SITE}/eiland/{d["groep"]}/'},
-            {'@type': 'ListItem', 'position': 3, 'name': naam, 'item': url}]},
+            {'@type': 'ListItem', 'position': 3, 'name': d['kec'], 'item': f'{SITE}/eiland/{d["groep"]}/#{kec_id(d["kec"])}'},
+            {'@type': 'ListItem', 'position': 4, 'name': naam, 'item': url}]},
     ]}
     ld = json.dumps(graaf, ensure_ascii=False)
     return pagina(titel, omschrijving, f'/{d["slug"]}/', ''.join(delen) + klok_js(verschil),
@@ -1033,10 +1039,10 @@ def eiland_html(g, lijst, nu, brandset):
         per.setdefault(d['kec'], []).append(d)
     nbrand = sum(1 for d in lijst if d['code'] in brandset)
     blokken = ''.join(
-        f'<div class="kec"><h3>{e(k)}</h3><ul>' + ''.join(
+        f'<div class="kec" id="{kec_id(k)}"><h3>{e(k)}</h3><ul>' + ''.join(
             f'<li><a href="/{d["slug"]}/">{"<i aria-label=brand></i>" if d["code"] in brandset else ""}{e(d["naam"])}</a></li>' for d in ds) + '</ul></div>'
         for k, ds in per.items())
-    body = f'''<section class="hero"><div class="w"><nav class="label kruim" aria-label="Kruimelpad"><a href="/">Kabar Maluku Live</a> › Eilandgroep</nav><h1>{e(D.GROEPEN[g])}</h1>
+    body = f'''<section class="hero"><div class="w"><nav class="label kruim" aria-label="Kruimelpad"><a href="/">Kabar Maluku Live</a> › <span aria-current="page">{e(D.GROEPEN[g])}</span></nav><h1>{e(D.GROEPEN[g])}</h1>
 <p class="sub">{e(D.GROEP_SUB[g])} · {len(lijst)} dorpen</p>
 <p class="samen">{f'Deze week zag de satelliet brand bij <b>{nbrand} {"dorp" if nbrand == 1 else "dorpen"}</b>. Die zijn gemarkeerd met een rode stip.' if nbrand else 'Deze week zag de satelliet <b>geen brand</b> bij de dorpen hier.'}</p></div></section>
 <div class="streep"><span></span><span></span><span></span></div>
