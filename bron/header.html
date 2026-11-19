@@ -1387,6 +1387,7 @@ window.__mzoMain=function(PRE){
   var entries=O.entries||[];
   var digital=entries.filter(function(e){return e.orderItemType===2;}).length>0;
   var physical=entries.filter(function(e){return e.orderItemType!==2;}).length>0&&!(O.shippingDetails&&O.shippingDetails.requiresShipping===false);
+  var gift=entries.length>0&&entries.every(function(e){return /doneer|donatie|vriend van moza/i.test(String(e.productName||e.name||e.title||''));});if(gift)physical=false;
   var trackers=(O.shipmentTrackers||[]).concat((DATA.trackingInfo&&DATA.trackingInfo.trackers)||[]);
   var st=String(O.state||'').toUpperCase();
   var canceled=/CANCEL/.test(st);
@@ -1471,10 +1472,11 @@ window.__mzoMain=function(PRE){
     var kop,tekst;
     if(canceled){kop='Je bestelling is geannuleerd';tekst='Deze bestelling gaat niet door. Heb je al betaald? Dan krijg je het geld terug. Vragen? <a href="/contact">Neem contact op</a>.';}
     else if(physical&&shipped){kop='Je bestelling is onderweg';tekst='Je pakket is verstuurd'+(tk.length?' met '+esc(tk[0].carrier)+'. Hieronder volg je precies waar het is.':'. Het komt binnenkort bij je aan.');}
+    else if(gift){kop='Bedankt voor je gift!';tekst='Je gift is binnen en telt meteen mee op de <a href="/doneer">doneerpagina</a>. Je krijgt ook een bevestiging per mail. Dankzij jou blijft MOZA.nu gratis voor iedereen.';}
     else if(physical){kop='We maken je bestelling klaar';tekst='We pakken je bestelling met zorg in. Meestal gaat hij binnen één werkdag de deur uit. Zodra het pakket onderweg is, krijg je een mail met de Track & Trace.';}
     else{kop=dlButtons(root).length>1?'Je foto’s staan klaar':'Je foto staat klaar';tekst='Je kunt je bestand hieronder meteen downloaden. Je hebt ook een mail gekregen met dezelfde downloadlink.';}
     var w=document.createElement('div');w.id='mzo-wrap';
-    var h='<section id="mzo-hero"><span class="lbl">Bedankt voor je bestelling</span><h1>'+kop+'</h1><p class="acc">Met je aankoop steun je MOZA</p><p>'+tekst+'</p><div class="nr">Bestelling #'+esc(O.orderNumber)+' · '+datum(O.submittedOn)+'</div></section><div class="mzo-streep"><i></i><i></i><i></i></div>';
+    var h='<section id="mzo-hero"><span class="lbl">'+(gift?'Bedankt voor je steun':'Bedankt voor je bestelling')+'</span><h1>'+kop+'</h1><p class="acc">'+(gift?'Voor en door Molukkers, dankzij jou':'Met je aankoop steun je MOZA')+'</p><p>'+tekst+'</p><div class="nr">Bestelling #'+esc(O.orderNumber)+' · '+datum(O.submittedOn)+'</div></section><div class="mzo-streep"><i></i><i></i><i></i></div>';
     if(physical&&!canceled){
       var s1=step('done',1,'Besteld',datum(O.submittedOn));
       var s2=shipped?step('done',2,'Klaargemaakt','Ingepakt en verstuurd'):step('now',2,'Wordt voor je klaargemaakt','Meestal versturen we je bestelling binnen één werkdag');
