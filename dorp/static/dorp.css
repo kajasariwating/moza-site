@@ -101,6 +101,7 @@ html.moza-dark .knop{color:var(--inkt)}
 .kruim{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 14px}
 .kruim a{display:inline-flex;align-items:center;gap:5px;min-height:44px;padding:0 12px;background:#fff;color:#111;border:2px solid #111;box-shadow:3px 3px 0 var(--geel);font-size:15px;font-weight:800;line-height:1.2;text-decoration:none}
 .kruim a svg{width:16px;height:16px;flex:none}
+html.moza-dark .kruim a{color:#111}
 .kruim a:hover,.kruim a:focus-visible{background:var(--geel)}
 .kruim a:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--geel)}
 .kruim .kr-s{color:#fff;font-weight:800;font-size:18px}
