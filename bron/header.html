@@ -634,7 +634,7 @@ function bereken(){if(job)return job;
  return job}
 function wanneer(){var d=new Date(),o={timeZone:'Europe/Amsterdam'};try{var dt=d.toLocaleDateString('nl-NL',{timeZone:o.timeZone,day:'numeric',month:'long',year:'numeric'}),tm=d.toLocaleTimeString('nl-NL',{timeZone:o.timeZone,hour:'2-digit',minute:'2-digit'}).replace(':','.');return 'Bijgewerkt op '+dt+' om '+tm+' uur'}catch(e){return ''}}
 function dag(iso){var tz='Europe/Amsterdam',f=function(x){return x.toLocaleDateString('en-CA',{timeZone:tz})};var d=new Date(iso);if(isNaN(d))return '';var n=new Date(),g=new Date(n.getTime()-864e5);if(f(d)===f(n))return 'vandaag';if(f(d)===f(g))return 'gisteren';return 'op '+d.toLocaleDateString('nl-NL',{timeZone:tz,day:'numeric',month:'long'})}
-function laatste(l){if(!l||!l.datum)return '';var w=dag(l.datum);if(!w)return '';var p=String(l.plaats||'').replace(/[<>&"]/g,'').trim();return 'Laatste donatie '+w+(p?' van iemand uit '+p:'')}
+function laatste(l){if(!l||!l.datum)return '';var w=dag(l.datum);if(!w)return '';var p=String(l.regio||'').replace(/[<>&"]/g,'').trim();return 'Laatste donatie '+w+(p?' van iemand uit '+p:'')}
 MZ.donStand=function(root){bereken().then(function(s){var R=root||document;[].forEach.call(R.querySelectorAll('[data-mz-stand]'),function(el){el.textContent=eur(s.totaal)});var w=wanneer(),l=laatste(s.laatste);[].forEach.call(R.querySelectorAll('[data-mz-stand-d]'),function(el){el.textContent=w;el.hidden=!w});[].forEach.call(R.querySelectorAll('[data-mz-stand-l]'),function(el){el.textContent=l;el.hidden=!l})}).catch(function(){})};
 })();
 </script>

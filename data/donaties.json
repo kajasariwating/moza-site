@@ -1,11 +1,11 @@
 {
-  "uitleg": "Donatieteller op moza.nu. basis = alle donaties in 2026 tot en met 18 november (opgave Kaja). handmatig = giften via bunq.me of de bank na 18 november: tel ze hier bij. start = voorraad per variant van het donatieproduct en van Vriend van MOZA.nu op 18 november; niet wijzigen. laatste = datum (UTC) en woonplaats van de laatste gift via de site; wordt elk uur automatisch bijgewerkt. Alleen de plaats, nooit naam, mail of adres.",
+  "uitleg": "Donatieteller op moza.nu. basis = alle donaties in 2026 tot en met 18 november (opgave Kaja). handmatig = giften via bunq.me of de bank na 18 november: tel ze hier bij. start = voorraad per variant van het donatieproduct en van Vriend van MOZA.nu op 18 november; niet wijzigen. laatste = datum (UTC) en regio (provincie, of het land bij een gift uit het buitenland) van de laatste gift via de site; wordt elk uur automatisch bijgewerkt. Nooit plaats, naam, mail of adres.",
   "jaar": 2026,
   "basis": 277,
   "handmatig": 0,
   "start": 100000,
   "laatste": {
     "datum": "2026-11-19T07:18:39Z",
-    "plaats": "Deventer"
+    "regio": "Overijssel"
   }
 }
