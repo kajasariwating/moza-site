@@ -586,7 +586,8 @@ window.addEventListener('message',function(e){if(e.origin!==location.origin)retu
 #moza-doneer .mdk-stand-l{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
 #moza-doneer .mdk-stand b{font-size:clamp(40px,7vw,56px);font-weight:900;line-height:1;letter-spacing:-.03em}
 #moza-doneer .mdk-stand-t{font-size:15px;line-height:1.4}
-#moza-doneer .mdk-stand-d{font-size:13px;font-weight:700;line-height:1.3}
+#moza-doneer .mdk-stand-ld{font-size:15px;font-weight:800;line-height:1.3}
+#moza-doneer .mdk-stand-d{font-size:12px;font-weight:400;line-height:1.3;margin-top:4px;opacity:.75}
 #moza-doneer .mdk-kawan{display:grid;gap:4px;padding:18px 20px;margin-bottom:22px;background:#1F3BD1;color:#fff!important;border:3px solid #111;box-shadow:6px 6px 0 #E9F25A;text-decoration:none;position:relative;transition:transform .1s,box-shadow .1s}
 #moza-doneer .mdk-kawan:hover{transform:translate(-2px,-2px);box-shadow:8px 8px 0 #E9F25A}
 #moza-doneer .mdk-kawan b{font-size:24px;font-weight:900;letter-spacing:-.02em;color:#E9F25A}
@@ -629,10 +630,12 @@ function bereken(){if(job)return job;
  var b=Promise.all(PRODS.map(prod)).then(function(l){var all=[].concat.apply([],l);if(!all.length)throw 0;return all});
  job=Promise.all([a,b]).then(function(x){var d={};for(var k in D)d[k]=D[k];for(var k2 in x[0])d[k2]=x[0][k2];
   var web=0;x[1].forEach(function(v){if(v.unlimited||typeof v.qtyInStock!=='number')return;var n=d.start-v.qtyInStock;if(n>0)web+=n*(+v.price||0)/100});
-  return {jaar:d.jaar,totaal:(+d.basis||0)+(+d.handmatig||0)+web}});
+  return {jaar:d.jaar,totaal:(+d.basis||0)+(+d.handmatig||0)+web,laatste:d.laatste||null}});
  return job}
 function wanneer(){var d=new Date(),o={timeZone:'Europe/Amsterdam'};try{var dt=d.toLocaleDateString('nl-NL',{timeZone:o.timeZone,day:'numeric',month:'long',year:'numeric'}),tm=d.toLocaleTimeString('nl-NL',{timeZone:o.timeZone,hour:'2-digit',minute:'2-digit'}).replace(':','.');return 'Bijgewerkt op '+dt+' om '+tm+' uur'}catch(e){return ''}}
-MZ.donStand=function(root){bereken().then(function(s){[].forEach.call((root||document).querySelectorAll('[data-mz-stand]'),function(el){el.textContent=eur(s.totaal)});var w=wanneer();[].forEach.call((root||document).querySelectorAll('[data-mz-stand-d]'),function(el){el.textContent=w;el.hidden=!w})}).catch(function(){})};
+function dag(iso){var tz='Europe/Amsterdam',f=function(x){return x.toLocaleDateString('en-CA',{timeZone:tz})};var d=new Date(iso);if(isNaN(d))return '';var n=new Date(),g=new Date(n.getTime()-864e5);if(f(d)===f(n))return 'vandaag';if(f(d)===f(g))return 'gisteren';return 'op '+d.toLocaleDateString('nl-NL',{timeZone:tz,day:'numeric',month:'long'})}
+function laatste(l){if(!l||!l.datum)return '';var w=dag(l.datum);if(!w)return '';var p=String(l.plaats||'').replace(/[<>&"]/g,'').trim();return 'Laatste donatie '+w+(p?' van iemand uit '+p:'')}
+MZ.donStand=function(root){bereken().then(function(s){var R=root||document;[].forEach.call(R.querySelectorAll('[data-mz-stand]'),function(el){el.textContent=eur(s.totaal)});var w=wanneer(),l=laatste(s.laatste);[].forEach.call(R.querySelectorAll('[data-mz-stand-d]'),function(el){el.textContent=w;el.hidden=!w});[].forEach.call(R.querySelectorAll('[data-mz-stand-l]'),function(el){el.textContent=l;el.hidden=!l})}).catch(function(){})};
 })();
 </script>
 <!-- ===== /mz-donstand ===== -->
@@ -728,7 +731,7 @@ MZ.donStand=function(root){bereken().then(function(s){[].forEach.call((root||doc
     sec.innerHTML='<div id="moza-doneer">'+
     '<header class="mdn-hero"><div class="mdn-in"><span class="mdn-lbl">Steun MOZA</span><h1>Houd Molukse verhalen gratis en onafhankelijk</h1><span class="mdn-serif">voor en door Molukkers</span>'+
       '<p>MOZA is gratis te lezen, voor iedereen. Dat kan alleen dankzij lezers die ons steunen. Met jouw bijdrage betalen we correspondenten op Maluku, schrijven we nieuwe kennisartikelen en houden we de website in de lucht.</p>'+
-      '<div class="mdn-ctas"><a class="mdn-btn" href="#mdn-doneer">Doneer nu</a><a class="mdn-btn ghost" href="/store">Naar de Toko Buku</a></div><div class="mdk-stand"><span class="mdk-stand-l">Binnen in 2026</span><b data-mz-stand>€ 277</b><span class="mdk-stand-d" data-mz-stand-d hidden></span><span class="mdk-stand-t">Dat is weinig. MOZA is een kleine stichting, geen rijke organisatie. Elke euro telt.</span></div></div></header>'+
+      '<div class="mdn-ctas"><a class="mdn-btn" href="#mdn-doneer">Doneer nu</a><a class="mdn-btn ghost" href="/store">Naar de Toko Buku</a></div><div class="mdk-stand"><span class="mdk-stand-l">Binnen in 2026</span><b data-mz-stand>€ 277</b><span class="mdk-stand-ld" data-mz-stand-l hidden></span><span class="mdk-stand-t">Dat is weinig. MOZA is een kleine stichting, geen rijke organisatie. Elke euro telt.</span><span class="mdk-stand-d" data-mz-stand-d hidden></span></div></div></header>'+
     '<div class="mdn-in">'+
       '<section class="mdn-sec" id="mdn-doneer" aria-labelledby="mdn-h1"><div class="mdn-head"><div><span class="mdn-lbl">Doneren</span><h2 id="mdn-h1">Elke euro telt</h2></div><p>Je hoeft niet veel te geven. Als veel lezers een klein bedrag geven, kan MOZA blijven bestaan.</p></div>'+
         '<div class="mdn-once"><div>'+
