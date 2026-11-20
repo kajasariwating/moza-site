@@ -1317,6 +1317,8 @@ html.moza-dark.mzo-on #order-status-page-root .mzo-nh{color:#ececf1!important}
 #mzo-hero .acc{font:italic 600 clamp(19px,2.4vw,24px)/1.25 Fraunces,Georgia,serif;color:#ff7ab6;margin:0 0 14px;position:relative;z-index:1}
 #mzo-hero p{font-size:17px;line-height:1.55;max-width:620px;margin:0;position:relative;z-index:1}
 #mzo-hero .nr{margin-top:16px;font-weight:800;font-size:14px;letter-spacing:.04em;position:relative;z-index:1}
+#mzo-hero a.dank{display:inline-block;margin-top:20px;position:relative;z-index:1;background:#e9f25a;color:#111!important;text-decoration:none!important;font:900 17px/1.2 "Hanken Grotesk",system-ui,sans-serif;padding:13px 18px;border:3px solid #111;box-shadow:5px 5px 0 #ff7ab6;transition:transform .12s,box-shadow .12s}
+#mzo-hero a.dank:hover,#mzo-hero a.dank:focus-visible{transform:translate(-2px,-2px);box-shadow:7px 7px 0 #ff7ab6;outline:none}
 .mzo-streep{display:flex;height:8px}.mzo-streep i{flex:1}.mzo-streep i:nth-child(1){background:#e9f25a}.mzo-streep i:nth-child(2){background:#ff7ab6}.mzo-streep i:nth-child(3){background:#111}
 .mzo-card{background:#fff;border:3px solid #111;padding:24px;margin-top:22px}
 .mzo-card h2{font:900 26px/1.1 "Hanken Grotesk",system-ui,sans-serif;letter-spacing:-.02em;margin:0 0 6px}
@@ -1481,7 +1483,7 @@ window.__mzoMain=function(PRE){
     else if(physical){kop='We maken je bestelling klaar';tekst='We pakken je bestelling met zorg in. Meestal gaat hij binnen één werkdag de deur uit. Zodra het pakket onderweg is, krijg je een mail met de Track & Trace.';}
     else{kop=dlButtons(root).length>1?'Je foto’s staan klaar':'Je foto staat klaar';tekst='Je kunt je bestand hieronder meteen downloaden. Je hebt ook een mail gekregen met dezelfde downloadlink.';}
     var w=document.createElement('div');w.id='mzo-wrap';
-    var h='<section id="mzo-hero"><span class="lbl">'+(gift?'Bedankt voor je steun':'Bedankt voor je bestelling')+'</span><h1>'+kop+'</h1><p class="acc">'+(gift?'Voor en door Molukkers, dankzij jou':'Met je aankoop steun je MOZA')+'</p><p>'+tekst+'</p><div class="nr">Bestelling #'+esc(O.orderNumber)+' · '+datum(O.submittedOn)+'</div></section><div class="mzo-streep"><i></i><i></i><i></i></div>';
+    var h='<section id="mzo-hero"><span class="lbl">'+(gift?'Bedankt voor je steun':'Bedankt voor je bestelling')+'</span><h1>'+kop+'</h1><p class="acc">'+(gift?'Voor en door Molukkers, dankzij jou':'Met je aankoop steun je MOZA')+'</p><p>'+tekst+'</p><div class="nr">Bestelling '+(O.orderNumber?'#'+esc(O.orderNumber)+' · ':'van ')+datum(O.submittedOn)+'</div>'+(gift?'<a class="dank" href="/bedankt-voor-je-donatie">Pak je bedankje: een wallpaper uit ons archief →</a>':'')+'</section><div class="mzo-streep"><i></i><i></i><i></i></div>';
     if(physical&&!canceled){
       var s1=step('done',1,'Besteld',datum(O.submittedOn));
       var s2=shipped?step('done',2,'Klaargemaakt','Ingepakt en verstuurd'):step('now',2,'Wordt voor je klaargemaakt','Meestal versturen we je bestelling binnen één werkdag');
