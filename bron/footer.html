@@ -1536,7 +1536,7 @@ html.moza-dark .mz-verzend{color:#ECECF1}
 <!-- ===== mz-gift-pd: productpagina's van giften zonder winkelzaken (verzending, voorraad, Klarna, Bewaar) ===== -->
 <style id="mz-gift-pd-css">html.mz-gift-pd .moza-buyline,html.mz-gift-pd .moza-support,html.mz-gift-pd .mz-verzend,html.mz-gift-pd .mz-save,html.mz-gift-pd .moza-badge{display:none!important}
 .mz-gift-n{display:flex;gap:10px;align-items:flex-start;margin:18px 0 0;font:400 16px/1.45 'Hanken Grotesk',system-ui,sans-serif;color:#111}.mz-gift-n svg{flex:0 0 22px;margin-top:1px}.mz-gift-n b{display:block;font-weight:800}
-html.moza-dark .mz-gift-n{color:#ECECF1}</style>
+html.moza-dark .mz-gift-n{color:#ECECF1}.tk-card:has(a[href*="/store/p/vriend-van-mozanu"]) .tk-st,.tk-card:has(a[href*="/store/p/doneer-aan-moza"]) .tk-st,.tk-card:has(a[href*="/store/p/jaarsteun-moza"]) .tk-st{display:none!important}</style>
 <script id="mz-gift-pd">(function(){
 var m=location.pathname.match(/^\/store\/p\/(doneer-aan-moza|vriend-van-mozanu|jaarsteun-moza)\/?$/);if(!m)return;
 document.documentElement.classList.add('mz-gift-pd');
