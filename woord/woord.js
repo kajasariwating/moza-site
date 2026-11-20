@@ -19,6 +19,7 @@ var W=[
  ['bandara','vliegveld','bandara'],
  ['gandong','Broederschap tussen twee dorpen op de Molukken, soms al eeuwenlang.','gandong'],
  ['capeu','hoed, pet','capeu'],
+ ['rapat','Vergadering of bijeenkomst. Een rapat masyarakat is een bijeenkomst van de gemeenschap, waar iedereen kan meepraten.','rapat'],
  ['amato','tot ziens','amato'],
  ['totobuang','Een rek met kleine koperen gongs waarop je een melodie slaat. Speelt vaak samen met de tifa: samen heet dat tifa totobuang.','totobuang']
 ];
