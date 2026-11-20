@@ -1533,10 +1533,23 @@ html.moza-dark #mzag .ev .mzig{background:#12151F}
 html.moza-dark .mz-verzend-k{color:#A8AAB6}
 html.moza-dark .mz-verzend{color:#ECECF1}
 </style>
+<!-- ===== mz-gift-pd: productpagina's van giften zonder winkelzaken (verzending, voorraad, Klarna, Bewaar) ===== -->
+<style id="mz-gift-pd-css">html.mz-gift-pd .moza-buyline,html.mz-gift-pd .moza-support,html.mz-gift-pd .mz-verzend,html.mz-gift-pd .mz-save,html.mz-gift-pd .moza-badge{display:none!important}
+.mz-gift-n{display:flex;gap:10px;align-items:flex-start;margin:18px 0 0;font:400 16px/1.45 'Hanken Grotesk',system-ui,sans-serif;color:#111}.mz-gift-n svg{flex:0 0 22px;margin-top:1px}.mz-gift-n b{display:block;font-weight:800}
+html.moza-dark .mz-gift-n{color:#ECECF1}</style>
+<script id="mz-gift-pd">(function(){
+var m=location.pathname.match(/^\/store\/p\/(doneer-aan-moza|vriend-van-mozanu|jaarsteun-moza)\/?$/);if(!m)return;
+document.documentElement.classList.add('mz-gift-pd');
+var HART='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M12 21s-7-4.4-9.3-9C1.2 8.8 3 5 6.6 5c2.1 0 3.4 1.2 4.4 2.6C12 6.2 13.3 5 15.4 5 19 5 20.8 8.8 19.3 12 17 16.6 12 21 12 21z"/></svg>';
+function zet(){var cart=document.querySelector('.product-detail .product-add-to-cart');if(!cart||document.querySelector('.mz-gift-n'))return;
+var p=document.createElement('p');p.className='mz-gift-n';p.innerHTML=HART+'<span><b>Een gift, geen bestelling</b>Je betaalt één keer. Er wordt niets verstuurd en niets automatisch afgeschreven.</span>';cart.after(p)}
+var n=0,iv=setInterval(function(){zet();if(++n>20)clearInterval(iv)},500);
+})();</script>
 <script id="mz-verzend-js">
 /* Toko Buku: wanneer gaat je bestelling op de post. Werkdag voor 16:00 = vandaag, anders de volgende werkdag. */
 (function(){
   var m=location.pathname.match(/^\/store\/p\/([^\/]+)\/?$/);if(!m)return;
+  if(/^(doneer-aan-moza|vriend-van-mozanu|jaarsteun-moza)$/.test(m[1]))return;
   var DAG=['zo','ma','di','wo','do','vr','za'];
   function nu(){
     var o={};new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Amsterdam',weekday:'short',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date()).forEach(function(p){o[p.type]=p.value;});
