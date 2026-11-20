@@ -75,9 +75,11 @@ function net(u,k,ext){return F.call(window,u,ext?{}:{credentials:'same-origin'})
 window.fetch=function(i,o){try{var u=typeof i==='string'?i:(i&&i.url);var m=((o&&o.method)||(i&&typeof i!=='string'&&i.method)||'GET').toUpperCase();
  if(u&&m==='GET'&&!(o&&o.body)){var url=new URL(u,location.href);var same=url.host===location.host;
   if((same&&url.searchParams.get('format')==='json')||url.host==='api.open-meteo.com'){if(same)url.searchParams.delete('_');var k=(same?'':url.host)+url.pathname+'?'+url.searchParams.toString();var ttl=same?FRESH:WX;var e=C[k];
-   if(!e||Date.now()-e.t>=ttl){var p=get(k).then(function(v){var age=v?Date.now()-v.t:1e13;if(v&&age<ttl)return v;if(v&&same&&age<STALE){net(url.href,k,!same).catch(function(){});return v}return net(url.href,k,!same)});e=C[k]={t:Date.now(),p:p};p.catch(function(){delete C[k]})}
+   if(!e||Date.now()-e.t>=ttl){var p=get(k).then(function(v){var age=v?Date.now()-v.t:1e13;if(v&&age<ttl)return v;if(v&&same&&age<(/^\/evenementen\/?$/.test(url.pathname)?86400000:STALE)){net(url.href,k,!same).catch(function(){});return v}return net(url.href,k,!same)});e=C[k]={t:Date.now(),p:p};p.catch(function(){delete C[k]})}
    var a=arguments,s=this;return e.p.then(mk,function(){return F.apply(s,a)})}}}catch(err){}return F.apply(this,arguments)};
 setTimeout(function(){db().then(function(d){if(!d)return;try{var st=d.transaction('c','readwrite').objectStore('c');var q=st.openCursor();q.onsuccess=function(){var c=q.result;if(!c)return;if(!c.value||Date.now()-c.value.t>86400000)c.delete();c.continue()}}catch(e){}})},6000);
+/* Agenda: meteen ophalen, niet pas als de hele pagina er staat */
+if(/^\/(events|evenementen)\/?$/i.test(location.pathname))window.fetch('/evenementen?format=json').catch(function(){});
 if(location.pathname==='/'){var L=['/lezen?format=json','/evenementen?format=json','/lezen?category=Maluku&format=json'];if(window.matchMedia&&matchMedia('(min-width:1600px)').matches)L.push('/store?format=json');L.forEach(function(u){window.fetch(u).catch(function(){})})}
 })();
 </script>
