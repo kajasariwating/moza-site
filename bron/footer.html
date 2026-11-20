@@ -1541,9 +1541,10 @@ html.moza-dark .mz-gift-n{color:#ECECF1}</style>
 var m=location.pathname.match(/^\/store\/p\/(doneer-aan-moza|vriend-van-mozanu|jaarsteun-moza)\/?$/);if(!m)return;
 document.documentElement.classList.add('mz-gift-pd');
 var HART='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M12 21s-7-4.4-9.3-9C1.2 8.8 3 5 6.6 5c2.1 0 3.4 1.2 4.4 2.6C12 6.2 13.3 5 15.4 5 19 5 20.8 8.8 19.3 12 17 16.6 12 21 12 21z"/></svg>';
-function zet(){var cart=document.querySelector('.product-detail .product-add-to-cart');if(!cart||document.querySelector('.mz-gift-n'))return;
+function weg(){[].forEach.call(document.querySelectorAll('.moza-buyline,.moza-support,.mz-verzend,.mz-save,.moza-badge'),function(e){e.style.setProperty('display','none','important')})}
+function zet(){weg();var cart=document.querySelector('.product-detail .product-add-to-cart');if(!cart||document.querySelector('.mz-gift-n'))return;
 var p=document.createElement('p');p.className='mz-gift-n';p.innerHTML=HART+'<span><b>Een gift, geen bestelling</b>Je betaalt één keer. Er wordt niets verstuurd en niets automatisch afgeschreven.</span>';cart.after(p)}
-var n=0,iv=setInterval(function(){zet();if(++n>20)clearInterval(iv)},500);
+var n=0,iv=setInterval(function(){zet();if(++n>30)clearInterval(iv)},400);
 })();</script>
 <script id="mz-verzend-js">
 /* Toko Buku: wanneer gaat je bestelling op de post. Werkdag voor 16:00 = vandaag, anders de volgende werkdag. */
