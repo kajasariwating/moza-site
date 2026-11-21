@@ -66,12 +66,13 @@ function venster(){if(d.getElementById('mz-mijnbezoeken'))return;
 <!-- MOZA snelheid: dezelfde JSON-verzoeken maar één keer ophalen, voorpagina-data vroeg starten -->
 <script id="mz-fetchcache">
 (function(){
-var F=window.fetch;if(!F||window.__mzFC)return;window.__mzFC=2;var C={};var FRESH=120000,STALE=1800000,WX=600000;
+var F=window.fetch;if(!F||window.__mzFC)return;window.__mzFC=3;window.__mzRawFetch=F;var C={};var FRESH=120000,STALE=1800000,WX=600000;
 var DB=null;function db(){if(DB)return DB;DB=new Promise(function(res){try{var r=indexedDB.open('mzfc',1);r.onupgradeneeded=function(){r.result.createObjectStore('c')};r.onsuccess=function(){res(r.result)};r.onerror=function(){res(null)};r.onblocked=function(){res(null)};setTimeout(function(){res(null)},500)}catch(e){res(null)}});return DB}
-function get(k){return db().then(function(d){if(!d)return null;return new Promise(function(res){try{var q=d.transaction('c').objectStore('c').get(k);q.onsuccess=function(){res(q.result||null)};q.onerror=function(){res(null)}}catch(e){res(null)}})})}
+/* Safari: IndexedDB kan blijven hangen. Na 400 ms gewoon het netwerk gebruiken (22-11-2026) */
+function get(k){return db().then(function(d){if(!d)return null;return new Promise(function(res){setTimeout(function(){res(null)},400);try{var q=d.transaction('c').objectStore('c').get(k);q.onsuccess=function(){res(q.result||null)};q.onerror=function(){res(null)}}catch(e){res(null)}})})}
 function put(k,v){db().then(function(d){if(!d)return;try{d.transaction('c','readwrite').objectStore('c').put(v,k)}catch(e){}})}
 function mk(x){return new Response(x.b,{status:200,headers:{'Content-Type':x.c||'application/json'}})}
-function net(u,k,ext){return F.call(window,u,ext?{}:{credentials:'same-origin'}).then(function(r){if(!r.ok)throw new Error('http');var c=r.headers.get('content-type');return r.text().then(function(b){var x={t:Date.now(),b:b,c:c};put(k,x);return x})})}
+function net(u,k,ext){return F.call(window,u,ext?{}:{credentials:'same-origin'}).then(function(r){if(!r.ok)throw new Error('http');var c=r.headers.get('content-type');return r.text().then(function(b){var x={t:Date.now(),b:b,c:c};if(b.length<300000)put(k,x);return x})})}
 window.fetch=function(i,o){try{var u=typeof i==='string'?i:(i&&i.url);var m=((o&&o.method)||(i&&typeof i!=='string'&&i.method)||'GET').toUpperCase();
  if(u&&m==='GET'&&!(o&&o.body)){var url=new URL(u,location.href);var same=url.host===location.host;
   if((same&&url.searchParams.get('format')==='json')||url.host==='api.open-meteo.com'){if(same)url.searchParams.delete('_');var k=(same?'':url.host)+url.pathname+'?'+url.searchParams.toString();var ttl=same?FRESH:WX;var e=C[k];
@@ -4137,10 +4138,24 @@ function render(){var c=counts();
  '<div class="in"><div class="how"><div class="l"><h2>Zet jouw evenement in de agenda</h2><ol><li>Stuur de naam, datum, tijd en plaats van je evenement naar MOZA.</li><li>Voeg een link en een foto toe als je die hebt.</li><li>De redactie kijkt ernaar en zet het in de agenda.</li></ol></div><div class="r"><p>De agenda is gratis voor iedereen die iets organiseert voor of met Molukkers.</p><a class="btn d" href="'+TIP+'">Evenement aanmelden →</a><a href="/contact" style="font-weight:800">Of mail naar info@moza.nu →</a></div></div></div>'}
 function ld(){var old=document.getElementById('mz-ld-agenda');if(old)old.remove();var O='https://www.moza.nu';var evs=ALL.slice(0,30).map(function(e){var L=e.location||{};var o={"@type":"Event","name":e.title,"startDate":new Date(e.startDate).toISOString(),"endDate":new Date(e.endDate||e.startDate).toISOString(),"url":O+e.fullUrl,"eventStatus":"https://schema.org/EventScheduled"};var ex=strip(e.excerpt);if(ex)o.description=ex.slice(0,300);if(e.assetUrl)o.image=[e.assetUrl];if(e._reg==='Online'){o.eventAttendanceMode="https://schema.org/OnlineEventAttendanceMode";o.location={"@type":"VirtualLocation","url":O+e.fullUrl}}else{o.eventAttendanceMode="https://schema.org/OfflineEventAttendanceMode";o.location={"@type":"Place","name":L.addressTitle||place(e)||'Nederland',"address":[L.addressLine1,L.addressLine2,'Nederland'].filter(Boolean).join(', ')}}return o});
  var s=document.createElement('script');s.type='application/ld+json';s.id='mz-ld-agenda';s.text=JSON.stringify({"@context":"https://schema.org","@graph":[{"@type":"CollectionPage","name":"Agenda: Molukse evenementen in Nederland","url":O+"/evenementen","inLanguage":"nl-NL","publisher":{"@id":O+"/#organization"}}].concat(evs)});document.head.appendChild(s)}
-function load(){fetch(SRC,{cache:'no-store'}).then(function(r){return r.json()}).then(function(j){var now=Date.now();var all=(j.upcoming||[]).concat(j.past||[]);var TA=document.createElement('textarea');function dec(s){if(!s||String(s).indexOf('&')<0)return s;TA.innerHTML=s;return TA.value}all.forEach(function(e){e.title=dec(e.title);var L=e.location||{};['addressTitle','addressLine1','addressLine2'].forEach(function(k){if(L[k])L[k]=dec(L[k])})});
- ALL=all.filter(function(e){return (e.endDate||e.startDate)>=now}).sort(function(a,b){return a.startDate-b.startDate});
- PAST=all.filter(function(e){return (e.endDate||e.startDate)<now}).sort(function(a,b){return b.startDate-a.startDate});
- ALL.forEach(function(e){e._reg=region(e)});LOADED=true;render();ld()}).catch(function(){ALL=[];PAST=[];LOADED=true;render()})}
+/* Snel laden (22-11-2026): eerst de laatst bewaarde agenda uit deze browser tonen, daarna verversen. Na 5 s zonder antwoord: rechtstreeks ophalen buiten de cache om. */
+var LSK='mzAgenda1',SIG='';
+function slim(e){var L=e.location||{};return {title:e.title,startDate:e.startDate,endDate:e.endDate,fullUrl:e.fullUrl,excerpt:strip(e.excerpt).slice(0,400),assetUrl:e.assetUrl,categories:e.categories,tags:e.tags,location:{addressTitle:L.addressTitle,addressLine1:L.addressLine1,addressLine2:L.addressLine2,addressCountry:L.addressCountry}}}
+function apply(all,bewaar){var now=Date.now();var TA=document.createElement('textarea');function dec(s){if(!s||String(s).indexOf('&')<0)return s;TA.innerHTML=s;return TA.value}all.forEach(function(e){e.title=dec(e.title);var L=e.location||{};['addressTitle','addressLine1','addressLine2'].forEach(function(k){if(L[k])L[k]=dec(L[k])})});
+ var A=all.filter(function(e){return (e.endDate||e.startDate)>=now}).sort(function(a,b){return a.startDate-b.startDate});
+ var P=all.filter(function(e){return (e.endDate||e.startDate)<now}).sort(function(a,b){return b.startDate-a.startDate}).slice(0,12);
+ var sl=A.concat(P).map(slim),sig=JSON.stringify(sl);
+ if(bewaar){try{localStorage.setItem(LSK,JSON.stringify({t:now,e:sl}))}catch(x){}}
+ if(LOADED&&sig===SIG)return;SIG=sig;
+ ALL=A;PAST=P;ALL.forEach(function(e){e._reg=region(e)});LOADED=true;render();ld()}
+function load(){
+ try{var c=JSON.parse(localStorage.getItem(LSK)||'null');if(c&&c.e&&Date.now()-c.t<14*86400000)apply(c.e,false)}catch(x){}
+ var klaar=false;function ok(j){if(klaar)return;klaar=true;apply((j.upcoming||[]).concat(j.past||[]),true)}
+ function fout(){if(klaar)return;klaar=true;if(!LOADED){ALL=[];PAST=[];LOADED=true;render()}}
+ var raw=window.__mzRawFetch||window.fetch;
+ fetch(SRC,{cache:'no-store'}).then(function(r){return r.json()}).then(ok).catch(function(){raw.call(window,SRC,{credentials:'same-origin'}).then(function(r){return r.json()}).then(ok).catch(fout)});
+ setTimeout(function(){if(!klaar)raw.call(window,SRC,{credentials:'same-origin'}).then(function(r){return r.json()}).then(ok).catch(function(){})},5000);
+ setTimeout(fout,20000)}
 function build(){var sw=document.getElementById('siteWrapper'),pg=document.getElementById('page');if(!sw||!pg)return false;if(document.getElementById('mzag'))return true;W=document.createElement('div');W.id='mzag';sw.insertBefore(W,pg);render();load();
  return true}
 function kies(f,v){F[f]=v;var top=W.querySelector('#mzag-lijst'),bi=W.querySelector('.bar>.in:not(#mzfb)');if(bi)bi.innerHTML=bar();top.innerHTML=telling()+listHtml()+pastHtml();
