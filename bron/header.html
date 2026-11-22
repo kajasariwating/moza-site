@@ -647,6 +647,7 @@ function bereken(){if(job)return job;
  var b=Promise.all(PRODS.map(prod)).then(function(l){(l[1]||[]).forEach(function(v){v._v=1});var all=[].concat.apply([],l);if(!all.length)throw 0;return all});
  job=Promise.all([a,b]).then(function(x){var d={};for(var k in D)d[k]=D[k];for(var k2 in x[0])d[k2]=x[0][k2];
   var los=(+d.basis||0)+(+d.handmatig||0),vr=0,nv=0;x[1].forEach(function(v){if(v.unlimited||typeof v.qtyInStock!=='number')return;var n=d.start-v.qtyInStock;if(n<=0)return;var e=n*(+v.price||0)/100;if(v._v){vr+=e;nv+=n}else los+=e});
+  var vx=d.vriend_extra||{},xb=+vx.bedrag||0,xn=+vx.aantal||0;if(xb>0&&xb<=los){los-=xb;vr+=xb;nv+=xn}
   return {jaar:d.jaar,totaal:los+vr,los:los,vriend:vr,vrienden:nv,laatste:d.laatste||null,laatste_los:d.laatste_los||null,laatste_vriend:d.laatste_vriend||null}});
  return job}
 function wanneer(){var d=new Date(),o={timeZone:'Europe/Amsterdam'};try{var dt=d.toLocaleDateString('nl-NL',{timeZone:o.timeZone,day:'numeric',month:'long',year:'numeric'}),tm=d.toLocaleTimeString('nl-NL',{timeZone:o.timeZone,hour:'2-digit',minute:'2-digit'}).replace(':','.');return 'Bijgewerkt op '+dt+' om '+tm+' uur'}catch(e){return ''}}
