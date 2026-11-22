@@ -642,7 +642,7 @@ var RAW='https://raw.githubusercontent.com/kajasariwating/moza-site/main/data/do
 var job=null;
 function eur(n){return '€ '+Math.round(n).toLocaleString('nl-NL')}
 function bereken(){if(job)return job;
- var a=fetch(RAW+'?t='+Math.floor(Date.now()/3e5)).then(function(r){return r.ok?r.json():{}}).catch(function(){return {}});
+ var a=fetch(RAW+'?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.json():{}}).catch(function(){return {}});
  function prod(u){return fetch(u+'?format=json&t='+Date.now(),{credentials:'same-origin'}).then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(j){return (j.item||{}).variants||[]}).catch(function(){return []})}
  var b=Promise.all(PRODS.map(prod)).then(function(l){(l[1]||[]).forEach(function(v){v._v=1});var all=[].concat.apply([],l);if(!all.length)throw 0;return all});
  job=Promise.all([a,b]).then(function(x){var d={};for(var k in D)d[k]=D[k];for(var k2 in x[0])d[k2]=x[0][k2];
