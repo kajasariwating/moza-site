@@ -6,6 +6,9 @@ Een pagina per dorp op de Molukken (2.420 dorpen): brand, weer, lucht, zee, aard
 - `bouw.py` maakt de hele site in `_site/`: een pagina per dorp, per eilandgroep, een zoekpagina, `zoek.json` en `sitemap.xml`.
 - `data.py` haalt de gegevens op. Faalt een bron, dan valt dat blok weg en blijft de rest staan.
 - `taal.py` bevat alle vertaalregels van data naar gewone taal. Grenzen aanpassen? Alleen hier.
+- `tekst.py` bevat de talen. De site staat in het Nederlands op `/` en in het Indonesisch op `/id/`. De Nederlandse zin is de sleutel, de Indonesische vertaling staat in `ID`. Mist een vertaling, dan meldt `bouw.py` dat aan het eind van de bouw. Nieuwe zin in de code? Zet hem in `t('…')` en voeg de vertaling toe aan `ID`.
+- De Indonesische versie heeft geen MOZA-menu, geen Nederlands nieuws en geen nieuwsbrief, en noemt alleen de tijd in Maluku (WIT). Wel een pagina `/id/tentang/` en een eigen `manifest.webmanifest`.
+- Op elke pagina staat dat dit geen officiële waarschuwing is, met BMKG, MAGMA en BPBD (`veilig_html()` in `bouw.py`).
 - `static/dorp.css` is de vormgeving (MOZA-huisstijl, licht en nacht).
 - `og.py` maakt de deelbeelden (og:image) per pagina, zoals "Ema of Ambon" in het zoekveld. Ze staan in de cache en worden alleen opnieuw gemaakt als `og.py` of de lettertypen in `static/fonts/` veranderen.
 - De workflow `.github/workflows/dorp.yml` bouwt elk uur en zet de site op GitHub Pages.

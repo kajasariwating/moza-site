@@ -425,3 +425,10 @@ html.moza-dark .mijn .nb{color:#B9BCC6}
 /* broodkruimel: huidige pagina en anker per kecamatan */
 .kec{scroll-margin-top:16px}
 .kec:target h3{background:var(--geel);color:#111;display:inline-block;padding:0 6px}
+/* taalknop NL/ID en veiligheidsregel (26-11-2026) */
+.knop.taal{font-weight:900;letter-spacing:.04em}
+@media (max-width:420px){.kop .knop.taal{width:44px;padding:0;justify-content:center}}
+.voet .veilig{border:2px solid var(--geel);padding:10px 12px;line-height:1.5;margin:12px 0}
+.voet .veilig b{color:var(--geel)}
+html[lang=id] header.kop{display:flex!important;position:sticky;top:0;z-index:9991}
+.deelblok a.nog{text-decoration:none}

@@ -12,6 +12,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import data as D  # noqa: E402
 import taal as T  # noqa: E402
 import og as OG  # noqa: E402
+import tekst as TK  # noqa: E402
+from tekst import t  # noqa: E402
 from shapely.geometry import Polygon, MultiPolygon, Point, box  # noqa: E402
 from shapely.strtree import STRtree  # noqa: E402
 from shapely.ops import unary_union  # noqa: E402
@@ -21,8 +23,15 @@ HIER = Path(__file__).resolve().parent
 WIT, NL = T.WIT, ZoneInfo('Europe/Amsterdam')
 
 
-def tijd_nl(t, nu, waar='in het dorp', hoofd=True):
+def tijd_nl(t, nu, waar=None, hoofd=True):
+    waar = waar or 'in het dorp'
     """Tijd in Nederland voorop, met de tijd in de Molukken tussen haakjes."""
+    if TK.TAAL == 'id':  # in Maluku: alleen de tijd daar
+        tw, nw = t.astimezone(WIT), nu.astimezone(WIT)
+        w = T.wanneer(tw, nw)
+        if hoofd:
+            w = w[0].upper() + w[1:]
+        return f'{w} pukul {tw:%H.%M} WIT'
     tn, nn = t.astimezone(NL), nu.astimezone(NL)
     w = T.wanneer(tn, nn)
     if hoofd:
@@ -143,10 +152,10 @@ def weer_bij(r, nu):
     vooruit = [(t, v) for t, v in regen if nu <= t + timedelta(hours=1) <= nu + timedelta(hours=12)]
     if nu_regen:
         eind = next((t for t, v in vooruit if (v or 0) < 0.2 and t > nu), None)
-        regenzin = f'Regen tot ongeveer {eind.hour}:00' if eind else 'Regen de komende uren'
+        regenzin = ('tot', eind.hour) if eind else ('nu', None)
     else:
         start = next((t for t, v in vooruit if (v or 0) >= 0.3), None)
-        regenzin = f'Regen vanaf ongeveer {start.hour}:00' if start else 'Droog de komende uren'
+        regenzin = ('vanaf', start.hour) if start else ('droog', None)
     dagen = []
     op = dag.get('sunrise') or []
     onder = dag.get('sunset') or []
@@ -162,6 +171,17 @@ def weer_bij(r, nu):
     wrichting = cur.get('wind_direction_10m')
     return {'temp': cur.get('temperature_2m'), 'code': cur.get('weather_code'), 'regenzin': regenzin,
             'dagen': dagen, 'wind': wind, 'wrichting': wrichting, 'wsnel': cur.get('wind_speed_10m')}
+
+
+def regen_tekst(rz):
+    soort, uur = rz
+    if soort == 'tot':
+        return t('Regen tot ongeveer {u}:00', u=uur)
+    if soort == 'nu':
+        return t('Regen de komende uren')
+    if soort == 'vanaf':
+        return t('Regen vanaf ongeveer {u}:00', u=uur)
+    return t('Droog de komende uren')
 
 
 def lucht_bij(r, nu):
@@ -326,7 +346,7 @@ def kaart_svg(d, geo, buren, kust, brandpunten, wrichting):
         if pk is not None and pk.intersects(vak):
             buurlijn += pad(pk)
     eigen = pad(g)
-    stukken = [f'<svg viewBox="0 0 {W} {H}" role="img" aria-label="Kaart van de grond van {e(d["naam"])} met plekken waar brand is gezien">',
+    stukken = [f'<svg viewBox="0 0 {W} {H}" role="img" aria-label="{t("Kaart van de grond van {naam} met plekken waar brand is gezien", naam=e(d["naam"]))}">',
                f'<rect width="{W}" height="{H}" fill="var(--zee)"/>']
     if land:
         stukken.append(f'<path d="{land}" fill="var(--land)" fill-rule="evenodd"/>')
@@ -346,7 +366,7 @@ def kaart_svg(d, geo, buren, kust, brandpunten, wrichting):
         naar = (wrichting + 180) % 360
         stukken.append(f'<g transform="translate({W - 30} {H - 34})"><circle r="20" fill="var(--papier)" stroke="var(--rand)" stroke-width="2"/>'
                        f'<g transform="rotate({naar:.0f})"><path d="M0 12V-11M-6 -4L0 -11L6 -4" fill="none" stroke="#1F3BD1" stroke-width="3"/></g></g>'
-                       f'<text x="{W - 30}" y="{H - 4}" font-size="11" font-weight="800" text-anchor="middle" fill="var(--inkt)">Wind</text>')
+                       f'<text x="{W - 30}" y="{H - 4}" font-size="11" font-weight="800" text-anchor="middle" fill="var(--inkt)">{t("Wind")}</text>')
     stukken.append('</svg>')
     return ''.join(stukken)
 
@@ -403,7 +423,18 @@ MEER_LINKS = [('/lezen', 'Lezen', 'Nieuws en verhalen'), ('/weten', 'Kennisbank'
 
 
 def onder_html(deel):
-    t, x = deel
+    tt, x = deel
+    if TK.TAAL == 'id':
+        sluit = f'<button type="button" class="x" data-x aria-label="{t("Sluiten")}">{ic("x", "2.4")}</button>'
+        deelvel = (f'<div id="mzk-deel" class="vel"><div class="dk" data-x></div><section role="dialog" aria-modal="true" aria-labelledby="mzk-deel-h">'
+                   f'<div class="vkop"><h2 id="mzk-deel-h">{t("Deel deze pagina")}</h2>{sluit}</div>'
+                   f'<span class="lbl">{t("Dit bericht staat al klaar")}</span><div class="msg"></div>'
+                   f'<a class="wa" target="_blank" rel="noopener">{ic("wa")}{t("Stuur via WhatsApp")}</a>'
+                   f'<div class="twee"><a class="fb" target="_blank" rel="noopener">Facebook</a><button type="button" class="kp">{t("Kopieer link")}</button></div>'
+                   f'<button type="button" class="ander">{t("Andere app kiezen")}</button></section></div>')
+        data = json.dumps({'t': tt, 'e': x}, ensure_ascii=False).replace('</', '<\\/')
+        return deelvel + f'<script>window.MZK_TAAL="id";window.MZK_DEEL={data}</script><script src="/onder.js?v={VERSIE}" defer></script>'
+    t_ = tt
     balk = (f'<nav id="mz-onder" aria-label="Menu van MOZA">'
             f'<a href="{MZ}/?{UTM}">{ic("home")}Voorpagina</a>'
             f'<a href="{MZ}/evenementen?{UTM}"><span class="ag">{ic("agenda")}</span>Agenda</a>'
@@ -430,7 +461,7 @@ def onder_html(deel):
                '<a class="mm-wa" href="https://whatsapp.com/channel/0029VaA4StPIt5rs5FadnH1d" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="#1f8f4e" stroke-width="1.9" aria-hidden="true"><path d="M4 20l1.3-4A8 8 0 1 1 8 18.7z"></path></svg><span><b>Volg MOZA op WhatsApp.</b> Het laatste Molukse nieuws op je telefoon.</span></a>'
                f'<a class="mm-beeld" href="{u("/beeldbank")}"><b>Beeldbank</b><span>Foto’s van Molukkers in Nederland door de jaren heen</span></a>'
                '</div></div>')
-    data = json.dumps({'t': t, 'e': x}, ensure_ascii=False).replace('</', '<\\/')
+    data = json.dumps({'t': t_, 'e': x}, ensure_ascii=False).replace('</', '<\\/')
     return balk + deelvel + meervel + f'<script>window.MZK_DEEL={data}</script><script src="/onder.js?v={VERSIE}" defer></script><script src="/kop.js?v={VERSIE}" defer></script>'
 
 
@@ -511,10 +542,47 @@ def mozakop_desktop():
     return f'<div id="mzd" data-nosnippet>{r1}</div>'
 
 
+def veilig_html():
+    """Op elke pagina: dit is geen officiële waarschuwing, met de officiële bronnen."""
+    return (f'<p class="veilig"><b>{t("Dit is geen officiële waarschuwing.")}</b> {t("Bij gevaar volg je altijd BMKG, MAGMA en de BPBD.")}<br>'
+            f'{t("Officiële informatie:")} <a href="https://www.bmkg.go.id" target="_blank" rel="noopener">BMKG</a> ({t("weer, aardbevingen en tsunami")}), '
+            f'<a href="https://magma.esdm.go.id" target="_blank" rel="noopener">MAGMA Indonesia</a> ({t("vulkanen")}), BPBD ({t("rampen in jouw regio")}).</p>')
+
+
+def taal_link(pad):
+    """Knop naar dezelfde pagina in de andere taal. Onthoudt de keuze (mzk-taal)."""
+    if TK.TAAL == 'id':
+        return f'<a class="knop taal" href="{pad}" hreflang="nl" lang="nl" data-taal="nl" aria-label="Nederlands">NL</a>'
+    return f'<a class="knop taal" href="/id{pad}" hreflang="id" lang="id" data-taal="id" aria-label="Bahasa Indonesia">ID</a>'
+
+
+TAAL_JS = ('<script>(function(){[].forEach.call(document.querySelectorAll("[data-taal]"),function(a){a.addEventListener("click",function(){'
+           'try{localStorage.setItem("mzk-taal",a.getAttribute("data-taal"))}catch(e){}})})})();</script>')
+
+
 def pagina(titel, omschrijving, pad, body, extra_head='', robots='index,follow', deel=DEEL_STANDAARD, app_titel='Kabar',
-           og='/og.png', og_alt='Kabar Maluku Live, powered by MOZA. Wat speelt er bij jouw dorp?'):
+           og='/og.png', og_alt='Kabar Maluku Live, powered by MOZA. Wat speelt er bij jouw dorp?', twee_talen=True):
+    pre = TK.pre()
+    id_ = TK.TAAL == 'id'
+    if deel is DEEL_STANDAARD:
+        deel = (t(deel[0]), t(deel[1]))
+    og_alt = t(og_alt) if og_alt == 'Kabar Maluku Live, powered by MOZA. Wat speelt er bij jouw dorp?' else og_alt
+    alt = (f'<link rel="alternate" hreflang="nl" href="{SITE}{pad}">\n<link rel="alternate" hreflang="id" href="{SITE}/id{pad}">\n'
+           f'<link rel="alternate" hreflang="x-default" href="{SITE}{pad}">\n') if twee_talen else ''
+    kop_rechts = (f'<button class="knop deelk" type="button" data-deel aria-label="{t("Deel deze pagina")}">{ic("deel")}<span class="kt">{t("Delen")}</span></button>'
+                  f'<a class="knop ander" href="{pre}/" aria-label="{t("Ander dorp zoeken")}">{ICON_ZOEK}<span class="kt">{t("Ander dorp")}</span></a>'
+                  + (taal_link(pad) if twee_talen else ''))
+    if id_:
+        voet = (f'<footer class="voet"><div class="w"><p class="pw">Kabar Maluku Live, didukung oleh <a class="mz" href="/id/tentang/" aria-label="MOZA">MOZA</a></p>'
+                f'{veilig_html()}<p><a href="/id/tentang/">{t("Over deze app")}</a></p></div></footer>')
+        manifest = '/id/manifest.webmanifest'
+    else:
+        voet = (f'<footer class="voet"><div class="w"><p class="pw">Kabar Maluku Live, powered by <a class="mz" href="https://www.moza.nu" aria-label="MOZA">MOZA</a></p><p>Voor, door en met Molukkers. Bekijk ook <a href="https://www.moza.nu/kaarten">alle kaarten</a> en <a href="https://www.moza.nu/lezen">het laatste nieuws</a> op moza.nu.</p>\n'
+                f'{veilig_html()}<p>Klopt er iets niet? <a href="https://www.moza.nu/contact">Laat het ons weten</a>.</p>'
+                + (f'<p><a href="/id{pad}" hreflang="id" lang="id" data-taal="id">Baca dalam Bahasa Indonesia</a></p>' if twee_talen else '') + '</div></footer>')
+        manifest = '/manifest.webmanifest'
     return f'''<!doctype html>
-<html lang="nl">
+<html lang="{TK.TAAL}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -524,12 +592,13 @@ window.mzGroot=function(){{var g=d.classList.toggle('mzk-groot');try{{localStora
 window.mzThema=function(){{var dk=!d.classList.contains('moza-dark');d.classList.toggle('moza-dark',dk);try{{localStorage.setItem('moza-theme',dk?'dark':'light')}}catch(e){{}};var m=document.querySelector('meta[name=theme-color]');if(m)m.content=dk?'#17181D':'#1F3BD1'}}}})();</script>
 <title>{e(titel)}</title>
 <meta name="description" content="{e(omschrijving)}">
-<link rel="canonical" href="{SITE}{pad}">
+<link rel="canonical" href="{SITE}{pre}{pad}">
+{alt}
 <meta name="robots" content="{robots}">
 <meta name="google-site-verification" content="d_LFz6BhzOvggjPcIRrdEZJacTM0pHkf1FeWmQoROfk">
 <meta property="og:title" content="{e(titel)}">
 <meta property="og:description" content="{e(omschrijving)}">
-<meta property="og:url" content="{SITE}{pad}">
+<meta property="og:url" content="{SITE}{pre}{pad}">
 <meta property="og:site_name" content="Kabar Maluku Live">
 <meta property="og:type" content="website">
 <meta property="og:image" content="{SITE}{og}">
@@ -542,19 +611,18 @@ window.mzThema=function(){{var dk=!d.classList.contains('moza-dark');d.classList
 <link rel="stylesheet" href="/dorp.css?v={VERSIE}">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="manifest" href="/manifest.webmanifest">
+<link rel="manifest" href="{manifest}">
 <meta name="theme-color" content="#1F3BD1">
 <meta name="apple-mobile-web-app-title" content="{e(app_titel)}">
 {extra_head}{PLAUSIBLE}
 </head>
 <body>
-{MOZAKOP}
-{MZD}
-<header class="kop"><a class="merk" href="/" aria-label="Kabar Maluku Live, naar de startpagina"><span class="kb">KABAR<small aria-hidden="true"><span>M</span><span>A</span><span>L</span><span>U</span><span>K</span><span>U</span></small><span class="sr">Maluku</span><i></i></span><span class="lv">LIVE</span></a><span class="rechts"><button class="knop deelk" type="button" data-deel aria-label="Deel deze pagina">{ic("deel")}<span class="kt">Delen</span></button><a class="knop ander" href="/" aria-label="Ander dorp zoeken">{ICON_ZOEK}<span class="kt">Ander dorp</span></a></span></header>
+{'' if id_ else MOZAKOP}
+{'' if id_ else MZD}
+<header class="kop"><a class="merk" href="{pre}/" aria-label="{t('Kabar Maluku Live, naar de startpagina')}"><span class="kb">KABAR<small aria-hidden="true"><span>M</span><span>A</span><span>L</span><span>U</span><span>K</span><span>U</span></small><span class="sr">Maluku</span><i></i></span><span class="lv">LIVE</span></a><span class="rechts">{kop_rechts}</span></header>
 {body}
-<footer class="voet"><div class="w"><p class="pw">Kabar Maluku Live, powered by <a class="mz" href="https://www.moza.nu" aria-label="MOZA">MOZA</a></p><p>Voor, door en met Molukkers. Bekijk ook <a href="https://www.moza.nu/kaarten">alle kaarten</a> en <a href="https://www.moza.nu/lezen">het laatste nieuws</a> op moza.nu.</p>
-<p>Klopt er iets niet? <a href="https://www.moza.nu/contact">Laat het ons weten</a>.</p></div></footer>
-{onder_html(deel)}
+{voet}
+{onder_html(deel)}{TAAL_JS if twee_talen else ''}
 </body>
 </html>'''
 
@@ -578,36 +646,36 @@ def samenvatting(d, br, bv, wr, lu, nu):
     if bv and bv['gevoeld']:
         q = bv['gevoeld'][0]
         if q['mmi'] >= 4.5 and (nu - q['t'].astimezone(WIT)) < timedelta(days=3):
-            return (f'{tijd_nl(q["t"], nu)} was er een aardbeving die je in {naam} '
-                    f'<b>goed kon voelen</b>. Kijk hieronder hoe sterk.')
+            return t('{w} was er een aardbeving die je in {naam} <b>goed kon voelen</b>. Kijk hieronder hoe sterk.', w=tijd_nl(q["t"], nu), naam=naam)
     vers = [p for p in br if (nu - p['t'].astimezone(WIT)) < timedelta(hours=48)]
     if vers:
         p = vers[0]
-        waar = 'op de grond van het dorp' if p['binnen'] else 'vlak bij de grond van het dorp'
-        zin = (f'{tijd_nl(p["t"], nu)} zag de satelliet een brand {waar}, '
-               f'<b>{T.afstand(p["km"])}</b> naar {p["richting"]}.')
+        waar = t('op de grond van het dorp') if p['binnen'] else t('vlak bij de grond van het dorp')
+        zin = t('{w} zag de satelliet een brand {waar}, <b>{afst}</b> naar {richting}.',
+                w=tijd_nl(p["t"], nu), waar=waar, afst=T.afstand(p["km"]), richting=t(p["richting"]))
         if wr and wr.get('wrichting') is not None and (wr.get('wsnel') or 0) >= 5:
             naar = (wr['wrichting'] + 180) % 360
             x, y = km_xy(d['la'], d['lo'], p['la'], p['lo'])
             hoek = (math.degrees(math.atan2(x, y)) + 360) % 360
             verschil = abs((naar - hoek + 180) % 360 - 180)
             if verschil < 50:
-                zin += ' De wind blaast de rook vandaag <b>richting het dorp</b>.'
+                zin += t(' De wind blaast de rook vandaag <b>richting het dorp</b>.')
             elif verschil > 130:
-                zin += ' De wind blaast de rook vandaag <b>weg van het dorp</b>.'
+                zin += t(' De wind blaast de rook vandaag <b>weg van het dorp</b>.')
         return zin
     if lu and lu['vandaag']:
         l = T.lucht(lu['vandaag']['pm'])
         if l and l['code'] in ('ongezond', 'zeerongezond'):
-            return f'De lucht in {naam} is vandaag <b>ongezond</b> door rook. {l["advies"]}'
+            return t('De lucht in {naam} is vandaag <b>ongezond</b> door rook. {advies}', naam=naam, advies=l["advies"])
     if wr:
         heet = [x for x in wr['dagen'][:3] if T.hitte(x['tmax']) and T.hitte(x['tmax'])[0] == 'snikheet']
         if heet:
-            dagnaam = 'Vandaag' if heet[0]['t'].date() == nu.date() else ('Morgen' if heet[0]['t'].date() == (nu + timedelta(days=1)).date() else T.DAGEN[heet[0]['t'].weekday()].capitalize())
-            return f'{dagnaam} wordt het <b>snikheet</b> in {naam}. {T.HITTE_ADVIES}'
+            dagnaam = t('Vandaag') if heet[0]['t'].date() == nu.date() else (t('Morgen') if heet[0]['t'].date() == (nu + timedelta(days=1)).date() else T.dag(heet[0]['t'].weekday()))
+            return t('{dag} wordt het <b>snikheet</b> in {naam}. {advies}', dag=dagnaam, naam=naam, advies=t(T.HITTE_ADVIES))
     if br:
-        return f'Deze week zag de satelliet {"één keer" if len(br) == 1 else str(len(br)) + " keer"} brand in of rond {naam}. Niet in de afgelopen twee dagen.'
-    return f'Het is rustig rond {naam}. De satelliet zag de afgelopen week <b>geen brand</b> in of rond het dorp.'
+        return t('Deze week zag de satelliet {keer} brand in of rond {naam}. Niet in de afgelopen twee dagen.',
+                 keer=t('één keer') if len(br) == 1 else t('{n} keer', n=len(br)), naam=naam)
+    return t('Het is rustig rond {naam}. De satelliet zag de afgelopen week <b>geen brand</b> in of rond het dorp.', naam=naam)
 
 
 
@@ -657,14 +725,14 @@ def vliegveld_voor(d, eiland=None):
 def reis_tekst(d, soort, naam, km):
     """'33 km over de weg', 'met de boot, 40 km hemelsbreed' of (zonder route) 'N km hemelsbreed'."""
     if km < 2:
-        return 'vlakbij'
+        return t('vlakbij')
     r = ROUTES.get(d['code'], {}).get(soort)
     if r and r[0] == naam:
         if r[2]:
-            return f'met de boot, {round(km)} km hemelsbreed'
+            return t('met de boot, {km} km hemelsbreed', km=round(km))
         if r[1]:
-            return f'{rond(r[1])} km over de weg'
-    return f'{round(km)} km hemelsbreed'
+            return t('{km} km over de weg', km=rond(r[1]))
+    return t('{km} km hemelsbreed', km=round(km))
 
 
 def routes_berekenen(rows, kust):
@@ -718,21 +786,21 @@ def kort_blok(d, kust_dorp, eiland=None):
     tegels = []
     inw = d.get('inw')
     if inw and inw.get('n'):
-        tegels.append(('Mensen', f'{inw["n"]:,}'.replace(',', '.'), f'BPS, {inw["jaar"]}'))
+        tegels.append((t('Mensen'), f'{inw["n"]:,}'.replace(',', '.'), f'BPS, {inw["jaar"]}'))
     if inw and inw.get('km2'):
-        tegels.append(('Grond', rond(inw['km2'] / 0.00714), 'voetbalvelden groot'))
+        tegels.append((t('Grond'), rond(inw['km2'] / 0.00714), t('voetbalvelden groot')))
     h = d.get('hoogte')
     if h is not None:
-        waar = ('laag gelegen' if h < 60 else 'in de heuvels' if h < 300 else 'in de bergen')
-        tegels.append(('Hoogte', f'{rond(max(h, 1)) if h >= 50 else max(int(h), 1)} meter', waar))
+        waar = (t('laag gelegen') if h < 60 else t('in de heuvels') if h < 300 else t('in de bergen'))
+        tegels.append((t('Hoogte'), f'{rond(max(h, 1)) if h >= 50 else max(int(h), 1)} meter', waar))
     if eiland is not None:
         zkm = eiland.exterior.distance(Point(d['lo'], d['la'])) * 111.0
         if not eiland.contains(Point(d['lo'], d['la'])) or zkm <= 0.25:
-            tegels.append(('Zee', 'Aan zee', 'het dorp ligt aan de kust'))
-        elif T.afstand(zkm) == 'vlakbij':
-            tegels.append(('Zee', 'Vlakbij', 'de kust is dichtbij'))
+            tegels.append((t('Zee'), t('Aan zee'), t('het dorp ligt aan de kust')))
+        elif zkm < 0.4:
+            tegels.append((t('Zee'), t('Vlakbij'), t('de kust is dichtbij')))
         else:
-            tegels.append(('Zee', T.afstand(zkm).capitalize() if zkm <= 3 else f'{round(zkm)} km', 'tot de kust'))
+            tegels.append((t('Zee'), T.afstand(zkm).capitalize() if zkm <= 3 else f'{round(zkm)} km', t('tot de kust')))
     # alleen veerhavens op hetzelfde eiland (met wat ruimte voor steigers in zee)
     zelfde = eiland.buffer(0.015) if eiland is not None else None
     havens = sorted(((T.km_tussen(d['la'], d['lo'], a, b), n) for n, a, b in VEERHAVENS
@@ -743,53 +811,55 @@ def kort_blok(d, kust_dorp, eiland=None):
     else:
         stad, km = stad_voor(d, eiland)
         if not (d.get('kabnaam', '').startswith('Kota ') or km <= 10):  # dorp ligt al in of bij de stad
-            tegels.append(('Afstand tot stad', stad, reis_tekst(d, 'stad', stad, km)))
+            tegels.append((t('Afstand tot stad'), stad, reis_tekst(d, 'stad', stad, km)))
     v = vliegveld_voor(d, eiland)
     if v:
         vn, _, _, vkm = v
         m = re.match(r'^(.*) \((.*)\)$', vn)
         plaats, veld = (m.group(2), m.group(1)) if m else (vn, '')
         tekst = reis_tekst(d, 'vlieg', vn, vkm)
-        tegels.append(('Vliegveld', plaats, f'{veld}, {tekst}' if veld else tekst))
+        tegels.append((t('Vliegveld'), plaats, f'{veld}, {tekst}' if veld else tekst))
     if len(tegels) < 2:
         return ''
-    t = ''.join(f'<div class="tg"><span class="label">{e(l)}</span><b>{e(w)}</b><small>{e(sm)}</small></div>' for l, w, sm in tegels)
-    bron = (f'<p class="nb">Bron {"inwoners en grond" if inw.get("km2") else "inwoners"}: BPS, {e(inw["bron"])}.</p>' if inw else '')
-    return (f'<section class="overdorp" aria-labelledby="h-over"><p class="label">Over het dorp</p>'
-            f'<h2 id="h-over">{e(d["naam"])} in het kort</h2><div class="tegels">{t}</div>{bron}</section>')
+    tg = ''.join(f'<div class="tg"><span class="label">{e(l)}</span><b>{e(w)}</b><small>{e(sm)}</small></div>' for l, w, sm in tegels)
+    bron = (f'<p class="nb">{t("Bron inwoners en grond: BPS, {b}." if inw.get("km2") else "Bron inwoners: BPS, {b}.", b=e(inw["bron"]))}</p>' if inw else '')
+    return (f'<section class="overdorp" aria-labelledby="h-over"><p class="label">{t("Over het dorp")}</p>'
+            f'<h2 id="h-over">{t("{naam} in het kort", naam=e(d["naam"]))}</h2><div class="tegels">{tg}</div>{bron}</section>')
 
 def dorp_html(d, ctx, nu):
     naam = d['naam']
     br, bv, wr, lu, zz, nw = (ctx[k] for k in ('br', 'bv', 'wr', 'lu', 'zz', 'nw'))
-    groep = D.GROEPEN.get(d['groep'], '')
+    groep = t(D.GROEPEN.get(d['groep'], ''))
     delen = []
 
     # ---- hero
+    id_, pre = TK.TAAL == 'id', TK.pre()
     verschil = int((nu.utcoffset() - nu.astimezone(NL).utcoffset()).total_seconds() // 3600)
-    chips = [f'<div class="chip"><span class="label">In het dorp</span><b id="tijd">{nu:%H:%M}</b>'
-             f'<small>{verschil} uur later dan in Nederland</small></div>']
+    chips = [f'<div class="chip"><span class="label">{t("In het dorp")}</span><b id="tijd">{nu:%H:%M}</b>'
+             + ('<small>WIT</small></div>' if id_ else f'<small>{verschil} uur later dan in Nederland</small></div>')]
     if wr and wr.get('temp') is not None:
-        regent = wr['regenzin'].startswith('Regen tot') or wr['regenzin'].startswith('Regen de')
-        klein = wr['regenzin'] if regent else f'{T.weer_woord(wr["code"])}. {wr["regenzin"]}'
-        chips.append(f'<div class="chip"><span class="label">Weer nu</span><b>{round(wr["temp"])}°</b>'
+        regent = wr['regenzin'][0] in ('tot', 'nu')
+        rz = regen_tekst(wr['regenzin'])
+        klein = rz if regent else f'{T.weer_woord(wr["code"])}. {rz}'
+        chips.append(f'<div class="chip"><span class="label">{t("Weer nu")}</span><b>{round(wr["temp"])}°</b>'
                      f'<small>{e(klein)}</small></div>')
     zon = ''
     if wr and wr['dagen'] and wr['dagen'][0].get('op'):
         z0 = wr['dagen'][0]
         nl = lambda t: t.astimezone(NL).strftime('%H:%M')
         zon = (f'<div class="zon"><span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 18h18M7 18a5 5 0 0110 0M12 4v4M5.6 9.6l1.8 1.8M18.4 9.6l-1.8 1.8M9 6l3-3 3 3"/></svg>'
-               f'<b>Zon op {z0["op"]:%H:%M}</b><small>in Nederland {nl(z0["op"])}</small></span>'
+               f'<b>{t("Zon op {t}", t=z0["op"].strftime("%H:%M"))}</b>' + ('' if id_ else f'<small>in Nederland {nl(z0["op"])}</small>') + '</span>'
                f'<span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 18h18M7 18a5 5 0 0110 0M12 3v5M5.6 9.6l1.8 1.8M18.4 9.6l-1.8 1.8M9 5l3 3 3-3"/></svg>'
-               f'<b>Zon onder {z0["onder"]:%H:%M}</b><small>in Nederland {nl(z0["onder"])}</small></span></div>')
+               f'<b>{t("Zon onder {t}", t=z0["onder"].strftime("%H:%M"))}</b>' + ('' if id_ else f'<small>in Nederland {nl(z0["onder"])}</small>') + '</span></div>')
     samen = samenvatting(d, br, bv, wr, lu, nu)
     delen.append(f'''<section class="hero" aria-labelledby="h1"><div class="w">
-<nav class="kruim" aria-label="Kruimelpad"><a class="kr-pc" href="/">{ic("home")}Kabar</a><span class="kr-s kr-pc" aria-hidden="true">›</span><a href="/eiland/{d["groep"]}/"><span class="kr-mob">{ic("terug")}</span>{e(groep)}</a><span class="kr-s" aria-hidden="true">›</span><a href="/eiland/{d["groep"]}/#{kec_id(d["kec"])}">{e(d["kec"])}</a><span class="kr-s kr-pc" aria-hidden="true">›</span><span class="kr-pc kr-nu" aria-current="page">{e(naam)}</span></nav>
+<nav class="kruim" aria-label="{t('Kruimelpad')}"><a class="kr-pc" href="{pre}/">{ic("home")}Kabar</a><span class="kr-s kr-pc" aria-hidden="true">›</span><a href="{pre}/eiland/{d["groep"]}/"><span class="kr-mob">{ic("terug")}</span>{e(groep)}</a><span class="kr-s" aria-hidden="true">›</span><a href="{pre}/eiland/{d["groep"]}/#{kec_id(d["kec"])}">{e(d["kec"])}</a><span class="kr-s kr-pc" aria-hidden="true">›</span><span class="kr-pc kr-nu" aria-current="page">{e(naam)}</span></nav>
 <h1 id="h1">{e(naam)}</h1>
-<button type="button" class="pin" data-pin data-s="{d["slug"]}" data-n="{e(naam)}" data-c="{e(d["kec"])}" aria-pressed="false"><span class="pin-i" aria-hidden="true">☆</span><span class="pin-t">Bewaar dit dorp</span></button>
-<p class="intro">Brand, weer, zee en aardbevingen bij {e(naam)}{" (officieel " + e(d["officieel"]) + ")" if d["officieel"] != naam else ""} in {e(d["kec"])}, {e(d["kabnaam"])}. Elk uur bijgewerkt.</p>
+<button type="button" class="pin" data-pin data-s="{d["slug"]}" data-n="{e(naam)}" data-c="{e(d["kec"])}" aria-pressed="false"><span class="pin-i" aria-hidden="true">☆</span><span class="pin-t">{t('Bewaar dit dorp')}</span></button>
+<p class="intro">{t('Brand, weer, zee en aardbevingen bij {naam}{off} in {kec}, {kab}. Elk uur bijgewerkt.', naam=e(naam), off=t(' (officieel {o})', o=e(d["officieel"])) if d["officieel"] != naam else "", kec=e(d["kec"]), kab=e(d["kabnaam"]))}</p>
 <div class="chips">{''.join(chips)}</div>{zon}
 <p class="samen">{samen}</p>
-<p class="accent">zo staat het er nu voor</p>
+<p class="accent">{t('zo staat het er nu voor')}</p>
 </div></section>
 <div class="streep"><span></span><span></span><span></span></div>''')
 
@@ -797,21 +867,21 @@ def dorp_html(d, ctx, nu):
     # ---- brand
     lijst = ''
     for i, p in enumerate(br[:9], 1):
-        t = p['t'].astimezone(WIT)
-        kop = f'{tijd_nl(t, nu)} · {T.afstand(p["km"])} naar {p["richting"]}'
+        tw = p['t'].astimezone(WIT)
+        kop = t('{w} · {afst} naar {richting}', w=tijd_nl(tw, nu), afst=T.afstand(p["km"]), richting=t(p["richting"]))
         lijst += (f'<li class="{"eerste" if i == 1 else ""}"><span class="nr" style="background:{"#FF4D2E" if i == 1 else "#FF7AB6"}">{i}</span>'
                   f'<span><b>{e(kop)}</b><span class="t">{e(T.brand_plek(p))} {e(T.brand_zekerheid(p))}</span></span></li>')
     if br:
-        brandkop = 'Waar brandt het?'
+        brandkop = t('Waar brandt het?')
         intro = ''
     else:
-        brandkop = 'Is er brand?'
-        intro = f'<div class="blok"><p class="groot">De satelliet zag de afgelopen week geen brand in of rond {e(naam)}.</p></div>'
+        brandkop = t('Is er brand?')
+        intro = f'<div class="blok"><p class="groot">{t("De satelliet zag de afgelopen week geen brand in of rond {naam}.", naam=e(naam))}</p></div>'
     svg = kaart_svg(d, None, ctx['buren'], ctx['kust'], br, wr.get('wrichting') if wr else None)
     m.append(f'''<section aria-labelledby="h-brand">
-<p class="label"><span class="tag" style="background:var(--rood)">Brand</span></p>
+<p class="label"><span class="tag" style="background:var(--rood)">{t('Brand')}</span></p>
 <h2 id="h-brand">{brandkop}</h2>{intro}
-<figure class="kaart">{svg}<figcaption>Het blauwe vlak is de grond van {e(naam)}. {'Het zwarte blokje is het dorp.' if d['echt'] else 'Het zwarte blokje is het midden van de grond van het dorp. Afstanden zijn vanaf dat punt.'} Je ziet alles tot ongeveer 5 kilometer rondom.</figcaption></figure>
+<figure class="kaart">{svg}<figcaption>{t('Het blauwe vlak is de grond van {naam}.', naam=e(naam))} {t('Het zwarte blokje is het dorp.') if d['echt'] else t('Het zwarte blokje is het midden van de grond van het dorp. Afstanden zijn vanaf dat punt.')} {t('Je ziet alles tot ongeveer 5 kilometer rondom.')}</figcaption></figure>
 {f'<ol class="lijst">{lijst}</ol>' if lijst else ''}
 </section>''')
 
@@ -821,30 +891,30 @@ def dorp_html(d, ctx, nu):
         for x in wr['dagen'][:3]:
             h = T.hitte(x['tmax'])
             heet = h and h[0] == 'snikheet'
-            dn = 'Vandaag' if x['t'].date() == nu.date() else ('Morgen' if x['t'].date() == (nu + timedelta(days=1)).date() else T.DAGEN[x['t'].weekday()].capitalize())
+            dn = t('Vandaag') if x['t'].date() == nu.date() else (t('Morgen') if x['t'].date() == (nu + timedelta(days=1)).date() else T.dag(x['t'].weekday()))
             woord = h[1] if h and h[1] else T.weer_woord(x['code'])
             cellen += f'<span class="{"heet" if heet else ""}">{dn}<b class="g">{round(x["tmax"])}°</b>{e(woord)}</span>'
             if heet and not kopzin:
-                kopzin = f'{dn} wordt het snikheet.'
+                kopzin = t('{dag} wordt het snikheet.', dag=dn)
         rijen = ''
         for x in wr['dagen'][3:7]:
             h = T.hitte(x['tmax'])
             woord = T.weer_woord(x['code'])
             laag = f' / {round(x["tmin"])}°' if x.get('tmin') is not None else ''
-            kans = f'{int(round(x["kans"], -1))}% kans op regen' if x.get('kans') is not None and x['kans'] >= 20 else 'Droog'
-            rijen += (f'<li><span class="dg">{T.DAGEN[x["t"].weekday()].capitalize()} {x["t"].day} {T.MAANDEN[x["t"].month - 1][:3]}</span>'
+            kans = t('{p}% kans op regen', p=int(round(x["kans"], -1))) if x.get('kans') is not None and x['kans'] >= 20 else None
+            rijen += (f'<li><span class="dg">{T.dag(x["t"].weekday())} {x["t"].day} {T.maand(x["t"].month - 1)[:3]}</span>'
                       f'<span class="tp"><b>{round(x["tmax"])}°</b>{laag}</span>'
-                      f'<span class="ww">{e(woord)}{" · " + e(h[1].lower()) if h and h[1] else ""} · {kans.lower() if kans != "Droog" else "droog"}</span></li>')
-        week = f'<p class="wk">De dagen daarna</p><ul class="week">{rijen}</ul>' if rijen else ''
+                      f'<span class="ww">{e(woord)}{" · " + e(h[1].lower()) if h and h[1] else ""} · {kans.lower() if kans else t("droog")}</span></li>')
+        week = f'<p class="wk">{t("De dagen daarna")}</p><ul class="week">{rijen}</ul>' if rijen else ''
         if kopzin:
-            tekst = f'<p class="groot">{kopzin}</p><p>{e(T.HITTE_ADVIES)}</p>'
+            tekst = f'<p class="groot">{kopzin}</p><p>{e(t(T.HITTE_ADVIES))}</p>'
             cls = 'blok schaduw-rood'
         else:
-            tekst = f'<p class="groot">{e(T.weer_woord(wr["dagen"][0]["code"]))} vandaag, {round(wr["dagen"][0]["tmax"])} graden.</p>'
+            tekst = f'<p class="groot">{t("{woord} vandaag, {g} graden.", woord=e(T.weer_woord(wr["dagen"][0]["code"])), g=round(wr["dagen"][0]["tmax"]))}</p>'
             cls = 'blok'
         m.append(f'''<section aria-labelledby="h-weer">
-<p class="label"><span class="tag" style="background:var(--geel)">Weer</span></p>
-<h2 id="h-weer">Wat voor weer wordt het?</h2>
+<p class="label"><span class="tag" style="background:var(--geel)">{t('Weer')}</span></p>
+<h2 id="h-weer">{t('Wat voor weer wordt het?')}</h2>
 <div class="{cls}">{tekst}<div class="drie">{cellen}</div>{week}</div></section>''')
 
     # ---- lucht
@@ -855,19 +925,19 @@ def dorp_html(d, ctx, nu):
         for x in toon:
             ll = T.lucht(x['pm'])
             if x['d'] == nu.date():
-                lab, cls = 'nu', 'nu'
+                lab, cls = t('nu'), 'nu'
             elif x['d'] > nu.date():
-                lab, cls = 'morgen', 'later'
+                lab, cls = t('morgen'), 'later'
             else:
-                lab, cls = T.DAG_KORT[x['d'].weekday()], ''
+                lab, cls = T.dag_kort(x['d'].weekday()), ''
             vakjes += f'<span class="{cls}"><i class="c-{ll["code"]}" title="{ll["label"]}"></i>{lab}</span>'
         if l:
             m.append(f'''<section aria-labelledby="h-lucht">
-<p class="label"><span class="tag" style="background:var(--roze)">Lucht</span></p>
-<h2 id="h-lucht">Is de lucht gezond?</h2>
+<p class="label"><span class="tag" style="background:var(--roze)">{t('Lucht')}</span></p>
+<h2 id="h-lucht">{t('Is de lucht gezond?')}</h2>
 <div class="blok"><p class="groot">{e(l["zin"])}</p>{f'<p>{e(l["advies"])}</p>' if l['advies'] else ''}
-<div class="dagen" role="img" aria-label="Hoe gezond de lucht was, per dag">{vakjes}</div>
-<div class="leg"><span><i class="c-gezond"></i>Helder</span><span><i class="c-rook"></i>Lichte waas</span><span><i class="c-ongezond"></i>Rook</span><span><i class="c-zeerongezond"></i>Dikke rook</span></div>
+<div class="dagen" role="img" aria-label="{t('Hoe gezond de lucht was, per dag')}">{vakjes}</div>
+<div class="leg"><span><i class="c-gezond"></i>{t('Helder')}</span><span><i class="c-rook"></i>{t('Lichte waas')}</span><span><i class="c-ongezond"></i>{t('Rook')}</span><span><i class="c-zeerongezond"></i>{t('Dikke rook')}</span></div>
 </div></section>''')
 
     # ---- zee (alleen voor dorpen aan de kust)
@@ -877,51 +947,53 @@ def dorp_html(d, ctx, nu):
         cellen = ''
         for x, n in zip(z, niv):
             ww = T.wind(x['wind'])
-            cellen += (f'<span class="{"hoog" if n >= 2 else ""}">{x["naam"]}<b>{T.golven(x["golf"])}</b>'
+            cellen += (f'<span class="{"hoog" if n >= 2 else ""}">{t(x["naam"])}<b>{T.golven(x["golf"])}</b>'
                        f'{T.golf_lichaam(x["golf"])}<br>{ww or ""}</span>')
         slechtst, best = max(niv), min(niv)
-        deel = lambda n: [x['naam'].lower() for x, v in zip(z, niv) if v == n]
+        deel = lambda n: [t(x['naam']).lower() for x, v in zip(z, niv) if v == n]
         if slechtst == best:
-            kop = {0: 'Morgen is het de hele dag rustig op zee.', 1: 'Morgen staan er de hele dag wat golven.',
-                   2: 'Morgen is het de hele dag onrustig op zee.', 3: 'Morgen is het de hele dag zwaar weer op zee.'}[best]
+            kop = t({0: 'Morgen is het de hele dag rustig op zee.', 1: 'Morgen staan er de hele dag wat golven.',
+                     2: 'Morgen is het de hele dag onrustig op zee.', 3: 'Morgen is het de hele dag zwaar weer op zee.'}[best])
         else:
             rustig, woelig = deel(best)[0], deel(slechtst)[0]
-            kop = f"Morgen is de zee ’s {rustig}s het rustigst. ’s {woelig.capitalize()}s wordt het {'onrustig' if slechtst >= 2 else 'wat woeliger'}."
+            kop = t('Morgen is de zee ’s {rustig}s het rustigst. ’s {woelig}s wordt het {hoe}.',
+                    rustig=rustig, woelig=woelig.capitalize() if not id_ else woelig, hoe=t('onrustig') if slechtst >= 2 else t('wat woeliger'))
         vb = T.oversteek_voorbeeld(d)
         if slechtst == best:
-            vis, over = e(T.VISSER[best]), e(T.OVERSTEEK[best])
+            vis, over = e(t(T.VISSER[best])), e(t(T.OVERSTEEK[best]))
         else:
             r, w = deel(best)[0], deel(slechtst)[0]
-            vis = f"<br>’s {r.capitalize()}s: {e(T.VISSER[best])}<br>’s {w.capitalize()}s: {e(T.VISSER[slechtst])}"
-            over = f"<br>’s {r.capitalize()}s: {e(T.OVERSTEEK[best])}<br>’s {w.capitalize()}s: {e(T.OVERSTEEK[slechtst])}"
+            sr, sw = t('’s {deel}s', deel=r.capitalize() if not id_ else r), t('’s {deel}s', deel=w.capitalize() if not id_ else w)
+            vis = f"<br>{sr}: {e(t(T.VISSER[best]))}<br>{sw}: {e(t(T.VISSER[slechtst]))}"
+            over = f"<br>{sr}: {e(t(T.OVERSTEEK[best]))}<br>{sw}: {e(t(T.OVERSTEEK[slechtst]))}"
         m.append(f'''<section aria-labelledby="h-zee">
-<p class="label"><span class="tag" style="background:var(--blauw);color:#fff">Zee</span></p>
-<h2 id="h-zee">Hoe is de zee morgen?</h2>
+<p class="label"><span class="tag" style="background:var(--blauw);color:#fff">{t('Zee')}</span></p>
+<h2 id="h-zee">{t('Hoe is de zee morgen?')}</h2>
 <div class="blok"><p class="groot">{e(kop)}</p>
 <div class="drie">{cellen}</div>
-<p><b>Voor vissers met een kleine boot:</b> {vis}</p>
-<p><b>Op bezoek en wil je oversteken of eiland-hoppen met de speedboot of ferry{', ' + e(vb) if vb else ''}?</b> {over}</p>
+<p><b>{t('Voor vissers met een kleine boot:')}</b> {vis}</p>
+<p><b>{t('Op bezoek en wil je oversteken of eiland-hoppen met de speedboot of ferry{vb}?', vb=', ' + e(vb) if vb else '')}</b> {over}</p>
 </div></section>''')
 
     # ---- bevingen
     if bv is not None:
         if bv['gevoeld']:
             q = bv['gevoeld'][0]
-            t = q['t'].astimezone(WIT)
+            tw = q['t'].astimezone(WIT)
             g = T.beving_gevoel(q['mmi'])
-            kop = f'De laatste beving die je in het dorp kon voelen, was {tijd_nl(t, nu, hoofd=False)}.'
+            kop = t('De laatste beving die je in het dorp kon voelen, was {w}.', w=tijd_nl(tw, nu, hoofd=False))
             n = bv['perjaar']
-            normaal = (f'<p class="let"><b>Dat is normaal.</b> Rond {e(naam)} voel je zo\'n beving {T.hoe_vaak(n)}.'
-                       if n >= 4 else f'<p class="let">Bevingen die je voelt, zijn hier niet zo vaak: {T.hoe_vaak(n)}.')
+            normaal = ('<p class="let">' + t("<b>Dat is normaal.</b> Rond {naam} voel je zo'n beving {hoe}.", naam=e(naam), hoe=T.hoe_vaak(n))
+                       if n >= 4 else '<p class="let">' + t('Bevingen die je voelt, zijn hier niet zo vaak: {hoe}.', hoe=T.hoe_vaak(n)))
             if bv['klein'] >= 20:
-                normaal += ' Kleine bevingen die je niet voelt, zijn er veel vaker.'
+                normaal += t(' Kleine bevingen die je niet voelt, zijn er veel vaker.')
             normaal += '</p>'
             inhoud = f'<p class="groot">{e(kop)}</p><p>{e(g[1])}</p>{normaal}'
         else:
-            inhoud = f'<p class="groot">Het afgelopen jaar was er geen beving die je in {e(naam)} kon voelen.</p>'
+            inhoud = f'<p class="groot">{t("Het afgelopen jaar was er geen beving die je in {naam} kon voelen.", naam=e(naam))}</p>'
         m.append(f'''<section aria-labelledby="h-beving">
-<p class="label"><span class="tag" style="background:#111;color:#fff">Aardbevingen</span></p>
-<h2 id="h-beving">Heeft de aarde gebeefd?</h2>
+<p class="label"><span class="tag" style="background:#111;color:#fff">{t('Aardbevingen')}</span></p>
+<h2 id="h-beving">{t('Heeft de aarde gebeefd?')}</h2>
 <div class="blok">{inhoud}</div></section>''')
 
     # ---- bos
@@ -939,49 +1011,58 @@ def dorp_html(d, ctx, nu):
             staaf += f'<i class="{"max" if mx and v == mx else ""}" style="height:{hgt:.0f}%" title="{y}"></i>'
         topjaar = max(jaren, key=jaren.get) if jaren else None
         if deel and bos['verlies'] >= 1:
-            kop = f'Sinds 2001 is ongeveer {deel} stukken bos rond {e(naam)} verdwenen.' if not deel.startswith('de helft') else f'Sinds 2001 is ongeveer de helft van het bos rond {e(naam)} verdwenen.'
-            tekst = f'Dat is zo groot als {T.voetbalvelden(bos["verlies"])}.' + (f' Het meeste verdween in {topjaar}.' if topjaar else '')
+            kop = (t('Sinds 2001 is ongeveer {deel} stukken bos rond {naam} verdwenen.', deel=deel, naam=e(naam)) if round(1 / frac) != 2
+                   else t('Sinds 2001 is ongeveer de helft van het bos rond {naam} verdwenen.', naam=e(naam)))
+            tekst = t('Dat is zo groot als {v}.', v=T.voetbalvelden(bos["verlies"])) + (t(' Het meeste verdween in {j}.', j=topjaar) if topjaar else '')
         else:
-            kop, tekst = f'Het bos rond {e(naam)} is sinds 2001 bijna niet kleiner geworden.', ''
+            kop, tekst = t('Het bos rond {naam} is sinds 2001 bijna niet kleiner geworden.', naam=e(naam)), ''
         m.append(f'''<section aria-labelledby="h-bos">
-<p class="label"><span class="tag" style="background:var(--geel)">Bos</span></p>
-<h2 id="h-bos">Hoeveel bos is er nog?</h2>
+<p class="label"><span class="tag" style="background:var(--geel)">{t('Bos')}</span></p>
+<h2 id="h-bos">{t('Hoeveel bos is er nog?')}</h2>
 <div class="blok warm"><p class="groot">{kop}</p>{f'<p>{e(tekst)}</p>' if tekst else ''}
-{f'<div class="staaf" role="img" aria-label="Hoeveel bos er per jaar verdween">{staaf}</div><div class="as"><span>{reeks[0]}</span><span>Hoe hoger, hoe meer bos weg</span><span>{reeks[-1]}</span></div>' if jaren and mx else ''}
+{f'<div class="staaf" role="img" aria-label="{t("Hoeveel bos er per jaar verdween")}">{staaf}</div><div class="as"><span>{reeks[0]}</span><span>{t("Hoe hoger, hoe meer bos weg")}</span><span>{reeks[-1]}</span></div>' if jaren and mx else ''}
 </div></section>''')
 
     # ---- nieuws
-    if nw:
+    if nw and not id_:
         kaartjes = ''.join(f'<a class="nieuws" href="{e(x["url"])}"><span>{x["t"].astimezone(WIT).day} {T.MAANDEN[x["t"].astimezone(WIT).month - 1]} {x["t"].astimezone(WIT).year}</span><b>{e(html.unescape(x["titel"]))}</b></a>' for x in nw)
         m.append(f'<section aria-labelledby="h-nieuws"><h2 id="h-nieuws">Nieuws over {e(naam)}</h2>{kaartjes}</section>')
 
     # ---- buurdorpen
     if ctx['buurlinks']:
-        rijen = ''.join(f'<a class="rij" href="/{b["slug"]}/"><b>{e(b["naam"])}<small>{e(b["kec"])} · {km_kort(b["km"])}</small></b>{"<span class=badge>BRAND</span>" if b.get("brand") else "<span aria-hidden=true>→</span>"}</a>' for b in ctx['buurlinks'])
-        m.append(f'<section aria-labelledby="h-buren"><h2 id="h-buren">Dorpen in de buurt</h2><div class="verder">{rijen}</div>'
-                 f'<a href="/eiland/{d["groep"]}/">Alle dorpen in {e(groep)} →</a></section>')
+        badge = f'<span class=badge>{t("BRAND")}</span>'
+        rijen = ''.join(f'<a class="rij" href="{pre}/{b["slug"]}/"><b>{e(b["naam"])}<small>{e(b["kec"])} · {km_kort(b["km"])}</small></b>{badge if b.get("brand") else "<span aria-hidden=true>→</span>"}</a>' for b in ctx['buurlinks'])
+        m.append(f'<section aria-labelledby="h-buren"><h2 id="h-buren">{t("Dorpen in de buurt")}</h2><div class="verder">{rijen}</div>'
+                 f'<a href="{pre}/eiland/{d["groep"]}/">{t("Alle dorpen in {g} →", g=e(groep))}</a></section>')
     al = {b['code'] for b in ctx['buurlinks']}
     rest = [x for x in ctx.get('zelfde_kec') or [] if x['code'] not in al]
     if rest:
-        namen = ''.join(f'<li><a href="/{x["slug"]}/">{e(x["naam"])}</a></li>' for x in rest)
-        m.append(f'<section aria-labelledby="h-kec"><h2 id="h-kec">Meer dorpen in {e(d["kec"])}</h2>'
+        namen = ''.join(f'<li><a href="{pre}/{x["slug"]}/">{e(x["naam"])}</a></li>' for x in rest)
+        m.append(f'<section aria-labelledby="h-kec"><h2 id="h-kec">{t("Meer dorpen in {kec}", kec=e(d["kec"]))}</h2>'
                  f'<ul class="namen">{namen}</ul></section>')
 
-    wa_tekst = f'Hoe is het nu in {d["naam"]}? Brand, weer, zee en aardbevingen, ieder uur bijgewerkt.\n{SITE}/{d["slug"]}/?utm_source=whatsapp&utm_medium=deel'
-    m.append(f'<section class="deelblok"><h2>Familie in {e(naam)}?</h2><p>Stuur deze pagina door. Dan weet iedereen waar je kunt kijken als er iets gebeurt.</p>'
-             f'<div class="dknop"><a class="wa" href="https://wa.me/?text={quote(wa_tekst)}" target="_blank" rel="noopener">{ic("wa")}Deel via WhatsApp</a>'
-             f'<button type="button" class="nog" data-deel>{ic("deel")}Andere manier</button></div></section>')
+    wa_tekst = t('Hoe is het nu in {naam}? Brand, weer, zee en aardbevingen, ieder uur bijgewerkt.', naam=d["naam"]) + f'\n{SITE}{pre}/{d["slug"]}/?utm_source=whatsapp&utm_medium=deel'
+    wa_id = ''
+    if not id_:  # voor familie in Maluku: dezelfde pagina in het Indonesisch sturen
+        TK.zet('id')
+        tid = t('Hoe is het nu in {naam}? Brand, weer, zee en aardbevingen, ieder uur bijgewerkt.', naam=d["naam"]) + f'\n{SITE}/id/{d["slug"]}/?utm_source=whatsapp&utm_medium=deel-id'
+        TK.zet('nl')
+        wa_id = (f'<a class="nog" href="https://wa.me/?text={quote(tid)}" target="_blank" rel="noopener" data-ev="Kabar: delen in het Indonesisch">'
+                 f'{ic("wa")}In het Indonesisch sturen</a>')
+    m.append(f'<section class="deelblok"><h2>{t("Familie in {naam}?", naam=e(naam))}</h2><p>{t("Stuur deze pagina door. Dan weet iedereen waar je kunt kijken als er iets gebeurt.")}</p>'
+             f'<div class="dknop"><a class="wa" href="https://wa.me/?text={quote(wa_tekst)}" target="_blank" rel="noopener">{ic("wa")}{t("Deel via WhatsApp")}</a>'
+             f'<button type="button" class="nog" data-deel>{ic("deel")}{t("Andere manier")}</button>{wa_id}</div></section>')
     # ---- zet je dorp vast (op het beginscherm van de telefoon)
-    m.append(f'''<section class="vast" aria-labelledby="h-vast"><h2 id="h-vast">Zet {e(naam)} vast op je telefoon</h2>
-<p>Dan staat {e(naam)} als icoontje tussen je apps en kijk je met één tik hoe het daar is.</p>
+    m.append(f'''<section class="vast" aria-labelledby="h-vast"><h2 id="h-vast">{t('Zet {naam} vast op je telefoon', naam=e(naam))}</h2>
+<p>{t('Dan staat {naam} als icoontje tussen je apps en kijk je met één tik hoe het daar is.', naam=e(naam))}</p>
 <script>(function(){{var u=navigator.userAgent,h=document.documentElement;h.classList.add(/iPhone|iPad|iPod/.test(u)||(/Macintosh/.test(u)&&'ontouchend' in document)?'is-ios':/Android/.test(u)?'is-and':'is-pc')}})();</script>
-<details class="vast-uitleg"><summary>Zo doe je het</summary>
-<div class="vast-ios"><p><b>iPhone (Safari)</b></p><ol><li>Tik onderaan op de deelknop (het vierkantje met het pijltje omhoog).</li><li>Kies <b>Zet op beginscherm</b>.</li><li>Tik op <b>Voeg toe</b>.</li></ol></div>
-<div class="vast-and"><p><b>Android (Chrome)</b></p><ol><li>Tik rechtsboven op de drie puntjes.</li><li>Kies <b>Toevoegen aan startscherm</b>.</li><li>Tik op <b>Toevoegen</b>.</li></ol></div>
-<div class="vast-pc"><p><b>Computer</b></p><p>Maak een bladwijzer: druk op Ctrl+D (Windows) of Cmd+D (Mac).</p></div>
+<details class="vast-uitleg"><summary>{t('Zo doe je het')}</summary>
+<div class="vast-ios"><p><b>iPhone (Safari)</b></p><ol><li>{t('Tik onderaan op de deelknop (het vierkantje met het pijltje omhoog).')}</li><li>{t('Kies <b>Zet op beginscherm</b>.')}</li><li>{t('Tik op <b>Voeg toe</b>.')}</li></ol></div>
+<div class="vast-and"><p><b>Android (Chrome)</b></p><ol><li>{t('Tik rechtsboven op de drie puntjes.')}</li><li>{t('Kies <b>Toevoegen aan startscherm</b>.')}</li><li>{t('Tik op <b>Toevoegen</b>.')}</li></ol></div>
+<div class="vast-pc"><p><b>{t('Computer')}</b></p><p>{t('Maak een bladwijzer: druk op Ctrl+D (Windows) of Cmd+D (Mac).')}</p></div>
 </details></section>''')
-    # ---- blijf op de hoogte: WhatsApp-kanaal en nieuwsbrief van MOZA
-    m.append('<section class="hoogte" aria-labelledby="h-hoogte"><h2 id="h-hoogte">Blijf op de hoogte</h2><div class="hoogte-rij">'
+    # ---- blijf op de hoogte: WhatsApp-kanaal en nieuwsbrief van MOZA (alleen Nederlands)
+    if not id_: m.append('<section class="hoogte" aria-labelledby="h-hoogte"><h2 id="h-hoogte">Blijf op de hoogte</h2><div class="hoogte-rij">'
              '<a class="hoogte-k wa-k" href="https://whatsapp.com/channel/0029VaA4StPIt5rs5FadnH1d" target="_blank" rel="noopener" data-ev="Kabar: WhatsApp-kanaal">'
              f'{ic("wa")}<span><b>Volg MOZA op WhatsApp</b>Het laatste Molukse nieuws op je telefoon. Gebeurt er iets groots op de Molukken, dan lees je het daar.</span></a>'
              '<a class="hoogte-k nb-k" href="https://www.moza.nu/lezen?utm_source=kabar&amp;utm_medium=nieuwsbrief#mzf-nb" data-ev="Kabar: nieuwsbrief">'
@@ -989,26 +1070,26 @@ def dorp_html(d, ctx, nu):
              '</div></section>')
     # ---- meer op MOZA
     laatst = [x for x in (ctx.get('laatst') or []) if x['url'] not in {y['url'] for y in (nw or [])}][:3]
-    if laatst:
+    if laatst and not id_:
         kaartjes = ''.join(f'<a class="nieuws" href="{e(x["url"])}?utm_source=kabar"><span>{x["t"].astimezone(WIT).day} {T.MAANDEN[x["t"].astimezone(WIT).month - 1]}</span><b>{e(html.unescape(x["titel"]))}</b></a>' for x in laatst)
         m.append(f'<section aria-labelledby="h-moza"><p class="label"><span class="tag" style="background:#111;color:#fff">MOZA</span></p><h2 id="h-moza">Nieuw op MOZA</h2>{kaartjes}'
                  f'<a href="https://www.moza.nu/lezen?utm_source=kabar">Meer verhalen op moza.nu →</a></section>')
 
     m.append(f'''<section class="weten" aria-labelledby="h-weten">
-<p class="label" id="h-weten">Goed om te weten</p>
-<p>De satelliet ziet van bovenaf waar het heet is. Meestal is dat brand, maar niet altijd. Twijfel je? Bel of app je familie.</p>
-<p>De grens van het dorp op de kaart is ongeveer. Hij zegt niets over van wie de grond is.</p>
-<p>Bijgewerkt op {nu.day} {T.MAANDEN[nu.month - 1]} om {nu:%H:%M} (tijd in het dorp). Bronnen: NASA FIRMS (brand), Open-Meteo (weer, lucht en zee), USGS (aardbevingen){', Global Forest Watch (bos)' if bos else ''}, grenzen: wilayah_boundaries.</p>
+<p class="label" id="h-weten">{t('Goed om te weten')}</p>
+<p>{t('De satelliet ziet van bovenaf waar het heet is. Meestal is dat brand, maar niet altijd. Twijfel je? Bel of app je familie.')}</p>
+<p>{t('De grens van het dorp op de kaart is ongeveer. Hij zegt niets over van wie de grond is.')}</p>
+<p>{t('Bijgewerkt op {d} {m} om {u} (tijd in het dorp). Bronnen: NASA FIRMS (brand), Open-Meteo (weer, lucht en zee), USGS (aardbevingen){bos}, grenzen: wilayah_boundaries.', d=nu.day, m=T.maand(nu.month - 1), u=nu.strftime('%H:%M' if not id_ else '%H.%M'), bos=t(', Global Forest Watch (bos)') if bos else '')}</p>
 </section>''')
     delen.append('<main class="w">' + ''.join(m) + '</main>')
 
     plek = T.plek_kort(d)
-    titel = f'{naam} ({plek}): brand, weer en aardbevingen | Kabar Maluku Live'
-    omschrijving = (f'Is er brand bij {naam} op {plek}? Zie elk uur wat er speelt: brand, weer voor 7 dagen, '
-                    f'zee, lucht en aardbevingen. {d["kec"]}, {d["kabnaam"]}.')
-    url = f'{SITE}/{d["slug"]}/'
+    titel = t('{naam} ({plek}): brand, weer en aardbevingen | Kabar Maluku Live', naam=naam, plek=plek)
+    omschrijving = t('Is er brand bij {naam} op {plek}? Zie elk uur wat er speelt: brand, weer voor 7 dagen, zee, lucht en aardbevingen. {kec}, {kab}.',
+                     naam=naam, plek=plek, kec=d["kec"], kab=d["kabnaam"])
+    url = f'{SITE}{pre}/{d["slug"]}/'
     graaf = {'@context': 'https://schema.org', '@graph': [
-        {'@type': 'WebPage', '@id': url, 'url': url, 'name': titel, 'description': omschrijving, 'inLanguage': 'nl',
+        {'@type': 'WebPage', '@id': url, 'url': url, 'name': titel, 'description': omschrijving, 'inLanguage': TK.TAAL,
          'dateModified': nu.isoformat(), 'isPartOf': {'@id': SITE + '/#site'}, 'about': {'@id': url + '#plaats'},
          'breadcrumb': {'@id': url + '#kruim'}},
         {'@type': 'Place', '@id': url + '#plaats', 'name': naam,
@@ -1017,17 +1098,17 @@ def dorp_html(d, ctx, nu):
          'address': {'@type': 'PostalAddress', 'addressLocality': d['kec'], 'addressRegion': d['prov'], 'addressCountry': 'ID'},
          'containedInPlace': {'@type': 'AdministrativeArea', 'name': f'{d["kabnaam"]}, {d["prov"]}'}},
         {'@type': 'BreadcrumbList', '@id': url + '#kruim', 'itemListElement': [
-            {'@type': 'ListItem', 'position': 1, 'name': 'Kabar Maluku Live', 'item': SITE + '/'},
-            {'@type': 'ListItem', 'position': 2, 'name': groep, 'item': f'{SITE}/eiland/{d["groep"]}/'},
-            {'@type': 'ListItem', 'position': 3, 'name': d['kec'], 'item': f'{SITE}/eiland/{d["groep"]}/#{kec_id(d["kec"])}'},
+            {'@type': 'ListItem', 'position': 1, 'name': 'Kabar Maluku Live', 'item': SITE + pre + '/'},
+            {'@type': 'ListItem', 'position': 2, 'name': groep, 'item': f'{SITE}{pre}/eiland/{d["groep"]}/'},
+            {'@type': 'ListItem', 'position': 3, 'name': d['kec'], 'item': f'{SITE}{pre}/eiland/{d["groep"]}/#{kec_id(d["kec"])}'},
             {'@type': 'ListItem', 'position': 4, 'name': naam, 'item': url}]},
     ]}
     ld = json.dumps(graaf, ensure_ascii=False)
     return pagina(titel, omschrijving, f'/{d["slug"]}/', ''.join(delen) + klok_js(verschil),
                   f'<script type="application/ld+json">{ld}</script>\n',
-                  deel=(f'Hoe is het nu in {d["naam"]}?', f'Brand, weer, zee en aardbevingen in {d["naam"]} op {plek}. Ieder uur bijgewerkt.'),
+                  deel=(t('Hoe is het nu in {naam}?', naam=d["naam"]), t('Brand, weer, zee en aardbevingen in {naam} op {plek}. Ieder uur bijgewerkt.', naam=d["naam"], plek=plek)),
                   app_titel=naam, og=f'/og/{d["slug"]}.png',
-                  og_alt=f'Kabar Maluku Live: wat speelt er in {d["naam"]}' + (f' op {ctx["eilandnaam"]}' if ctx.get('eilandnaam') else '') + '?')
+                  og_alt=t('Kabar Maluku Live: wat speelt er in {naam}{op}?', naam=d["naam"], op=t(' op {e}', e=ctx["eilandnaam"]) if ctx.get('eilandnaam') else ''))
 
 
 # ---------------------------------------------------------------- eiland en start
@@ -1037,25 +1118,28 @@ def eiland_html(g, lijst, nu, brandset):
     for d in sorted(lijst, key=lambda x: (x['kec'], x['naam'])):
         per.setdefault(d['kec'], []).append(d)
     nbrand = sum(1 for d in lijst if d['code'] in brandset)
+    pre, gn, gs = TK.pre(), t(D.GROEPEN[g]), t(D.GROEP_SUB[g])
     blokken = ''.join(
         f'<div class="kec" id="{kec_id(k)}"><h3>{e(k)}</h3><ul>' + ''.join(
-            f'<li><a href="/{d["slug"]}/">{"<i aria-label=brand></i>" if d["code"] in brandset else ""}{e(d["naam"])}</a></li>' for d in ds) + '</ul></div>'
+            f'<li><a href="{pre}/{d["slug"]}/">{"<i aria-label=" + t("brand") + "></i>" if d["code"] in brandset else ""}{e(d["naam"])}</a></li>' for d in ds) + '</ul></div>'
         for k, ds in per.items())
-    body = f'''<section class="hero"><div class="w"><nav class="kruim" aria-label="Kruimelpad"><a href="/">{ic("terug")}Kabar Maluku Live</a><span class="kr-s kr-pc" aria-hidden="true">›</span><span class="kr-pc kr-nu" aria-current="page">{e(D.GROEPEN[g])}</span></nav><h1>{e(D.GROEPEN[g])}</h1>
-<p class="sub">{e(D.GROEP_SUB[g])} · {len(lijst)} dorpen</p>
-<p class="samen">{f'Deze week zag de satelliet brand bij <b>{nbrand} {"dorp" if nbrand == 1 else "dorpen"}</b>. Die zijn gemarkeerd met een rode stip.' if nbrand else 'Deze week zag de satelliet <b>geen brand</b> bij de dorpen hier.'}</p></div></section>
+    samen = (t('Deze week zag de satelliet brand bij <b>{n} {d}</b>. Die zijn gemarkeerd met een rode stip.', n=nbrand, d=t('dorp') if nbrand == 1 else t('dorpen'))
+             if nbrand else t('Deze week zag de satelliet <b>geen brand</b> bij de dorpen hier.'))
+    body = f'''<section class="hero"><div class="w"><nav class="kruim" aria-label="{t('Kruimelpad')}"><a href="{pre}/">{ic("terug")}Kabar Maluku Live</a><span class="kr-s kr-pc" aria-hidden="true">›</span><span class="kr-pc kr-nu" aria-current="page">{e(gn)}</span></nav><h1>{e(gn)}</h1>
+<p class="sub">{e(gs)} · {t('{n} dorpen', n=len(lijst))}</p>
+<p class="samen">{samen}</p></div></section>
 <div class="streep"><span></span><span></span><span></span></div>
-<main class="w"><section><h2>Kies je dorp</h2>{blokken}</section></main>'''
-    url = f'{SITE}/eiland/{g}/'
+<main class="w"><section><h2>{t('Kies je dorp')}</h2>{blokken}</section></main>'''
+    url = f'{SITE}{pre}/eiland/{g}/'
     ld = json.dumps({'@context': 'https://schema.org', '@graph': [
-        {'@type': 'CollectionPage', '@id': url, 'url': url, 'name': f'Dorpen in {D.GROEPEN[g]}', 'inLanguage': 'nl', 'isPartOf': {'@id': SITE + '/#site'}},
+        {'@type': 'CollectionPage', '@id': url, 'url': url, 'name': t('Dorpen in {g}', g=gn), 'inLanguage': TK.TAAL, 'isPartOf': {'@id': SITE + '/#site'}},
         {'@type': 'BreadcrumbList', 'itemListElement': [
-            {'@type': 'ListItem', 'position': 1, 'name': 'Kabar Maluku Live', 'item': SITE + '/'},
-            {'@type': 'ListItem', 'position': 2, 'name': D.GROEPEN[g], 'item': url}]}]}, ensure_ascii=False)
-    return pagina(f'Dorpen in {D.GROEPEN[g]}: brand, weer en aardbevingen | Kabar Maluku Live',
-                  f'Alle {len(lijst)} dorpen in {D.GROEPEN[g]} ({D.GROEP_SUB[g]}). Zie per dorp of er brand is, wat voor weer het wordt en of de aarde beefde.',
+            {'@type': 'ListItem', 'position': 1, 'name': 'Kabar Maluku Live', 'item': SITE + pre + '/'},
+            {'@type': 'ListItem', 'position': 2, 'name': gn, 'item': url}]}]}, ensure_ascii=False)
+    return pagina(t('Dorpen in {g}: brand, weer en aardbevingen | Kabar Maluku Live', g=gn),
+                  t('Alle {n} dorpen in {g} ({sub}). Zie per dorp of er brand is, wat voor weer het wordt en of de aarde beefde.', n=len(lijst), g=gn, sub=gs),
                   f'/eiland/{g}/', body, f'<script type="application/ld+json">{ld}</script>\n',
-                  og=f'/og/eiland-{g}.png', og_alt=f'Kabar Maluku Live: wat speelt er in de eilandgroep {D.GROEPEN[g]}?')
+                  og=f'/og/eiland-{g}.png', og_alt=t('Kabar Maluku Live: wat speelt er in de eilandgroep {g}?', g=gn))
 
 
 def recente_bevingen(rows, lijst, nu, op_land=None, dagen=7, max_n=5):
@@ -1137,12 +1221,12 @@ def dichtste_stad(la, lo):
 def diepte_tekst(km):
     km = round(km)
     if km < 30:
-        return f'De beving lag ondiep, ongeveer {km} km onder de grond. Dan voel je hem dichtbij goed.'
+        return t('De beving lag ondiep, ongeveer {km} km onder de grond. Dan voel je hem dichtbij goed.', km=km)
     if km < 70:
-        return f'De beving lag ongeveer {km} km onder de grond.'
+        return t('De beving lag ongeveer {km} km onder de grond.', km=km)
     if km < 300:
-        return f'De beving lag diep: ongeveer {km} km onder de grond. Daardoor komt er boven veel minder kracht aan.'
-    return f'De beving lag heel diep: ongeveer {km} km onder de grond. Daardoor merk je er boven weinig van.'
+        return t('De beving lag diep: ongeveer {km} km onder de grond. Daardoor komt er boven veel minder kracht aan.', km=km)
+    return t('De beving lag heel diep: ongeveer {km} km onder de grond. Daardoor merk je er boven weinig van.', km=km)
 
 
 GERUST = {
@@ -1159,70 +1243,46 @@ def bevingen_blok(bev, nu):
         return ''
     lijst, jaar, stil = bev['lijst'], bev['jaar'], bev.get('stil', 0)
     per_week = round(jaar / 52)
-    normaal = (f'Aardbevingen zijn in de Molukken heel gewoon. Het afgelopen jaar waren er {jaar} met kracht 4 of meer, '
-               f'{"ongeveer " + str(per_week) + " per week" if per_week >= 2 else "een paar per maand"}. De meeste merk je nauwelijks.')
-    kop = '<section aria-labelledby="h-bev" class="bevblok"><h2 id="h-bev">Aardbevingen deze week</h2>'
+    normaal = t('Aardbevingen zijn in de Molukken heel gewoon. Het afgelopen jaar waren er {n} met kracht 4 of meer, {hoe}. De meeste merk je nauwelijks.',
+                n=jaar, hoe=t('ongeveer {n} per week', n=per_week) if per_week >= 2 else t('een paar per maand'))
+    kop = f'<section aria-labelledby="h-bev" class="bevblok"><h2 id="h-bev">{t("Aardbevingen deze week")}</h2>'
     if not lijst:
-        return kop + f'<p class="let"><b>Rustig.</b> De afgelopen 7 dagen was er geen beving die mensen merkten. {normaal}</p></section>'
+        return kop + f'<p class="let">{t("<b>Rustig.</b> De afgelopen 7 dagen was er geen beving die mensen merkten. {normaal}", normaal=normaal)}</p></section>'
     kaarten = []
     for q in lijst:
-        t = q['t'].astimezone(WIT)
+        tw = q['t'].astimezone(WIT)
         g = T.beving_gevoel(q['mmi'])
         niveau = g[0] if g else None
-        voel = g[1] if g else 'Bijna niemand heeft hem gevoeld.'
-        woord = g[1].split('.')[0].upper() if g else 'NIET GEVOELD'
+        voel = g[1] if g else t('Bijna niemand heeft hem gevoeld.')
+        woord = g[1].split('.')[0].upper() if g else t('NIET GEVOELD')
         plek = T.plek_kort(q['dorp'])
-        waar = (f'op {plek}' if q['land'] else f'in zee bij {plek}')
+        waar = (t('op {plek}', plek=plek) if q['land'] else t('in zee bij {plek}', plek=plek))
         stad, ka = dichtste_stad(q['la'], q['lo'])
-        extra = (f', vlak bij {stad}' if ka <= 10 else f', ongeveer {round(ka)} km van {stad}' if ka < 300 else '')
+        extra = (t(', vlak bij {stad}', stad=stad) if ka <= 10 else t(', ongeveer {km} km van {stad}', km=round(ka), stad=stad) if ka < 300 else '')
         kracht = f'{q["mag"]:.1f}'.replace('.', ',')
         kaarten.append(
-            f'<a class="bevkaart bk-{niveau or "geen"}" href="/{q["dorp"]["slug"]}/"><p class="bk-tijd"><b>{e(tijd_nl(t, nu, "in de Molukken"))}</b>'
+            f'<a class="bevkaart bk-{niveau or "geen"}" href="{TK.pre()}/{q["dorp"]["slug"]}/"><p class="bk-tijd"><b>{e(tijd_nl(tw, nu, "in de Molukken"))}</b>'
             f'<span class="badge bv-{niveau or "geen"}">{e(woord)}</span></p>'
-            f'<h3>Kracht {kracht}, {e(waar)}{e(extra)}</h3>'
+            f'<h3>{e(t("Kracht {k}, {waar}{extra}", k=kracht, waar=waar, extra=extra))}</h3>'
             f'<p>{diepte_tekst(q["diepte"])}</p>'
-            f'<p><b>Wat merkten mensen ervan?</b> {e(voel)} {GERUST.get(niveau, GERUST[None])}</p>'
-            f'<p class="bk-meer">Bekijk het dichtstbijzijnde dorp, {e(q["dorp"]["naam"])} →</p></a>')
-    return (kop + '<p>Afgelopen 7 dagen. Tijden in Nederlandse tijd, met de tijd in de Molukken tussen haakjes.</p>' + ''.join(kaarten)
-            + (f'<p>Daarnaast waren er deze week {stil} bevingen van kracht 4 of meer die zo diep of zo ver weg lagen dat niemand ze merkte.</p>' if stil > 1 else '')
-            + f'<p class="let">{normaal} Wil je weten hoe het in jouw dorp voelde? Zoek je dorp hierboven.</p></section>')
+            f'<p><b>{t("Wat merkten mensen ervan?")}</b> {e(voel)} {t(GERUST.get(niveau, GERUST[None]))}</p>'
+            f'<p class="bk-meer">{t("Bekijk het dichtstbijzijnde dorp, {naam} →", naam=e(q["dorp"]["naam"]))}</p></a>')
+    return (kop + f'<p>{t("Afgelopen 7 dagen. Tijden in Nederlandse tijd, met de tijd in de Molukken tussen haakjes.")}</p>' + ''.join(kaarten)
+            + (f'<p>{t("Daarnaast waren er deze week {n} bevingen van kracht 4 of meer die zo diep of zo ver weg lagen dat niemand ze merkte.", n=stil)}</p>' if stil > 1 else '')
+            + f'<p class="let">{t("{normaal} Wil je weten hoe het in jouw dorp voelde? Zoek je dorp hierboven.", normaal=normaal)}</p></section>')
 
 
 def start_html(groepen, brandlijst, nu, bevlijst=None):
-    knoppen = ''.join(f'<a href="/eiland/{g}/">{e(n)}</a>' for g, n in D.GROEPEN.items())
+    pre, id_ = TK.pre(), TK.TAAL == 'id'
+    knoppen = ''.join(f'<a href="{pre}/eiland/{g}/">{e(t(n))}</a>' for g, n in D.GROEPEN.items())
     brand = ''
     if brandlijst:
-        brand = ('<section><h2>Brand gezien bij</h2><p>Afgelopen 48 uur, op de grond van het dorp.</p><div class="verder">'
-                 + ''.join(f'<a class="rij" href="/{d["slug"]}/"><b>{e(d["naam"])}<small>{e(d["kec"])} · {e(D.GROEPEN[d["groep"]])}</small></b><span class="badge">BRAND</span></a>' for d in brandlijst[:12])
+        brand = (f'<section><h2>{t("Brand gezien bij")}</h2><p>{t("Afgelopen 48 uur, op de grond van het dorp.")}</p><div class="verder">'
+                 + ''.join(f'<a class="rij" href="{pre}/{d["slug"]}/"><b>{e(d["naam"])}<small>{e(d["kec"])} · {e(t(D.GROEPEN[d["groep"]]))}</small></b><span class="badge">{t("BRAND")}</span></a>' for d in brandlijst[:12])
                  + '</div></section>')
-    body = f'''<section class="hero"><div class="w">
-<p class="label">Kabar Maluku Live · powered by MOZA</p><h1>Wat speelt er bij jouw dorp?</h1>
-<p class="accent">brand, beving, lucht en weer</p>
-<label for="q" class="sr">Zoek je dorp of eiland</label>
-<div class="zoek">{ICON_ZOEK}<input id="q" type="text" inputmode="search" enterkeyhint="search" role="searchbox" autocomplete="off" autocapitalize="words" placeholder="Bijvoorbeeld Ullath of Seram" aria-controls="res"></div>
-<div id="res" class="verder" aria-live="polite"></div>
-</div></section>
-<div class="streep"><span></span><span></span><span></span></div>
-<main class="w">
-<section id="mijn" class="mijn" hidden aria-labelledby="h-mijn"><h2 id="h-mijn">Jouw dorpen</h2><div class="verder"></div>
-<p class="nb">Je bewaarde dorpen blijven op deze telefoon of computer staan. <b>Tip:</b> zet Kabar Maluku ook op je beginscherm. iPhone: tik op de deelknop en kies <i>Zet op beginscherm</i>. Android: tik op ⋮ en kies <i>Toevoegen aan startscherm</i>.</p></section>
-<section class="uitleg" aria-labelledby="h-uitleg"><h2 id="h-uitleg">Zo werkt het</h2>
-<ol class="stappen">
-<li><b>Zoek je dorp</b><span>Typ de naam hierboven. Een oude naam of andere schrijfwijze werkt vaak ook.</span></li>
-<li><b>Lees wat er speelt</b><span>Brand, weer, lucht, zee en aardbevingen, in gewone woorden en elk uur bijgewerkt.</span></li>
-<li><b>Deel en zet vast</b><span>Stuur je dorp naar familie via WhatsApp, of zet het als icoontje op je telefoon.</span></li>
-</ol>
-<script>(function(){{var u=navigator.userAgent,h=document.documentElement;h.classList.add(/iPhone|iPad|iPod/.test(u)||(/Macintosh/.test(u)&&'ontouchend' in document)?'is-ios':/Android/.test(u)?'is-and':'is-pc')}})();</script>
-<details class="vast-uitleg vast-start"><summary>Hoe zet je je dorp vast?</summary>
-<p>Open eerst de pagina van je dorp (zoek hierboven). Dan:</p>
-<div class="vast-ios"><p><b>iPhone (Safari)</b></p><ol><li>Tik onderaan op de deelknop (het vierkantje met het pijltje omhoog).</li><li>Kies <b>Zet op beginscherm</b>.</li><li>Tik op <b>Voeg toe</b>. Je dorp staat nu als icoontje tussen je apps.</li></ol></div>
-<div class="vast-and"><p><b>Android (Chrome)</b></p><ol><li>Tik rechtsboven op de drie puntjes.</li><li>Kies <b>Toevoegen aan startscherm</b>.</li><li>Tik op <b>Toevoegen</b>. Je dorp staat nu als icoontje tussen je apps.</li></ol></div>
-<div class="vast-pc"><p><b>Computer</b></p><p>Maak een bladwijzer: druk op Ctrl+D (Windows) of Cmd+D (Mac).</p></div>
-</details></section>
-<section><h2>Of kies een eilandgroep</h2><div class="knoppen">{knoppen}</div></section>
-{bevingen_blok(bevlijst, nu)}
-{brand}
-<section class="hoogte" aria-labelledby="h-hoogte"><h2 id="h-hoogte">Blijf op de hoogte</h2><div class="hoogte-rij">
+    # Gekozen taal onthouden: wie eerder Indonesisch koos, gaat op de Nederlandse startpagina meteen naar /id/.
+    terug = ('' if id_ else '<script>(function(){try{if(localStorage.getItem("mzk-taal")==="id")location.replace("/id/"+location.search)}catch(e){}})();</script>')
+    hoogte = '' if id_ else f'''<section class="hoogte" aria-labelledby="h-hoogte"><h2 id="h-hoogte">Blijf op de hoogte</h2><div class="hoogte-rij">
 <a class="hoogte-k wa-k" href="https://whatsapp.com/channel/0029VaA4StPIt5rs5FadnH1d" target="_blank" rel="noopener" data-ev="Kabar: WhatsApp-kanaal">{ic("wa")}<span><b>Volg MOZA op WhatsApp</b>Het laatste Molukse nieuws op je telefoon. Gebeurt er iets groots op de Molukken, dan lees je het daar.</span></a>
 <a class="hoogte-k nb-k" href="https://www.moza.nu/lezen?utm_source=kabar&amp;utm_medium=nieuwsbrief#mzf-nb" data-ev="Kabar: nieuwsbrief">{ic("post")}<span><b>Elke donderdag de nieuwsbrief</b>Het belangrijkste over Molukkers in Nederland, inclusief wat er speelde op de Molukken.</span></a>
 </div></section>
@@ -1238,29 +1298,81 @@ def start_html(groepen, brandlijst, nu, bevlijst=None):
 <a href="https://www.moza.nu/evenementen?utm_source=kabar&amp;utm_medium=start"><b>Agenda</b><span>Molukse activiteiten in Nederland</span></a>
 <a href="https://www.moza.nu/store?utm_source=kabar&amp;utm_medium=start"><b>Toko Buku</b><span>Boeken en prints over de Molukken</span></a>
 </div></section>
-<section aria-labelledby="h-kaart"><h2 id="h-kaart">Of kies op de kaart</h2><p>Zoom in, tik op een dorp en kies <b>Wat speelt er nu</b>.</p></section>
-</main>
-<div id="mzn-plek"></div>
+<section aria-labelledby="h-kaart"><h2 id="h-kaart">Of kies op de kaart</h2><p>Zoom in, tik op een dorp en kies <b>Wat speelt er nu</b>.</p></section>'''
+    # De kaart (atlas) is nog alleen Nederlands; op /id/ voorlopig zonder kaart.
+    kaart = '' if id_ else f'''<div id="mzn-plek"></div>
 <script>window.MZN_STEDEN={json.dumps([[n, round(a, 4), round(b, 4)] for n, a, b in STEDEN], ensure_ascii=False)};</script>
 <script>window.MZN_SLUG={{}};fetch('/slugs.json').then(function(r){{return r.json()}}).then(function(j){{Object.assign(window.MZN_SLUG,j)}}).catch(function(){{}});</script>
-<script src="/atlas/atlas-maluku.js?v={VERSIE}" defer></script>
+<script src="/atlas/atlas-maluku.js?v={VERSIE}" defer></script>'''
+    gnamen = {D.GROEPEN[g]: t(D.GROEPEN[g]) for g in D.GROEPEN}
+    body = f'''{terug}<section class="hero"><div class="w">
+<p class="label">{t('Kabar Maluku Live · powered by MOZA')}</p><h1>{t('Wat speelt er bij jouw dorp?')}</h1>
+<p class="accent">{t('brand, beving, lucht en weer')}</p>
+<label for="q" class="sr">{t('Zoek je dorp of eiland')}</label>
+<div class="zoek">{ICON_ZOEK}<input id="q" type="text" inputmode="search" enterkeyhint="search" role="searchbox" autocomplete="off" autocapitalize="words" placeholder="{t('Bijvoorbeeld Ullath of Seram')}" aria-controls="res"></div>
+<div id="res" class="verder" aria-live="polite"></div>
+</div></section>
+<div class="streep"><span></span><span></span><span></span></div>
+<main class="w">
+<section id="mijn" class="mijn" hidden aria-labelledby="h-mijn"><h2 id="h-mijn">{t('Jouw dorpen')}</h2><div class="verder"></div>
+<p class="nb">{t('Je bewaarde dorpen blijven op deze telefoon of computer staan. <b>Tip:</b> zet Kabar Maluku ook op je beginscherm. iPhone: tik op de deelknop en kies <i>Zet op beginscherm</i>. Android: tik op ⋮ en kies <i>Toevoegen aan startscherm</i>.')}</p></section>
+<section class="uitleg" aria-labelledby="h-uitleg"><h2 id="h-uitleg">{t('Zo werkt het')}</h2>
+<ol class="stappen">
+<li><b>{t('Zoek je dorp')}</b><span>{t('Typ de naam hierboven. Een oude naam of andere schrijfwijze werkt vaak ook.')}</span></li>
+<li><b>{t('Lees wat er speelt')}</b><span>{t('Brand, weer, lucht, zee en aardbevingen, in gewone woorden en elk uur bijgewerkt.')}</span></li>
+<li><b>{t('Deel en zet vast')}</b><span>{t('Stuur je dorp naar familie via WhatsApp, of zet het als icoontje op je telefoon.')}</span></li>
+</ol>
+<script>(function(){{var u=navigator.userAgent,h=document.documentElement;h.classList.add(/iPhone|iPad|iPod/.test(u)||(/Macintosh/.test(u)&&'ontouchend' in document)?'is-ios':/Android/.test(u)?'is-and':'is-pc')}})();</script>
+<details class="vast-uitleg vast-start"><summary>{t('Hoe zet je je dorp vast?')}</summary>
+<p>{t('Open eerst de pagina van je dorp (zoek hierboven). Dan:')}</p>
+<div class="vast-ios"><p><b>iPhone (Safari)</b></p><ol><li>{t('Tik onderaan op de deelknop (het vierkantje met het pijltje omhoog).')}</li><li>{t('Kies <b>Zet op beginscherm</b>.')}</li><li>{t('Tik op <b>Voeg toe</b>. Je dorp staat nu als icoontje tussen je apps.')}</li></ol></div>
+<div class="vast-and"><p><b>Android (Chrome)</b></p><ol><li>{t('Tik rechtsboven op de drie puntjes.')}</li><li>{t('Kies <b>Toevoegen aan startscherm</b>.')}</li><li>{t('Tik op <b>Toevoegen</b>. Je dorp staat nu als icoontje tussen je apps.')}</li></ol></div>
+<div class="vast-pc"><p><b>{t('Computer')}</b></p><p>{t('Maak een bladwijzer: druk op Ctrl+D (Windows) of Cmd+D (Mac).')}</p></div>
+</details></section>
+<section><h2>{t('Of kies een eilandgroep')}</h2><div class="knoppen">{knoppen}</div></section>
+{bevingen_blok(bevlijst, nu)}
+{brand}
+{hoogte}
+</main>
+{kaart}
 <script>(function(){{var q=document.getElementById('q'),res=document.getElementById('res'),L=null;
 function n(s){{return s.toLowerCase().normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/[^a-z0-9 ]/g,' ').trim()}}
 function load(){{if(L)return Promise.resolve(L);return fetch('/zoek.json').then(function(r){{return r.json()}}).then(function(j){{L=j.map(function(x){{x.k=n(x.n+' '+(x.o||''));return x}});return L}})}}
 function esc(s){{return String(s).replace(/[&<>"]/g,function(c){{return{{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}}[c]}})}}
 function show(){{var v=n(q.value);if(v.length<2){{res.innerHTML='';return}}load().then(function(L){{
-var gs={json.dumps({g: n for g, n in D.GROEPEN.items()}, ensure_ascii=False)},kw={json.dumps(EILAND_WOORDEN, ensure_ascii=False)},gh='';Object.keys(gs).forEach(function(g){{if(kw[g].some(function(w){{return w.indexOf(v)===0||v.indexOf(w)===0}}))gh+='<a class="rij" style="background:#1F3BD1;color:#fff" href="/eiland/'+g+'/"><b>'+esc(gs[g])+'<small style="color:#fff">Alle dorpen in deze eilandgroep</small></b><span aria-hidden="true">→</span></a>'}});
+var gs={json.dumps({g: t(n) for g, n in D.GROEPEN.items()}, ensure_ascii=False)},gn={json.dumps(gnamen, ensure_ascii=False)},kw={json.dumps(EILAND_WOORDEN, ensure_ascii=False)},gh='';Object.keys(gs).forEach(function(g){{if(kw[g].some(function(w){{return w.indexOf(v)===0||v.indexOf(w)===0}}))gh+='<a class="rij" style="background:#1F3BD1;color:#fff" href="{pre}/eiland/'+g+'/"><b>'+esc(gs[g])+'<small style="color:#fff">{t('Alle dorpen in deze eilandgroep')}</small></b><span aria-hidden="true">→</span></a>'}});
 var a=L.filter(function(x){{return x.k.indexOf(v)===0}}),b=L.filter(function(x){{return x.k.indexOf(v)>0}});var r=a.concat(b).slice(0,12);
-res.innerHTML=gh+r.map(function(x){{return '<a class="rij" href="/'+x.s+'/"><b>'+esc(x.n)+'<small>'+esc(x.c)+' · '+esc(x.g)+'</small></b>'+(x.b?'<span class="badge">BRAND</span>':'<span aria-hidden="true">→</span>')+'</a>'}}).join('')||'<p>Geen dorp gevonden. Probeer een andere schrijfwijze.</p>'}})}}
+res.innerHTML=gh+r.map(function(x){{return '<a class="rij" href="{pre}/'+x.s+'/"><b>'+esc(x.n)+'<small>'+esc(x.c)+' · '+esc(gn[x.g]||x.g)+'</small></b>'+(x.b?'<span class="badge">{t('BRAND')}</span>':'<span aria-hidden="true">→</span>')+'</a>'}}).join('')||'<p>{t('Geen dorp gevonden. Probeer een andere schrijfwijze.')}</p>'}})}}
 q.addEventListener('input',show);try{{var u=new URLSearchParams(location.search).get('q');if(u)q.value=u}}catch(e){{}}if(q.value)show()}})();</script>'''
     ld = json.dumps({'@context': 'https://schema.org', '@graph': [
         {'@type': 'WebSite', '@id': SITE + '/#site', 'url': SITE + '/', 'name': 'Kabar Maluku Live',
-         'alternateName': ['Kabar Maluku', 'live.moza.nu'], 'inLanguage': 'nl',
+         'alternateName': ['Kabar Maluku', 'live.moza.nu'], 'inLanguage': TK.TAAL,
          'publisher': {'@type': 'NewsMediaOrganization', '@id': 'https://www.moza.nu/#organization', 'name': 'MOZA', 'url': 'https://www.moza.nu/'},
-         'potentialAction': {'@type': 'SearchAction', 'target': SITE + '/?q={search_term_string}', 'query-input': 'required name=search_term_string'}}]}, ensure_ascii=False)
-    return pagina('Kabar Maluku Live: brand, weer en aardbevingen bij jouw dorp op de Molukken',
-                  'Zoek je dorp op de Molukken en zie of er brand is, of de lucht gezond is, wat voor weer het wordt en of de aarde beefde. Voor alle 2.420 dorpen, elk uur bijgewerkt.',
+         'potentialAction': {'@type': 'SearchAction', 'target': SITE + pre + '/?q={search_term_string}', 'query-input': 'required name=search_term_string'}}]}, ensure_ascii=False)
+    return pagina(t('Kabar Maluku Live: brand, weer en aardbevingen bij jouw dorp op de Molukken'),
+                  t('Zoek je dorp op de Molukken en zie of er brand is, of de lucht gezond is, wat voor weer het wordt en of de aarde beefde. Voor alle 2.420 dorpen, elk uur bijgewerkt.'),
                   '/', body, f'<script type="application/ld+json">{ld}</script>\n')
+
+
+def tentang_html():
+    """Pagina 'Tentang' (over deze app), alleen in het Indonesisch."""
+    body = f'''<section class="hero"><div class="w"><nav class="kruim" aria-label="Navigasi"><a href="/id/">{ic("terug")}Kabar Maluku Live</a></nav>
+<h1>Tentang Kabar Maluku Live</h1></div></section>
+<div class="streep"><span></span><span></span><span></span></div>
+<main class="w"><section>
+<p>Kabar Maluku Live menunjukkan apa yang terjadi di setiap desa di Maluku dan Maluku Utara: titik panas dari satelit, cuaca, kualitas udara, keadaan laut dan gempa bumi. Semua dengan kata-kata sederhana dan diperbarui setiap jam.</p>
+<h2>Siapa yang membuatnya?</h2>
+<p>Aplikasi ini dibuat oleh MOZA, sebuah yayasan di Belanda yang memberi informasi tentang orang Maluku di Belanda. Banyak orang Maluku di Belanda punya keluarga di Maluku. Dengan aplikasi ini mereka dan keluarga di Maluku bisa melihat keadaan di desa dengan mudah.</p>
+<h2>Dari mana datanya?</h2>
+<p>Kebakaran: NASA FIRMS (satelit). Cuaca, udara dan laut: Open-Meteo. Gempa: USGS. Hutan: Global Forest Change (Universitas Maryland). Jumlah penduduk dan luas desa: BPS. Batas desa: wilayah_boundaries.</p>
+<h2>Bukan peringatan resmi</h2>
+<p>Data di aplikasi ini dihitung otomatis dan bisa terlambat atau keliru. Aplikasi ini <b>bukan peringatan resmi</b>. Saat ada bahaya, selalu ikuti informasi dari BMKG (cuaca, gempa dan tsunami), MAGMA Indonesia (gunung api) dan BPBD di daerahmu.</p>
+<p><a href="https://www.bmkg.go.id" target="_blank" rel="noopener">bmkg.go.id</a> · <a href="https://magma.esdm.go.id" target="_blank" rel="noopener">magma.esdm.go.id</a></p>
+<h2>Ada yang tidak benar?</h2>
+<p>Beri tahu kami lewat <a href="https://www.moza.nu/contact">formulir kontak MOZA</a> (dalam bahasa Belanda atau Inggris).</p>
+</section></main>'''
+    return pagina('Tentang | Kabar Maluku Live', 'Siapa yang membuat Kabar Maluku Live, dari mana datanya dan mengapa ini bukan peringatan resmi.',
+                  '/tentang/', body, twee_talen=False)
 
 
 # ---------------------------------------------------------------- hoofdprogramma
@@ -1434,14 +1546,26 @@ def main():
         f = uit / d['slug'] / 'index.html'
         f.parent.mkdir(parents=True, exist_ok=True)
         f.write_text(dorp_html(d, ctx, nu))
+        # dezelfde pagina in het Indonesisch, op /id/
+        TK.zet('id')
+        f = uit / 'id' / d['slug'] / 'index.html'
+        f.parent.mkdir(parents=True, exist_ok=True)
+        f.write_text(dorp_html(d, ctx, nu))
+        TK.zet('nl')
         if i % 200 == 0:
             print(' ', i, d['slug'])
 
-    for g in D.GROEPEN:
-        f = uit / 'eiland' / g / 'index.html'
-        f.parent.mkdir(parents=True, exist_ok=True)
-        f.write_text(eiland_html(g, [d for d in rows if d['groep'] == g], nu, brandset))
-    (uit / 'index.html').write_text(start_html(D.GROEPEN, brandlijst, nu, bevlijst))
+    for taal, map_ in (('nl', uit), ('id', uit / 'id')):
+        TK.zet(taal)
+        for g in D.GROEPEN:
+            f = map_ / 'eiland' / g / 'index.html'
+            f.parent.mkdir(parents=True, exist_ok=True)
+            f.write_text(eiland_html(g, [d for d in rows if d['groep'] == g], nu, brandset))
+        map_.mkdir(parents=True, exist_ok=True)
+        (map_ / 'index.html').write_text(start_html(D.GROEPEN, brandlijst, nu, bevlijst))
+    (uit / 'id' / 'tentang').mkdir(parents=True, exist_ok=True)
+    (uit / 'id' / 'tentang' / 'index.html').write_text(tentang_html())
+    TK.zet('nl')
     (uit / 'zoek.json').write_text(json.dumps(zoek, ensure_ascii=False, separators=(',', ':')))
     (uit / 'slugs.json').write_text(json.dumps({d['code']: d['slug'] for d in rows}, separators=(',', ':')))
     shutil.copytree(D.ATLAS, uit / 'atlas')
@@ -1453,16 +1577,27 @@ def main():
     shutil.copy(HIER / 'static' / 'apple-touch-icon.png', uit / 'apple-touch-icon.png')
     for f in ('manifest.webmanifest', 'icon-192.png', 'icon-512.png'):
         shutil.copy(HIER / 'static' / f, uit / f)
+    man = json.loads((HIER / 'static' / 'manifest.webmanifest').read_text())
+    man.update({'id': '/id/', 'lang': 'id', 'start_url': '/id/?utm_source=beginscherm&utm_medium=app', 'scope': '/id/',
+                'description': 'Kebakaran, cuaca, laut dan gempa di desamu di Maluku. Didukung oleh MOZA.'})
+    (uit / 'id' / 'manifest.webmanifest').write_text(json.dumps(man, ensure_ascii=False, indent=2))
     for f in (HIER / 'static').glob('google*.html'):  # verificatie Google Search Console
         shutil.copy(f, uit / f.name)
     (uit / 'CNAME').write_text('live.moza.nu\n')
     (uit / 'robots.txt').write_text(f'User-agent: *\nAllow: /\nSitemap: {SITE}/sitemap.xml\n')
     (uit / '404.html').write_text(pagina('Niet gevonden | Kabar Maluku Live', 'Deze pagina bestaat niet.', '/404.html',
-                                         '<main class="w"><section><h2>Dit dorp vinden we niet</h2><p><a href="/">Zoek je dorp →</a></p></section></main>', robots='noindex'))
+                                         '<main class="w"><section><h2>Dit dorp vinden we niet</h2><p><a href="/">Zoek je dorp →</a></p></section></main>', robots='noindex',
+                                         twee_talen=False))
     dag = nu.strftime('%Y-%m-%d')
     urls = [f'{SITE}/'] + [f'{SITE}/eiland/{g}/' for g in D.GROEPEN] + [f'{SITE}/{d["slug"]}/' for d in rows]
+    urls += [f'{SITE}/id/', f'{SITE}/id/tentang/'] + [f'{SITE}/id/eiland/{g}/' for g in D.GROEPEN] + [f'{SITE}/id/{d["slug"]}/' for d in rows]
     (uit / 'sitemap.xml').write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
                                      + ''.join(f'<url><loc>{u}</loc><lastmod>{dag}</lastmod></url>\n' for u in urls) + '</urlset>\n')
+    mist = TK.ontbrekend()
+    if mist:
+        print('LET OP: nog niet vertaald naar het Indonesisch:', len(mist))
+        for x in mist:
+            print('  -', x[:120])
     print('klaar:', uit)
 
 

@@ -5,6 +5,8 @@ Schrijfregels: B1, 'je', geen komma voor 'en', geen vakwoorden (geen hectare, mi
 """
 from datetime import datetime, timedelta, timezone
 import math
+from tekst import t
+import tekst as _TK
 
 WIT = timezone(timedelta(hours=9))  # Maluku-tijd (Waktu Indonesia Timur)
 
@@ -29,8 +31,43 @@ def dagdeel(uur):
     return 'nacht'
 
 
+DAGEN_ID = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu']
+DAG_KORT_ID = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min']
+MAANDEN_ID = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus',
+              'September', 'Oktober', 'November', 'Desember']
+
+
+def dag(i):
+    """Naam van de dag (0 = maandag), met hoofdletter."""
+    return DAGEN_ID[i] if _TK.TAAL == 'id' else DAGEN[i].capitalize()
+
+
+def dag_kort(i):
+    return DAG_KORT_ID[i] if _TK.TAAL == 'id' else DAG_KORT[i]
+
+
+def maand(i):
+    """Naam van de maand (0 = januari)."""
+    return MAANDEN_ID[i] if _TK.TAAL == 'id' else MAANDEN[i]
+
+
+def _wanneer_id(ts, nu):
+    d = (nu.date() - ts.date()).days
+    u = ts.hour
+    deel = 'pagi' if 5 <= u < 11 else 'siang' if 11 <= u < 15 else 'sore' if 15 <= u < 18 else 'malam' if u >= 18 else 'dini hari'
+    if d == 0:
+        return 'tadi ' + deel if deel in ('pagi', 'dini hari') else deel + ' ini'
+    if d == 1:
+        return 'kemarin ' + deel
+    if d < 7:
+        return DAGEN_ID[ts.weekday()] + ' ' + deel
+    return f'{ts.day} {MAANDEN_ID[ts.month - 1]}'
+
+
 def wanneer(ts, nu):
     """ts en nu als datetime in WIT. Geeft bv. 'gistermiddag', 'vanochtend', 'dinsdagavond', '2 november'."""
+    if _TK.TAAL == 'id':
+        return _wanneer_id(ts, nu)
     d = (nu.date() - ts.date()).days
     deel = dagdeel(ts.hour)
     if d == 0:
@@ -65,25 +102,25 @@ def richting(la1, lo1, la2, lo2):
     x = (math.cos(math.radians(la1)) * math.sin(math.radians(la2))
          - math.sin(math.radians(la1)) * math.cos(math.radians(la2)) * math.cos(math.radians(lo2 - lo1)))
     b = (math.degrees(math.atan2(y, x)) + 360) % 360
-    return RICHTING[int((b + 22.5) // 45) % 8]
+    return RICHTING[int((b + 22.5) // 45) % 8]  # vertalen bij het tonen (t())
 
 
 def afstand(km):
     """Afstand in gewone taal. Tot 3 km in looptijd (5 km per uur), daarna in hele kilometers."""
     if km < 0.4:
-        return 'vlakbij'
+        return t('vlakbij')
     minuten = km * 12
     if minuten < 10:
-        return 'een paar minuten lopen'
+        return t('een paar minuten lopen')
     if minuten < 20:
-        return 'een kwartier lopen'
+        return t('een kwartier lopen')
     if minuten < 25:
-        return 'twintig minuten lopen'
+        return t('twintig minuten lopen')
     if minuten < 38:
-        return 'een half uur lopen'
+        return t('een half uur lopen')
     if km <= 3.2:
-        return 'drie kwartier lopen'
-    return f'ongeveer {round(km)} kilometer'
+        return t('drie kwartier lopen')
+    return t('ongeveer {n} kilometer', n=round(km))
 
 
 # ---------- brand ----------
@@ -92,17 +129,17 @@ def brand_zekerheid(p):
     """p: dict met 'conf' ('h','n','l') en 'keer' (aantal satellietmetingen binnen 12 uur en 1 km)."""
     if p['conf'] == 'h' or p['keer'] >= 2:
         if p['keer'] >= 2:
-            return 'Bijna zeker een brand: meerdere satellieten zagen het.'
-        return 'Bijna zeker een brand.'
+            return t('Bijna zeker een brand: meerdere satellieten zagen het.')
+        return t('Bijna zeker een brand.')
     if p['conf'] == 'l':
-        return 'Niet zeker. Het kan ook een veld zijn dat werd schoongebrand, of iets anders dat heet is.'
-    return 'Waarschijnlijk een brand.'
+        return t('Niet zeker. Het kan ook een veld zijn dat werd schoongebrand, of iets anders dat heet is.')
+    return t('Waarschijnlijk een brand.')
 
 
 def brand_plek(p):
     if p['binnen']:
-        return 'Op de grond van het dorp.'
-    return 'Net buiten de grond van het dorp.'
+        return t('Op de grond van het dorp.')
+    return t('Net buiten de grond van het dorp.')
 
 
 # ---------- lucht (fijnstof PM2.5, gemiddelde per dag) ----------
@@ -126,7 +163,7 @@ LUCHT = [
 def lucht(pm):
     for grens, code, label, zin, advies in LUCHT:
         if pm is not None and pm <= grens:
-            return {'code': code, 'label': label, 'zin': zin, 'advies': advies}
+            return {'code': code, 'label': t(label), 'zin': t(zin), 'advies': t(advies) if advies else ''}
     return None
 
 
@@ -137,22 +174,22 @@ def weer_woord(code):
     if code is None:
         return ''
     if code == 0:
-        return 'Zon'
+        return t('Zon')
     if code in (1, 2):
-        return 'Zon en wolken'
+        return t('Zon en wolken')
     if code == 3:
-        return 'Bewolkt'
+        return t('Bewolkt')
     if code in (45, 48):
-        return 'Mist'
+        return t('Mist')
     if code in (51, 53, 55, 56, 57):
-        return 'Motregen'
+        return t('Motregen')
     if code in (61, 63, 80, 81):
-        return 'Regen'
+        return t('Regen')
     if code in (65, 82):
-        return 'Zware regen'
+        return t('Zware regen')
     if code in (95, 96, 99):
-        return 'Onweer'
-    return 'Regen'
+        return t('Onweer')
+    return t('Regen')
 
 
 def hitte(tmax):
@@ -160,9 +197,9 @@ def hitte(tmax):
     if tmax is None:
         return None
     if tmax >= 35:
-        return ('snikheet', 'Snikheet')
+        return ('snikheet', t('Snikheet'))
     if tmax >= 33:
-        return ('heet', 'Heet')
+        return ('heet', t('Heet'))
     return ('normaal', '')
 
 
@@ -175,24 +212,24 @@ def golven(m):
     if m is None:
         return None
     if m < 0.5:
-        return 'Kleine golven'
+        return t('Kleine golven')
     if m < 1.25:
-        return 'Wat golven'
+        return t('Wat golven')
     if m < 2.5:
-        return 'Hoge golven'
-    return 'Zeer hoge golven'
+        return t('Hoge golven')
+    return t('Zeer hoge golven')
 
 
 def wind(kmh):
     if kmh is None:
         return None
     if kmh < 12:
-        return 'weinig wind'
+        return t('weinig wind')
     if kmh < 29:
-        return 'matige wind'
+        return t('matige wind')
     if kmh < 50:
-        return 'harde wind'
-    return 'storm'
+        return t('harde wind')
+    return t('storm')
 
 
 def zee_onrustig(m, kmh):
@@ -217,26 +254,26 @@ def beving_gevoel(i):
     if i < VOELBAAR:
         return None
     if i < 3.5:
-        return ('licht', 'Heel licht. Alleen mensen die stil zitten of liggen merkten het. Alsof er een kleine vrachtwagen langsrijdt.')
+        return ('licht', t('Heel licht. Alleen mensen die stil zitten of liggen merkten het. Alsof er een kleine vrachtwagen langsrijdt.'))
     if i < 4.5:
-        return ('licht', 'Licht. Te vergelijken met een zware vrachtwagen die vlak langs het huis rijdt: ramen en deuren trillen even.')
+        return ('licht', t('Licht. Te vergelijken met een zware vrachtwagen die vlak langs het huis rijdt: ramen en deuren trillen even.'))
     if i < 5.5:
-        return ('stevig', 'Stevig. Bijna iedereen voelde het. Spullen kunnen omvallen en slapende mensen worden wakker.')
+        return ('stevig', t('Stevig. Bijna iedereen voelde het. Spullen kunnen omvallen en slapende mensen worden wakker.'))
     if i < 6.5:
-        return ('sterk', 'Sterk. Mensen schrikken en gaan naar buiten. Kleine schade aan huizen is mogelijk.')
-    return ('zwaar', 'Zwaar. Kans op schade aan huizen. Neem contact op met je familie.')
+        return ('sterk', t('Sterk. Mensen schrikken en gaan naar buiten. Kleine schade aan huizen is mogelijk.'))
+    return ('zwaar', t('Zwaar. Kans op schade aan huizen. Neem contact op met je familie.'))
 
 
 def hoe_vaak(per_jaar):
     if per_jaar >= 24:
-        return 'een paar keer per maand'
+        return t('een paar keer per maand')
     if per_jaar >= 10:
-        return 'ongeveer één keer per maand'
+        return t('ongeveer één keer per maand')
     if per_jaar >= 4:
-        return 'een paar keer per jaar'
+        return t('een paar keer per jaar')
     if per_jaar >= 1:
-        return 'ongeveer één keer per jaar'
-    return 'minder dan één keer per jaar'
+        return t('ongeveer één keer per jaar')
+    return t('minder dan één keer per jaar')
 
 
 # ---------- bos ----------
@@ -247,22 +284,22 @@ def deel_van(fractie):
         return None
     n = round(1 / fractie)
     if n <= 1:
-        return 'bijna alles'
+        return t('bijna alles')
     if n == 2:
-        return 'de helft'
-    return f'1 op de {n}'
+        return t('de helft')
+    return t('1 op de {n}', n=n)
 
 
 def voetbalvelden(ha):
     """Een voetbalveld is ongeveer 0,7 hectare."""
     n = ha / 0.714
     if n < 1:
-        return 'minder dan een voetbalveld'
+        return t('minder dan een voetbalveld')
     if n < 15:
-        return f'{round(n)} voetbalvelden'
+        return t('{n} voetbalvelden', n=round(n))
     if n < 100:
-        return f'{int(round(n, -1))} voetbalvelden'
-    return f'{int(round(n, -2))} voetbalvelden'
+        return t('{n} voetbalvelden', n=int(round(n, -1)))
+    return t('{n} voetbalvelden', n=int(round(n, -2)))
 
 
 # ---------- zee: wat het betekent ----------
@@ -279,16 +316,16 @@ def golf_lichaam(m):
     if m is None:
         return ''
     if m < 0.3:
-        return 'bijna vlak'
+        return t('bijna vlak')
     if m < 0.6:
-        return 'tot je knieën'
+        return t('tot je knieën')
     if m < 1.1:
-        return 'tot je heupen'
+        return t('tot je heupen')
     if m < 1.6:
-        return 'tot je schouders'
+        return t('tot je schouders')
     if m < 2.1:
-        return 'zo hoog als een mens'
-    return 'hoger dan een mens'
+        return t('zo hoog als een mens')
+    return t('hoger dan een mens')
 
 
 VISSER = [
@@ -315,7 +352,7 @@ def oversteek_voorbeeld(d):
     eiland = LEASE_EILAND.get(d['kec'].lower())
     if not eiland:
         return None
-    return f'bijvoorbeeld van {eiland} naar Tulehu op Ambon'
+    return t('bijvoorbeeld van {eiland} naar Tulehu op Ambon', eiland=eiland)
 
 
 # ---------- korte plaatsaanduiding voor titels ----------

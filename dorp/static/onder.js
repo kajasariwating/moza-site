@@ -1,6 +1,10 @@
 /* Kabar Maluku Live: menubalk onderin (zoals op moza.nu), delen en Meer-menu */
+/* Taal: window.MZK_TAAL='id' op de Indonesische pagina's (/id/). */
+window.MZK_T=function(nl){var I={'Kopieer link':'Salin link','Link gekopieerd':'Link disalin','Kopieer de link':'Salin link ini',
+  'Bewaar dit dorp':'Simpan desa ini','Bewaard bij jouw dorpen':'Tersimpan di desamu','BRAND':'KEBAKARAN','niet meer bewaren':'hapus dari simpanan'};
+  return window.MZK_TAAL==='id'&&I[nl]?I[nl]:nl};
 (function(){
-  var H=document.documentElement,D=window.MZK_DEEL||{};
+  var H=document.documentElement,D=window.MZK_DEEL||{},T=window.MZK_T;
   function url(bron){var u=(document.querySelector('link[rel=canonical]')||{}).href||location.href.split('#')[0].split('?')[0];return u+'?utm_source='+bron+'&utm_medium=deel'}
   function tekst(bron){return (D.t||document.title)+'\n'+(D.e||'')+'\n'+url(bron)}
   function vel(id){var z=document.getElementById(id);if(!z)return null;
@@ -18,9 +22,9 @@
     m.appendChild(document.createElement('br'));var l=document.createElement('span');l.className='u';l.textContent=url('whatsapp').replace(/^https?:\/\//,'').split('?')[0];m.appendChild(l);
     deel.querySelector('.wa').href='https://wa.me/?text='+encodeURIComponent(tekst('whatsapp'));
     deel.querySelector('.fb').href='https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(url('facebook'));
-    var kp=deel.querySelector('.kp');kp.textContent='Kopieer link';kp.onclick=function(){
-      var u=url('link'),ok=function(){kp.textContent='Link gekopieerd';plausible('Kabar delen: link')};
-      if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(u).then(ok,function(){prompt('Kopieer de link',u)});else prompt('Kopieer de link',u)};
+    var kp=deel.querySelector('.kp');kp.textContent=T('Kopieer link');kp.onclick=function(){
+      var u=url('link'),ok=function(){kp.textContent=T('Link gekopieerd');plausible('Kabar delen: link')};
+      if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(u).then(ok,function(){prompt(T('Kopieer de link'),u)});else prompt(T('Kopieer de link'),u)};
     var an=deel.querySelector('.ander');an.style.display=navigator.share?'':'none';
     an.onclick=function(){navigator.share({title:D.t,text:(D.t||'')+'\n'+(D.e||''),url:url('app')}).then(function(){dicht(deel)},function(){})};
     open(deel);plausible('Kabar delen: open');
@@ -40,14 +44,14 @@ document.addEventListener('click',function(ev){var a=ev.target.closest&&ev.targe
 document.addEventListener('toggle',function(ev){var d=ev.target;if(d&&d.classList&&d.classList.contains('vast-uitleg')&&d.open)p('Kabar: uitleg vastzetten')},true);})();
 /* Bewaarde dorpen: knop op de dorpspagina, lijst op de startpagina. Alleen in deze browser. */
 (function(){
-  var KEY='mzk-dorpen';
+  var KEY='mzk-dorpen',T=window.MZK_T,PRE=window.MZK_TAAL==='id'?'/id':'';
   function lees(){try{var x=JSON.parse(localStorage.getItem(KEY)||'[]');return Array.isArray(x)?x:[]}catch(e){return[]}}
   function schrijf(l){try{localStorage.setItem(KEY,JSON.stringify(l.slice(0,12)))}catch(e){}}
   function pl(n){try{if(window.plausible)window.plausible(n)}catch(e){}}
   [].forEach.call(document.querySelectorAll('[data-pin]'),function(b){
     var s=b.getAttribute('data-s');
     function zet(){var op=lees().some(function(x){return x.s===s});b.setAttribute('aria-pressed',op?'true':'false');
-      b.querySelector('.pin-i').textContent=op?'★':'☆';b.querySelector('.pin-t').textContent=op?'Bewaard bij jouw dorpen':'Bewaar dit dorp'}
+      b.querySelector('.pin-i').textContent=op?'★':'☆';b.querySelector('.pin-t').textContent=op?T('Bewaard bij jouw dorpen'):T('Bewaar dit dorp')}
     zet();
     b.addEventListener('click',function(){var l=lees(),i=-1;l.forEach(function(x,k){if(x.s===s)i=k});
       if(i>=0){l.splice(i,1);pl('Kabar dorp vergeten')}else{l.unshift({s:s,n:b.getAttribute('data-n'),c:b.getAttribute('data-c')});pl('Kabar dorp bewaard')}
@@ -56,11 +60,11 @@ document.addEventListener('toggle',function(ev){var d=ev.target;if(d&&d.classLis
   var m=document.getElementById('mijn');if(!m)return;
   function toon(brand){var l=lees();if(!l.length){m.hidden=true;return}
     var box=m.querySelector('.verder');box.innerHTML='';
-    l.forEach(function(x){var a=document.createElement('a');a.className='rij';a.href='/'+x.s+'/';
+    l.forEach(function(x){var a=document.createElement('a');a.className='rij';a.href=PRE+'/'+x.s+'/';
       var b=document.createElement('b');b.textContent=x.n;var sm=document.createElement('small');sm.textContent=x.c||'';b.appendChild(sm);a.appendChild(b);
-      if(brand&&brand[x.s]){var bd=document.createElement('span');bd.className='badge';bd.textContent='BRAND';a.appendChild(bd)}
+      if(brand&&brand[x.s]){var bd=document.createElement('span');bd.className='badge';bd.textContent=T('BRAND');a.appendChild(bd)}
       else{var p=document.createElement('span');p.className='pijl';p.setAttribute('aria-hidden','true');p.textContent='→';a.appendChild(p)}
-      var w=document.createElement('button');w.type='button';w.className='weg';w.setAttribute('aria-label',x.n+' niet meer bewaren');w.textContent='×';
+      var w=document.createElement('button');w.type='button';w.className='weg';w.setAttribute('aria-label',x.n+' '+T('niet meer bewaren'));w.textContent='×';
       w.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();schrijf(lees().filter(function(y){return y.s!==x.s}));toon(brand)});
       a.appendChild(w);box.appendChild(a)});
     m.hidden=false}
