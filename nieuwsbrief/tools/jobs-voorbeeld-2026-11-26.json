@@ -1,0 +1,221 @@
+[
+{
+"t": "head",
+"f": "head",
+"date": "26 november 2026"
+},
+{
+"t": "social",
+"f": "s0",
+"img": "rz.jpg",
+"pos": "center 45%",
+"h": 330,
+"noband": true,
+"l1": "25 nov 1986",
+"l2": "Deze week toen",
+"sticker": "40 jaar",
+"title": "Een akkoord in de <em>Ridderzaal</em>",
+"fs": 42,
+"hr": 130,
+"credit": "Beeld: Nationaal Archief / Anefo"
+},
+{
+"t": "hero",
+"f": "hero",
+"label": "DEZE WEEK TOEN",
+"title": "1986: kabinet en Badan Persatuan vieren akkoord in de Ridderzaal",
+"text": "Veertig jaar geleden kreeg de eerste generatie de Rietkerk-uitkering en een herdenkingspenning. Er kwam een banenplan voor duizend Molukkers en een museum als levend monument. Wat leverde het op, en waarom was er ook kritiek?",
+"link": "Lees Deze week toen"
+},
+{
+"t": "social",
+"f": "s1",
+"bg": "#FF7AB6",
+"h": 300,
+"l1": "27 t/m 29 nov",
+"l2": "Agenda",
+"sticker": "Dit<br>weekend",
+"sty": 60,
+"title": "Moluks in 2051, Lekransira en <em>Candy Dulfer</em>",
+"fs": 31,
+"hr": 130,
+"sub": "Acht tips van vrijdagavond tot zondag, van Nijmegen tot Middelburg.",
+"link": "Bekijk de tips"
+},
+{
+"t": "row",
+"f": "r1",
+"label": "DIT WEEKEND|TE DOEN",
+"box": "#FF7AB6",
+"title": "Moluks in 2051, Lekransira en Candy Dulfer voor de Molukken",
+"sub": "Met de afsluiting van 75 jaar Molukkers in Culemborg."
+},
+{
+"t": "social",
+"f": "s2",
+"bg": "#1F3BD1",
+"h": 300,
+"l1": "Familiegeschiedenis",
+"l2": "Leeswijzer",
+"sticker": "Drie<br>boeken",
+"sty": 60,
+"title": "Vraag naar het verhaal van je <em>familie</em>",
+"fs": 38,
+"hr": 130,
+"sub": "Met de feestdagen zit de familie samen aan tafel. Zo begin je, met drie boeken om het gesprek te starten.",
+"link": "Lees de Leeswijzer"
+},
+{
+"t": "row",
+"f": "r2",
+"label": "LEESWIJZER",
+"title": "Straks samen aan tafel: vraag naar het verhaal van je familie",
+"sub": "Gesloten koffers, Wie zijn mijn voorouders en Onder de sneeuw een Indisch graf."
+},
+{
+"t": "split",
+"f": "x0",
+"img": "kaart.jpg",
+"pos": "62% 45%",
+"tag": "Bandazee",
+"label": "KAART VAN DE WEEK",
+"title": "Twee stevige <em>bevingen</em> in vijf dagen",
+"sub": "Eerst bij Kei, toen bij Romang. Allebei diep onder de zee: daardoor kwam er boven minder kracht aan.",
+"credit": "Beeld: MOZA.nu",
+"sh": "#1F3BD1"
+},
+{
+"t": "row",
+"f": "r3",
+"label": "WOORD VAN|DE WEEK",
+"box": "#E9F25A",
+"title": "Rapat: als de Molukse gemeenschap samen om tafel gaat",
+"sub": "Met de uitspraak om te beluisteren."
+},
+{
+"t": "row",
+"f": "r4",
+"label": "PEILING",
+"title": "Wat moet er in het onderzoek naar 75 jaar Molukkers? Doe nog mee",
+"sub": "De peiling loopt tot en met 6 december."
+},
+{
+"t": "split",
+"f": "x1",
+"hole": true,
+"tag": "Den Haag",
+"label": "NIEUWS",
+"title": "Papoea's vragen Jetten om <em>erkenning</em>",
+"sub": "Maandag praten Papoea's met premier Jetten over de rol van Nederland in West Papua. Dezelfde dag neemt Thomas Sohilait vijf Molukse jongeren mee.",
+"sh": "#E9F25A"
+},
+{
+"t": "split",
+"f": "x2",
+"hole": true,
+"rev": true,
+"tag": "Ambon",
+"label": "NIEUWS UIT MALUKU",
+"title": "Jongeren eisen <em>vrijlating</em>",
+"sub": "Bij de 22e Aksi Kamisan in Ambon kwamen jongeren op voor vier mannen uit Tananahu op Seram. Onze correspondent was erbij.",
+"credit": "Beeld: Elnino Fofid",
+"sh": "#FF7AB6"
+},
+{
+"t": "split",
+"f": "x3",
+"hole": true,
+"tag": "Docuserie",
+"label": "TV DRENTHE",
+"title": "Leeft het verhaal nog bij de <em>vierde generatie?</em>",
+"sub": "Vanaf vandaag zendt TV Drenthe Dekat di Hati van Willem Hully uit. Elke donderdag een nieuwe aflevering.",
+"credit": "Beeld: TV Drenthe",
+"sh": "#1F3BD1"
+},
+{
+"t": "split",
+"f": "x4",
+"hole": true,
+"rev": true,
+"tag": "Sasi",
+"label": "VAN DE REDACTIE",
+"title": "Geen <em>Black Friday</em> bij MOZA.nu",
+"sub": "Snel en veel kopen past niet bij ons. Onze cultuur kent juist sasi: de natuur rust geven tot er weer genoeg is.",
+"sh": "#E9F25A"
+},
+{
+"t": "pop",
+"f": "p1",
+"n": 1,
+"title": "400.000 Nederlanders hebben diabetes zonder het te weten, bij Molukkers komt de ziekte vaker voor"
+},
+{
+"t": "pop",
+"f": "p2",
+"n": 2,
+"title": "Jongeren in Ambon eisen vrijlating van vier mannen uit Tananahu"
+},
+{
+"t": "pop",
+"f": "p3",
+"n": 3,
+"title": "Mantelzorgers bij dementie lopen op hun tandvlees: wat betekent dat voor Molukse families?"
+},
+{
+"t": "stand",
+"f": "stand",
+"text": "MOZA.nu wordt gemaakt voor en door Molukkers en is afhankelijk van donaties. Dit jaar kregen we € 312 aan losse giften en hebben we 6 vrienden. We zoeken minimaal 100 donateurs die ons willen steunen. Maak MOZA.nu mogelijk en doneer."
+},
+{
+"t": "ev",
+"f": "e1",
+"day": "1",
+"mon": "DEC",
+"wd": "DINSDAG",
+"cat": "DANS",
+"title": "Draagkracht van Cheroney Pelupessy",
+"where": "20:30 · Theater Bellevue, Amsterdam"
+},
+{
+"t": "ev",
+"f": "e2",
+"day": "5",
+"mon": "DEC",
+"wd": "ZATERDAG",
+"cat": "BOEK & DANS",
+"title": "Presentatie Tasilo Pieck met Dansgroep Pusaka",
+"where": "11:00 · Wijkcentrum St. Joseph, Hilversum"
+},
+{
+"t": "ev",
+"f": "e3",
+"day": "6",
+"mon": "DEC",
+"wd": "ZONDAG",
+"cat": "MUZIEK",
+"title": "Lekransira: Julya Lo'ko",
+"where": "20:30 · De Vorstin, Hilversum"
+},
+{
+"t": "kb",
+"f": "k1",
+"bg": "#E9F25A",
+"dot": "rgba(0,0,0,.16)",
+"label": "KENNISBANK · NIEUW",
+"icon": "<svg width='56' height='56' viewBox='0 0 24 24' fill='none' stroke='#111' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><path d='M21 12a8 8 0 0 1-11.5 7.2L4 21l1.8-5.2A8 8 0 1 1 21 12z'/></svg>",
+"title": "Moluks Maleis en Bahasa Indonesia",
+"text": "Allebei komen ze uit het Maleis, maar het zijn twee aparte talen. Moluks Maleis is de taal van thuis en de straat, Bahasa Indonesia die van school en overheid.",
+"link": "Lees het artikel"
+},
+{
+"t": "kb",
+"f": "k2",
+"bg": "#FF7AB6",
+"dot": "rgba(0,0,0,.16)",
+"label": "KENNISBANK · NIEUW",
+"icon": "<svg width='56' height='56' viewBox='0 0 24 24' fill='none' stroke='#111' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><rect x='5' y='3' width='14' height='18' rx='1'/><circle cx='12' cy='10' r='3'/><path d='M9 16h6'/></svg>",
+"title": "Familie uitnodigen naar Nederland",
+"text": "Je familielid vraagt zelf een Schengenvisum aan in Indonesië. Jij helpt vanuit Nederland met logies en soms een garantstelling.",
+"link": "Lees hoe het visum werkt"
+}
+]
