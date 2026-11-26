@@ -3776,7 +3776,7 @@ html.mzr body .sqs-html-content ul.mzr-tl>li{padding-left:28px!important;text-in
     if(key==='dwt'){
       var first=kids[0];
       if(first&&first.tagName==='P'&&isOnly(first,'strong')){var bd=parseNL(txt(first));hin.appendChild(el('div','mzr-big',esc(txt(first))));first.classList.add('mzr-hide');
-        if(bd&&pd){var y=pd.getFullYear()-bd.getFullYear();var same=bd.getMonth()===pd.getMonth()&&bd.getDate()===pd.getDate();var n=y<=12?WOORD[y]:String(y);hin.appendChild(el('div','mzr-sub',same?('vandaag precies '+n+' jaar geleden'):('deze week '+n+' jaar geleden')));}}
+        if(bd&&pd){var y=pd.getFullYear()-bd.getFullYear();var same=bd.getMonth()===pd.getMonth()&&bd.getDate()===pd.getDate();var n=y<=12?WOORD[y]:String(y);var dd=Math.round((new Date(pd.getFullYear(),pd.getMonth(),pd.getDate())-new Date(pd.getFullYear(),bd.getMonth(),bd.getDate()))/864e5);hin.appendChild(el('div','mzr-sub',same?('vandaag precies '+n+' jaar geleden'):(dd>0&&dd<7?('deze week '+n+' jaar geleden'):(n+' jaar geleden'))));}}
       hin.appendChild(el('div','mzr-title',esc(title)));
     } else if(key==='dw'){
       var m=/^(.*?)\s*\(([^)]+)\)\s*$/.exec(title);
