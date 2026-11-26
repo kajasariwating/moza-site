@@ -1,8 +1,12 @@
 {
-  "uitleg": "Donatieteller op moza.nu. basis = alle donaties in 2026 tot en met 18 november (opgave Kaja). handmatig = giften via bunq.me of de bank na 18 november: tel ze hier bij. start = voorraad per variant van het donatieproduct en van Vriend van MOZA.nu op 18 november; niet wijzigen. laatste = datum (UTC) en regio (provincie, of het land bij een gift uit het buitenland) van de laatste gift via de site; wordt elk uur automatisch bijgewerkt. Nooit plaats, naam, mail of adres. laatste_los en laatste_vriend = hetzelfde, maar apart voor een losse donatie en voor een nieuwe Vriend van MOZA.nu. vriend_extra = losse giften via de site van € 20 of meer sinds 18 november (bedrag in euro en aantal giften): die tellen op de site mee als Vriend van MOZA.nu en gaan van de losse donaties af; wordt elk uur automatisch bijgewerkt.",
+  "uitleg": "Donatieteller op moza.nu. basis = alle donaties in 2026 tot en met 18 november (opgave Kaja). handmatig = giften via bunq.me of de bank na 18 november: tel ze hier bij. start = voorraad per variant van het donatieproduct en van Vriend van MOZA.nu op 18 november; niet wijzigen. laatste = datum (UTC) en regio (provincie, of het land bij een gift uit het buitenland) van de laatste gift via de site; wordt elk uur automatisch bijgewerkt. Nooit plaats, naam, mail of adres. laatste_los en laatste_vriend = hetzelfde, maar apart voor een losse donatie en voor een nieuwe Vriend van MOZA.nu. vriend_extra = losse giften via de site van € 20 of meer sinds 18 november (bedrag in euro en aantal giften): die tellen op de site mee als Vriend van MOZA.nu en gaan van de losse donaties af; wordt elk uur automatisch bijgewerkt. vriend_handmatig = giften via bunq.me of de bank van € 20 of meer sinds 18 november (bedrag en aantal): die tellen ook als Vriend van MOZA.nu. Ze zitten al in handmatig en zijn bij vriend_extra opgeteld (vriend_extra = site + vriend_handmatig).",
   "jaar": 2026,
   "basis": 277,
   "handmatig": 105,
+  "vriend_handmatig": {
+    "bedrag": 90,
+    "aantal": 3
+  },
   "start": 100000,
   "laatste": {
     "datum": "2026-11-26T09:07:19Z",
@@ -17,7 +21,7 @@
     "regio": "Noord-Brabant"
   },
   "vriend_extra": {
-    "bedrag": 90,
-    "aantal": 3
+    "bedrag": 180,
+    "aantal": 6
   }
 }
