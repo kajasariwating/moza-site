@@ -5,19 +5,19 @@
   "handmatig": 55,
   "start": 100000,
   "laatste": {
-    "datum": "2026-11-26T07:34:16Z",
-    "regio": "Limburg"
+    "datum": "2026-11-26T09:07:19Z",
+    "regio": "Noord-Brabant"
   },
   "laatste_los": {
     "datum": "2026-11-20T06:44:12Z",
     "regio": "Limburg"
   },
   "laatste_vriend": {
-    "datum": "2026-11-26T07:34:16Z",
-    "regio": "Limburg"
+    "datum": "2026-11-26T09:07:19Z",
+    "regio": "Noord-Brabant"
   },
   "vriend_extra": {
-    "bedrag": 70,
-    "aantal": 2
+    "bedrag": 90,
+    "aantal": 3
   }
 }
